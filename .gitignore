@@ -1,2 +1,27 @@
 #licenced
 documents/papers
+documents/presentation
+documents/manual
+
+#claude
+CLAUDE.md
+AGENTS.md
+
+#system
+*/@eaDir
+@eaDir
+
+#large files
+software/data_dcase
+software/datasets
+
+#old
+software/src_references
+
+#cache
+.DS_Store
+__pycache__/
+*.pyc
+.Xil/
+.claude/
+hardware/vivado/build/
