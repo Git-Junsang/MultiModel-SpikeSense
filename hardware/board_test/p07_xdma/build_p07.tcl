@@ -80,8 +80,14 @@ add_files -norecurse [make_wrapper -files $bdf -top]
 # ---- VIO ----
 create_ip -name vio -vendor xilinx.com -library ip -module_name vio_p07
 set_property -dict [list \
-    CONFIG.C_NUM_PROBE_IN   {4} \
-    CONFIG.C_NUM_PROBE_OUT  {0} \
+    CONFIG.C_NUM_PROBE_IN   {6} \
+    CONFIG.C_PROBE_IN4_WIDTH {14} \
+    CONFIG.C_PROBE_IN5_WIDTH {14} \
+    CONFIG.C_NUM_PROBE_OUT  {2} \
+    CONFIG.C_PROBE_OUT0_WIDTH {1} \
+    CONFIG.C_PROBE_OUT0_INIT_VAL {0x0} \
+    CONFIG.C_PROBE_OUT1_WIDTH {1} \
+    CONFIG.C_PROBE_OUT1_INIT_VAL {0x0} \
     CONFIG.C_EN_PROBE_IN_ACTIVITY {0} \
     CONFIG.C_PROBE_IN0_WIDTH {1} \
     CONFIG.C_PROBE_IN1_WIDTH {1} \

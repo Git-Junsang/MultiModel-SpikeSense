@@ -28,7 +28,8 @@ create_clock -name pcie_refclk -period 10.000 [get_ports pcie_refclk_p]
 # set_property LOC GTPE2_CHANNEL_X0Y6 [get_cells -hierarchical -filter {NAME =~ *gtp_channel.gtpe2_channel_i && NAME =~ *pipe_lane[1]*}]
 
 ## ---- PERST# (Host 슬롯 리셋, Active-Low) ----
-## 매뉴얼 Figure 3-4-1에 PCIE_PERST 신호는 있으나 FPGA 핀 번호가 표에 없다.
-## [미확인] ALINX 예제 설계 또는 캐리어보드 회로도로 핀을 확인한 뒤 채운다(P0.7).
-# set_property -dict { PACKAGE_PIN ??? IOSTANDARD LVCMOS33 PULLUP true } [get_ports pcie_perst_n]
-# set_false_path -from [get_ports pcie_perst_n]
+## 매뉴얼 Figure 3-4-1에 신호만 있고 핀 번호가 없어, 2026-09-23 보드 시험으로 확정했다.
+## 방법: 주변장치에 배정되지 않은 3.3 V 핀 14개를 풀다운 입력으로 받아 "Low였던 적"을
+## 래치하고 Host를 재부팅했다. L16(B15_L23_P)만 Low로 떨어졌다 High로 돌아왔다.
+set_property -dict { PACKAGE_PIN L16 IOSTANDARD LVCMOS33 PULLUP true } [get_ports pcie_perst_n]
+set_false_path -from [get_ports pcie_perst_n]

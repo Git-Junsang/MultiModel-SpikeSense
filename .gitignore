@@ -1,7 +1,9 @@
-#licenced
-documents/papers
-documents/presentation
-documents/manual
+# licensed
+documents/papers/*
+!documents/papers/summaries/
+!documents/papers/summaries/**
+documents/presentation/
+documents/manual/
 
 #claude
 CLAUDE.md
@@ -12,8 +14,7 @@ AGENTS.md
 @eaDir
 
 #large files
-software/data_dcase
-software/datasets
+software/data
 
 #old
 software/src_references

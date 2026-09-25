@@ -1,0 +1,15 @@
+{
+  "machine": "pump",
+  "mid": "04",
+  "method": "supervised",
+  "epochs": 60,
+  "batch_size": 512,
+  "lr": 0.002,
+  "sched": "cosine",
+  "mask_p": 0.5,
+  "clip_loss": true,
+  "hop": 16,
+  "val_frac": 0.1,
+  "seed": 42,
+  "out_dir": "/mnt/nas/data/2026-CAU/\uc911\uc559\ub300\ud559\uad50 \ud559\ubd80\uc5f0\uad6c\uc0dd/Project/MultiModel-SpikeSense/software/runs/all40/pump_id04"
+}

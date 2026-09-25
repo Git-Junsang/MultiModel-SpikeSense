@@ -1,11 +1,11 @@
 # 할 일 리스트 — Phase·Task
 
-작성일: 2026-09-22 | 개정: r4 (2026-09-23, 출력 2클래스·DCASE 확정 반영)
+작성일: 2026-09-22 | 개정: r6 (2026-09-25, P1.5 완료 반영)
 
 ## 머리말
 
 - **기준 문서**: [2026-09-17 중간보고](<../presentation/다중 모델, 다중 트랙 실시간 SNN 추론 가속기_중간보고_26.09.17.pptx>) 슬라이드 16(연구 진행 계획), [PROPOSAL.md](PROPOSAL.md) §6(연구 진행 계획)·§9(미정 사항)
-- **현재 상태** (2026-09-23): P0.1~P0.4, P1.1, P1.3 완료. P0.5는 bitstream 생성까지(`hardware/board_test/p05_blink/`), 보드 점멸 확인 기록은 아직 없다. P0.6(MIG)·P0.7(XDMA)은 빌드 스크립트만 작성했고 실행 전. P1.4 진행 중: 8출력 구조로 40대 학습 1회 완료(결과 `software/runs/archive_8out_results.csv`, 가중치는 재학습 때 덮어써져 없음), 현재 2출력(`40→384→256→64→2`)으로 40대 재학습 중(`software/runs/all40/`, 로그 `software/runs/train_all.log`). RTL·호스트 코드는 아직 없다.
+- **현재 상태** (2026-09-25): Phase 0(P0.1~P0.8) 완료. P1.1~P1.5 완료. P0.5~P0.7 보드 확인 완료(2026-09-23): LED 설계·DDR3 MIG·PCIe Gen2 ×2 XDMA DMA 왕복. PCIe PERST#는 L16으로 확정했다. P1.4 완료: 2출력(`40→384→256→64→2`) 40대 학습, 파일 단위 ROC-AUC 평균 0.9563(제외 장비를 slider_id06 → fan_id00으로 교체한 뒤 값. 41대 전부 기준 0.9510). P0.8: NumPy FP32 순전파가 40대 모두 PyTorch와 판정·AUC 일치. P1.5: 선행 방식 INT8(층별 대칭, β Q0.8) + 16 bit 막전위 포화 채택, AUC 평균 0.9563 → 0.9554. RTL·호스트 코드는 아직 없다.
 - **진행 방식**: 트랙을 나누지 않고 ID 순서대로 진행한다. **Phase 0(FPGA·서버 점검, 개발 환경)이 1순위**다. 날짜와 소요 기간은 정하지 않는다.
 - **표기**: ID `Pp.n`에서 p는 Phase, n은 순서다. `선행`에 적힌 task가 끝나야 시작한다. 완료한 task는 `[x]`로 바꾸고 산출물 위치를 적는다.
 - **수치 구분**: 2.0 GB/s, 32레인 @ 100 MHz, 709.375 KiB 가용분은 가정·계산값이다. 실측으로 확인하기 전에는 결과로 쓰지 않는다.
@@ -20,10 +20,10 @@
 | [x] | P0.2 | 툴체인 점검: Vivado 2026.1(`/tools/Xilinx/2026.1`) 라이선스와 XC7A200T-2FBG484I 파트 지원, `xvlog`·`xelab`·`xsim`, Verilator 실행 | 빈 설계 합성 성공, 최소 testbench xsim 실행, Verilator lint 실행 → [ENVIRONMENT.md](ENVIRONMENT.md) §3 | —         |
 | [x] | P0.3 | 보드 연결 환경: 보드를 꽂을 Host PC(PCIe 슬롯·OS) 확정, JTAG 케이블·드라이버 설치, Hardware Manager 인식                                  | Hardware Manager에서 XC7A200T 인식 → [ENVIRONMENT.md](ENVIRONMENT.md) §4. Host `sdsl-llm`(Ubuntu 24.04), PCIe 슬롯 장착·슬롯 전원. Host Vivado BASIC 라이선스 설치, 로컬 JTAG 인식 | P0.2       |
 | [x] | P0.4 | [보드 매뉴얼](../manual/AX7A200_User_Manual.pdf) 기반 기본 XDC(시스템 클럭·LED·키·DDR3·PCIe 핀)와 Vivado 프로젝트 생성 스크립트          | 저장소의 XDC와 Tcl 스크립트, 스크립트로 프로젝트 재생성 가능 → `hardware/constraints/ax7a200b_*.xdc`, `hardware/vivado/create_project.tcl`, [ENVIRONMENT.md](ENVIRONMENT.md) §5. PCIe PERST#·팬 핀은 미확인 | P0.2       |
-| [ ] | P0.5 | LED 점멸 설계로 bitstream 생성·다운로드                                                                                                    | 보드에서 LED 점멸 확인. 진행: `hardware/board_test/p05_blink/` 설계·testbench·빌드 스크립트, bitstream 생성. 보드 확인 기록 없음 | P0.3, P0.4 |
-| [ ] | P0.6 | MIG DDR3 예제 설계 생성, 보드에서 메모리 테스트                                                                                             | 캘리브레이션 완료·테스트 통과, MIG 설정값 기록                  | P0.5       |
-| [ ] | P0.7 | PCIe Gen2 ×2 XDMA 예제로 Host 링크 확인과 DMA 왕복                                                                                         | `lspci`에서 링크 폭·속도 확인, Host↔FPGA 데이터 왕복 일치    | P0.5       |
-| [ ] | P0.8 | 저장소 디렉터리 골격(`software/`, `hardware/`, `sim/`)을 정하고 선행 `software/test_model_numpy.py` 재현                            | 디렉터리 구조 확정, 선행 NumPy 순전파 재현 결과                  | P0.1       |
+| [x] | P0.5 | LED 점멸 설계로 bitstream 생성·다운로드                                                                                                    | 보드에서 동작 확인(2026-09-23). LED는 볼 수 없어 JTAG(VIO)로 확인: 연산 결과 `0x13E5E51C`(=333,833,500) 일치, 사이클 카운터로 약 200 MHz, LED 구동값 순환. 물리 LED 배선은 미확인 → `hardware/board_test/p05_blink/`, [ENVIRONMENT.md](ENVIRONMENT.md) §6 | P0.3, P0.4 |
+| [x] | P0.6 | MIG DDR3 예제 설계 생성, 보드에서 메모리 테스트                                                                                             | 보드 확인(2026-09-23): `init_calib_complete=1`, 360초 동안 `tg_compare_error=0`. 검사 범위는 예제 기본값인 앞쪽 16 MiB → `hardware/board_test/p06_mig/`(prj·빌드 스크립트·탑), [ENVIRONMENT.md](ENVIRONMENT.md) §6 | P0.5       |
+| [x] | P0.7 | PCIe Gen2 ×2 XDMA 예제로 Host 링크 확인과 DMA 왕복                                                                                         | 보드 확인(2026-09-23): `lspci` `10ee:7022`, LnkSta **5 GT/s ×2**, 64 KiB DMA 왕복 10/10 일치. PERST#=L16 확정 → `hardware/board_test/p07_xdma/`, `hardware/board_test/host/`, [ENVIRONMENT.md](ENVIRONMENT.md) §6 | P0.5       |
+| [x] | P0.8 | 저장소 디렉터리 골격(`software/`, `hardware/`)을 정하고 선행 `software/test_model_numpy.py` 재현 | [P0.8 리포트](<../reports/P0.8 Research Report.md>). 골격 확정: `software/`(model_develop·analysis_develop·analysis_data·model_weights·data, [README](../../software/README.md)), `hardware/`(src·testbench·sim·constraints·vivado·board_test, [README](../../hardware/README.md)). 시뮬레이션 폴더는 루트 `sim/` 대신 `hardware/sim/`. 선행 INT8 NumPy 순전파를 선행 골든 벡터와 비트 일치로 재현. 새 모델 FP32 NumPy 순전파(`software/model_develop/snn_numpy.py`)를 40대 test 세트에서 PyTorch와 비교: 판정 불일치 129,792개 중 1개, AUC 40대 소수 4자리 일치, 스파이크 차이 200개/28.4억은 모두 임계값 근처 FP32 반올림 → `software/analysis_develop/check_numpy_fp.py`, 결과 `software/analysis_develop/numpy_fp/` | P0.1       |
 
 **완료 판정**: 보드(JTAG)·DDR3·PCIe·학습 서버·시뮬레이터가 모두 동작한다.
 
@@ -31,11 +31,11 @@
 
 |     | ID   | 작업                                                                                            | 완료 조건(산출물)                              | 선행       |
 | --- | ---- | ----------------------------------------------------------------------------------------------- | ---------------------------------------------- | ---------- |
-| [x] | P1.1 | 데이터 확보 방안 결정, 출력 라벨 정의 | **DCASE 2020 Task 2 확정**(개발·추가 학습·평가 세트 + `eval_data_list.csv`, wav 54,254개, 17 GB) → `software/datasets/dcase2020_task2/`. 기계 ID 41개 확인. 출력은 2클래스(정상/이상) | P0.8       |
-| [ ] | P1.2 | 기계 ID 41개 중 40개 선정, 트랙↔모델 매핑 초안, 이상 샘플 학습 방식(같은 기종 다른 ID의 정상을 가짜 이상으로 사용) 결정                                                  | 모델 40개 구성표, 매핑 초안. 진행: 40대 선정(slider id_06 제외) → `software/src/dcase_data.py`. 매핑 초안은 미작성 | P1.1       |
-| [x] | P1.3 | `40→384→256→64→2` PLIF-T 모델 구현(선행 `snn_model.py` 확장). 가중치 층 4개, 뉴런 706개 | 모델 코드, 파라미터 수 130,176 확인 → `software/src/snn_model.py`. 가중치 130,176·뉴런 706 확인, 선행 구조(`40→128→32→2`) 설정 시 선행 모델과 출력 일치 | P0.8       |
-| [ ] | P1.4 | 개인 서버에서 40개 모델 학습                                                                    | 학습된 모델 40개, 모델별 정확도 기록. 진행: 배치·에포크 결정(512, 60, 코사인) → `software/runs/fan_id00/REPORT.md`. 8출력 40대 결과 `software/runs/archive_8out_results.csv`, 2출력 40대 학습 중 → `software/runs/all40/` | P1.2, P1.3 |
-| [ ] | P1.5 | INT8 양자화와 FP 대비 정확도 비교(선행`compare_quant.py` 참고)                                | 모델별 INT8 정확도·저하폭                     | P1.4       |
+| [x] | P1.1 | 데이터 확보 방안 결정, 출력 라벨 정의 | [P1.1~1.2 리포트](<../reports/P1.1~1.2 Research Report.md>). **DCASE 2020 Task 2 확정**(개발·추가 학습·평가 세트 + `eval_data_list.csv`, wav 54,254개, 17 GB) → `software/data/dataset_dcase/`. 기계 ID 41개 확인. 출력은 2클래스(정상/이상) | P0.8       |
+| [x] | P1.2 | 기계 ID 41개 중 40개 선정, 트랙↔모델 매핑 초안, 이상 샘플 학습 방식 결정                                                  | 모델 40개 구성표, 매핑 초안. 진행: 40대 선정(fan id_00 제외) → `software/model_develop/dcase_data.py`. 가짜 이상(다른 ID 정상)은 실제 이상 탐지에 실패해 폐기하고 지도학습을 채택했다. 매핑 초안 3안(U 균등·S 편중·D 희소) → [P1.1~1.2 리포트](<../reports/P1.1~1.2 Research Report.md>) §5.3 | P1.1       |
+| [x] | P1.3 | `40→384→256→64→2` PLIF-T 모델 구현(선행 `snn_model.py` 확장). 가중치 층 4개, 뉴런 706개 | [P1.3~1.4 리포트](<../reports/P1.3~1.4 Research Report.md>). 모델 코드 → `software/model_develop/snn_model.py`. 가중치 130,176·뉴런 706·PLIF 파라미터 1,412 확인. 선행 구조(`40→128→32→2`) 설정 시 선행 모델과 순전파 출력 3종·역전파 기울기가 비트 단위 일치(`verify_reference.py`). 뉴런 갱신 규칙은 `plift_core.v`와 동일하게 유지 | P0.8       |
+| [x] | P1.4 | 개인 서버에서 40개 모델 학습                                                                    | **40대 학습 완료**(RTX 3090 Ti 독점, 85.2분, 장비당 128초). 파일 단위 ROC-AUC 평균 0.9563, 0.9 이상 35대, 0.8 미만 0대, 최저 0.8175(ToyCar_id05). 41대 중 제외 장비를 slider_id06(AUC 0.998) → fan_id00(0.738)으로 교체했다. 평가 결과를 보고 고른 교체이므로 41대 전부 기준 평균 0.9510도 함께 기록한다. 배치 512·에포크 60·코사인의 근거와 학습 방식·결과 → `software/analysis_data/REPORT.md`, 표 `results.csv`, 가중치 `software/model_weights/<장비>/last.pth` | P1.2, P1.3 |
+| [x] | P1.5 | INT8 양자화와 FP 대비 정확도 비교(선행`compare_quant.py` 참고)                                | [P1.5 리포트](<../reports/P1.5 Research Report.md>). **선행 방식 채택**(가중치 층별 대칭 INT8, β Q0.8, 임계값 uint8, 누설 내림) + **16 bit 막전위 포화 가산** 추가. 후보 7개(뉴런별 스케일·β Q0.12·누설 반올림) 간 평균 AUC 차이 0.0006 이내라 하드웨어가 단순한 쪽을 골랐다. 40대 파일 AUC 평균 0.9563 → 0.9554(−0.0009, 장비별 −0.0116~+0.0090), 판정 일치 96.5%, 16 bit 넘침 0회(L3 최대 17,093 = 52.2%). 선행 INT8 가중치로 선행 골든과 비트 일치. RTL에 넘길 폭: 층 1 누산 21 bit, 층 2 전류 17 bit. 모델당 β·임계값 1,412 B 추가(P1.6에서 저장 위치 결정) → `software/model_develop/snn_int8.py`, `software/analysis_develop/{compare_quant,quant_variants}.py`, 결과 `software/analysis_develop/quant_int8/` | P1.4       |
 | [ ] | P1.6 | 가중치 HEX/바이너리 내보내기(선행`export_weights.py` 확장), DDR3 적재 레이아웃 정의           | 모델당 130,176 B 파일 40개, 주소 레이아웃 문서 | P1.5       |
 | [ ] | P1.7 | INT8 비트 정확 NumPy 골든 참조 구현, 참조 입력·막전위·출력 벡터 생성                          | 골든 모델 코드, RTL 비교용 벡터                | P1.6       |
 

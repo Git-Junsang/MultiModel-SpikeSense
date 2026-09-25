@@ -1,0 +1,1464 @@
+====================================================================== 
+전체 40대 학습 | clip_loss=True hop=16 | 채택=마지막 에포크
+
+--- [1/40] fan_id00
+[fan_id00] method=supervised bs=512 epochs=60 sched=cosine clip_loss hop=16
+  train 정상 14760 seg, 다른 ID 풀 3294 seg, val 1820 seg, test 3040 seg
+  파일 단위 손실: 정상 820파일, 이상 183파일
+  ep   1 | train 0.7495/0.527 | val 0.1730/0.574 auc 0.578 | test AUC 0.599 pAUC 0.564 | 2.0s
+  ep  10 | train 0.1642/0.670 | val 0.2036/0.520 auc 0.598 | test AUC 0.731 pAUC 0.645 | 1.7s
+  ep  20 | train 0.1419/0.717 | val 0.3697/0.588 auc 0.667 | test AUC 0.700 pAUC 0.664 | 1.8s
+  ep  30 | train 0.1344/0.716 | val 0.2132/0.611 auc 0.650 | test AUC 0.726 pAUC 0.689 | 1.7s
+  ep  40 | train 0.1145/0.786 | val 0.2601/0.608 auc 0.678 | test AUC 0.729 pAUC 0.708 | 1.7s
+  ep  50 | train 0.1014/0.823 | val 0.3374/0.626 auc 0.669 | test AUC 0.739 pAUC 0.693 | 1.6s
+  ep  60 | train 0.0942/0.840 | val 0.4140/0.640 auc 0.665 | test AUC 0.738 pAUC 0.693 | 1.6s
+  완료 → /mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/software/runs/all40/fan_id00
+
+unit                  val_loss     val_auc    test_auc   test_pauc test_f1_bal test_acc_bal test_seg_f1 test_seg_acc test_auc_bestval
+fan_id00                0.4140      0.6645      0.7376      0.6930      0.6330      0.6515      0.6946      0.6401      0.6223
+평균                      0.4140      0.6645      0.7376      0.6930      0.6330      0.6515      0.6946      0.6401      0.6223
+
+--- [2/40] fan_id01
+[fan_id01] method=supervised bs=512 epochs=60 sched=cosine clip_loss hop=16
+  train 정상 15138 seg, 다른 ID 풀 2646 seg, val 1860 seg, test 2630 seg
+  파일 단위 손실: 정상 841파일, 이상 147파일
+  ep   1 | train 0.9026/0.549 | val 0.2015/0.508 auc 0.520 | test AUC 0.546 pAUC 0.533 | 1.7s
+  ep  10 | train 0.0852/0.864 | val 0.1490/0.796 auc 0.965 | test AUC 0.967 pAUC 0.954 | 1.6s
+  ep  20 | train 0.0327/0.955 | val 0.2415/0.863 auc 0.973 | test AUC 0.988 pAUC 0.962 | 1.9s
+  ep  30 | train 0.0165/0.979 | val 0.2536/0.891 auc 0.973 | test AUC 0.990 pAUC 0.972 | 1.8s
+  ep  40 | train 0.0055/0.992 | val 0.1867/0.917 auc 0.979 | test AUC 0.989 pAUC 0.980 | 1.7s
+  ep  50 | train 0.0016/0.999 | val 0.1950/0.926 auc 0.983 | test AUC 0.984 pAUC 0.976 | 1.8s
+  ep  60 | train 0.0012/0.998 | val 0.1860/0.923 auc 0.983 | test AUC 0.985 pAUC 0.975 | 1.7s
+  완료 → /mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/software/runs/all40/fan_id01
+
+unit                  val_loss     val_auc    test_auc   test_pauc test_f1_bal test_acc_bal test_seg_f1 test_seg_acc test_auc_bestval
+fan_id00                0.4140      0.6645      0.7376      0.6930      0.6330      0.6515      0.6946      0.6401      0.6223
+fan_id01                0.1860      0.9832      0.9848      0.9755      0.9234      0.9265      0.9278      0.9148      0.9740
+평균                      0.3000      0.8238      0.8612      0.8342      0.7782      0.7890      0.8112      0.7774      0.7981
+
+--- [3/40] fan_id02
+[fan_id02] method=supervised bs=512 epochs=60 sched=cosine clip_loss hop=16
+  train 정상 14832 seg, 다른 ID 풀 2898 seg, val 1840 seg, test 2800 seg
+  파일 단위 손실: 정상 824파일, 이상 161파일
+  ep   1 | train 0.8534/0.523 | val 0.1750/0.520 auc 0.533 | test AUC 0.523 pAUC 0.505 | 1.8s
+  ep  10 | train 0.0625/0.909 | val 0.2425/0.834 auc 0.898 | test AUC 0.948 pAUC 0.876 | 1.6s
+  ep  20 | train 0.0409/0.946 | val 0.3186/0.836 auc 0.916 | test AUC 0.963 pAUC 0.916 | 1.6s
+  ep  30 | train 0.0222/0.966 | val 0.4776/0.848 auc 0.916 | test AUC 0.969 pAUC 0.923 | 1.6s
+  ep  40 | train 0.0146/0.979 | val 0.6214/0.839 auc 0.923 | test AUC 0.971 pAUC 0.934 | 1.8s
+  ep  50 | train 0.0051/0.993 | val 0.7059/0.848 auc 0.921 | test AUC 0.973 pAUC 0.937 | 1.7s
+  ep  60 | train 0.0025/0.998 | val 0.6474/0.851 auc 0.926 | test AUC 0.971 pAUC 0.932 | 1.8s
+  완료 → /mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/software/runs/all40/fan_id02
+
+unit                  val_loss     val_auc    test_auc   test_pauc test_f1_bal test_acc_bal test_seg_f1 test_seg_acc test_auc_bestval
+fan_id00                0.4140      0.6645      0.7376      0.6930      0.6330      0.6515      0.6946      0.6401      0.6223
+fan_id01                0.1860      0.9832      0.9848      0.9755      0.9234      0.9265      0.9278      0.9148      0.9740
+fan_id02                0.6474      0.9257      0.9712      0.9316      0.8868      0.8935      0.8976      0.8775      0.7849
+평균                      0.4158      0.8578      0.8979      0.8667      0.8144      0.8238      0.8400      0.8108      0.7937
+
+--- [4/40] fan_id03
+[fan_id03] method=supervised bs=512 epochs=60 sched=cosine clip_loss hop=16
+  train 정상 14778 seg, 다른 ID 풀 2898 seg, val 1820 seg, test 2790 seg
+  파일 단위 손실: 정상 821파일, 이상 161파일
+  ep   1 | train 0.7932/0.607 | val 0.2994/0.674 auc 0.770 | test AUC 0.918 pAUC 0.872 | 1.5s
+  ep  10 | train 0.0737/0.874 | val 0.0860/0.880 auc 0.961 | test AUC 0.977 pAUC 0.961 | 1.5s
+  ep  20 | train 0.0426/0.940 | val 0.0836/0.923 auc 0.983 | test AUC 0.977 pAUC 0.930 | 1.6s
+  ep  30 | train 0.0142/0.981 | val 0.1112/0.945 auc 0.986 | test AUC 0.984 pAUC 0.950 | 1.6s
+  ep  40 | train 0.0072/0.993 | val 0.1541/0.939 auc 0.988 | test AUC 0.986 pAUC 0.958 | 1.5s
+  ep  50 | train 0.0037/0.996 | val 0.1494/0.928 auc 0.985 | test AUC 0.987 pAUC 0.967 | 1.6s
+  ep  60 | train 0.0020/0.999 | val 0.1474/0.936 auc 0.986 | test AUC 0.986 pAUC 0.958 | 1.5s
+  완료 → /mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/software/runs/all40/fan_id03
+
+unit                  val_loss     val_auc    test_auc   test_pauc test_f1_bal test_acc_bal test_seg_f1 test_seg_acc test_auc_bestval
+fan_id00                0.4140      0.6645      0.7376      0.6930      0.6330      0.6515      0.6946      0.6401      0.6223
+fan_id01                0.1860      0.9832      0.9848      0.9755      0.9234      0.9265      0.9278      0.9148      0.9740
+fan_id02                0.6474      0.9257      0.9712      0.9316      0.8868      0.8935      0.8976      0.8775      0.7849
+fan_id03                0.1474      0.9861      0.9859      0.9582      0.9246      0.9260      0.9375      0.9222      0.9880
+평균                      0.3487      0.8899      0.9199      0.8896      0.8419      0.8494      0.8644      0.8387      0.8423
+
+--- [5/40] fan_id04
+[fan_id04] method=supervised bs=512 epochs=60 sched=cosine clip_loss hop=16
+  train 정상 15120 seg, 다른 ID 풀 2826 seg, val 1860 seg, test 2740 seg
+  파일 단위 손실: 정상 840파일, 이상 157파일
+  ep   1 | train 0.9552/0.541 | val 0.1742/0.488 auc 0.555 | test AUC 0.566 pAUC 0.506 | 1.5s
+  ep  10 | train 0.1313/0.766 | val 0.1610/0.760 auc 0.838 | test AUC 0.844 pAUC 0.686 | 1.8s
+  ep  20 | train 0.1040/0.842 | val 0.1886/0.807 auc 0.876 | test AUC 0.943 pAUC 0.814 | 1.6s
+  ep  30 | train 0.0656/0.892 | val 0.1909/0.813 auc 0.897 | test AUC 0.961 pAUC 0.880 | 1.9s
+  ep  40 | train 0.0442/0.930 | val 0.2103/0.832 auc 0.915 | test AUC 0.971 pAUC 0.918 | 1.5s
+  ep  50 | train 0.0270/0.966 | val 0.2397/0.837 auc 0.911 | test AUC 0.977 pAUC 0.933 | 1.8s
+  ep  60 | train 0.0218/0.977 | val 0.2613/0.838 auc 0.913 | test AUC 0.978 pAUC 0.938 | 2.0s
+  완료 → /mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/software/runs/all40/fan_id04
+
+unit                  val_loss     val_auc    test_auc   test_pauc test_f1_bal test_acc_bal test_seg_f1 test_seg_acc test_auc_bestval
+fan_id00                0.4140      0.6645      0.7376      0.6930      0.6330      0.6515      0.6946      0.6401      0.6223
+fan_id01                0.1860      0.9832      0.9848      0.9755      0.9234      0.9265      0.9278      0.9148      0.9740
+fan_id02                0.6474      0.9257      0.9712      0.9316      0.8868      0.8935      0.8976      0.8775      0.7849
+fan_id03                0.1474      0.9861      0.9859      0.9582      0.9246      0.9260      0.9375      0.9222      0.9880
+fan_id04                0.2613      0.9133      0.9783      0.9383      0.8192      0.8345      0.8364      0.8131      0.8971
+평균                      0.3312      0.8946      0.9316      0.8993      0.8374      0.8464      0.8588      0.8335      0.8533
+
+--- [6/40] fan_id05
+[fan_id05] method=supervised bs=512 epochs=60 sched=cosine clip_loss hop=16
+  train 정상 16200 seg, 다른 ID 풀 2826 seg, val 2000 seg, test 2840 seg
+  파일 단위 손실: 정상 900파일, 이상 157파일
+  ep   1 | train 0.7131/0.664 | val 0.1450/0.710 auc 0.771 | test AUC 0.833 pAUC 0.828 | 1.7s
+  ep  10 | train 0.0381/0.944 | val 0.2889/0.849 auc 0.955 | test AUC 0.973 pAUC 0.925 | 1.7s
+  ep  20 | train 0.0377/0.947 | val 0.1860/0.920 auc 0.965 | test AUC 0.977 pAUC 0.964 | 1.6s
+  ep  30 | train 0.0058/0.993 | val 0.2447/0.907 auc 0.958 | test AUC 0.975 pAUC 0.969 | 1.6s
+  ep  40 | train 0.0027/0.997 | val 0.2552/0.920 auc 0.965 | test AUC 0.972 pAUC 0.970 | 2.0s
+  ep  50 | train 0.0012/0.998 | val 0.2461/0.923 auc 0.976 | test AUC 0.974 pAUC 0.970 | 1.7s
+  ep  60 | train 0.0004/1.000 | val 0.2603/0.927 auc 0.976 | test AUC 0.976 pAUC 0.969 | 1.6s
+  완료 → /mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/software/runs/all40/fan_id05
+
+unit                  val_loss     val_auc    test_auc   test_pauc test_f1_bal test_acc_bal test_seg_f1 test_seg_acc test_auc_bestval
+fan_id00                0.4140      0.6645      0.7376      0.6930      0.6330      0.6515      0.6946      0.6401      0.6223
+fan_id01                0.1860      0.9832      0.9848      0.9755      0.9234      0.9265      0.9278      0.9148      0.9740
+fan_id02                0.6474      0.9257      0.9712      0.9316      0.8868      0.8935      0.8976      0.8775      0.7849
+fan_id03                0.1474      0.9861      0.9859      0.9582      0.9246      0.9260      0.9375      0.9222      0.9880
+fan_id04                0.2613      0.9133      0.9783      0.9383      0.8192      0.8345      0.8364      0.8131      0.8971
+fan_id05                0.2603      0.9764      0.9759      0.9693      0.9302      0.9321      0.9366      0.9246      0.9750
+평균                      0.3194      0.9082      0.9390      0.9110      0.8529      0.8607      0.8718      0.8487      0.8735
+
+--- [7/40] fan_id06
+[fan_id06] method=supervised bs=512 epochs=60 sched=cosine clip_loss hop=16
+  train 정상 14814 seg, 다른 ID 풀 2916 seg, val 1840 seg, test 2810 seg
+  파일 단위 손실: 정상 823파일, 이상 162파일
+  ep   1 | train 0.9201/0.711 | val 0.1778/0.780 auc 0.919 | test AUC 0.864 pAUC 0.658 | 2.0s
+  ep  10 | train 0.0053/0.993 | val 0.0654/0.947 auc 0.994 | test AUC 0.996 pAUC 0.993 | 1.6s
+  ep  20 | train 0.0010/0.999 | val 0.0531/0.967 auc 0.998 | test AUC 0.998 pAUC 0.994 | 1.6s
+  ep  30 | train 0.0003/1.000 | val 0.0471/0.966 auc 0.999 | test AUC 0.999 pAUC 0.994 | 1.6s
+  ep  40 | train 0.0000/1.000 | val 0.0484/0.970 auc 0.999 | test AUC 0.999 pAUC 0.996 | 1.6s
+  ep  50 | train 0.0001/1.000 | val 0.0410/0.968 auc 0.999 | test AUC 0.999 pAUC 0.997 | 1.4s
+  ep  60 | train 0.0000/1.000 | val 0.0561/0.965 auc 0.999 | test AUC 0.999 pAUC 0.996 | 1.5s
+  완료 → /mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/software/runs/all40/fan_id06
+
+unit                  val_loss     val_auc    test_auc   test_pauc test_f1_bal test_acc_bal test_seg_f1 test_seg_acc test_auc_bestval
+fan_id00                0.4140      0.6645      0.7376      0.6930      0.6330      0.6515      0.6946      0.6401      0.6223
+fan_id01                0.1860      0.9832      0.9848      0.9755      0.9234      0.9265      0.9278      0.9148      0.9740
+fan_id02                0.6474      0.9257      0.9712      0.9316      0.8868      0.8935      0.8976      0.8775      0.7849
+fan_id03                0.1474      0.9861      0.9859      0.9582      0.9246      0.9260      0.9375      0.9222      0.9880
+fan_id04                0.2613      0.9133      0.9783      0.9383      0.8192      0.8345      0.8364      0.8131      0.8971
+fan_id05                0.2603      0.9764      0.9759      0.9693      0.9302      0.9321      0.9366      0.9246      0.9750
+fan_id06                0.0561      0.9993      0.9992      0.9956      0.9777      0.9780      0.9784      0.9726      0.9992
+평균                      0.2818      0.9212      0.9476      0.9231      0.8707      0.8774      0.8870      0.8664      0.8915
+
+--- [8/40] pump_id00
+[pump_id00] method=supervised bs=512 epochs=60 sched=cosine clip_loss hop=16
+  train 정상 14670 seg, 다른 ID 풀 1152 seg, val 1820 seg, test 1720 seg
+  파일 단위 손실: 정상 815파일, 이상 64파일
+  ep   1 | train 0.8120/0.655 | val 1.3873/0.539 auc 0.733 | test AUC 0.724 pAUC 0.725 | 1.5s
+  ep  10 | train 0.0724/0.879 | val 0.9374/0.553 auc 0.577 | test AUC 0.819 pAUC 0.789 | 1.5s
+  ep  20 | train 0.0591/0.898 | val 0.4125/0.791 auc 0.814 | test AUC 0.853 pAUC 0.806 | 1.4s
+  ep  30 | train 0.0304/0.953 | val 0.9752/0.614 auc 0.725 | test AUC 0.877 pAUC 0.857 | 1.5s
+  ep  40 | train 0.0178/0.979 | val 1.0454/0.666 auc 0.760 | test AUC 0.881 pAUC 0.879 | 1.4s
+  ep  50 | train 0.0090/0.986 | val 1.2680/0.686 auc 0.742 | test AUC 0.891 pAUC 0.878 | 1.5s
+  ep  60 | train 0.0081/0.991 | val 1.2800/0.687 auc 0.748 | test AUC 0.885 pAUC 0.881 | 1.4s
+  완료 → /mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/software/runs/all40/pump_id00
+
+unit                  val_loss     val_auc    test_auc   test_pauc test_f1_bal test_acc_bal test_seg_f1 test_seg_acc test_auc_bestval
+fan_id00                0.4140      0.6645      0.7376      0.6930      0.6330      0.6515      0.6946      0.6401      0.6223
+fan_id01                0.1860      0.9832      0.9848      0.9755      0.9234      0.9265      0.9278      0.9148      0.9740
+fan_id02                0.6474      0.9257      0.9712      0.9316      0.8868      0.8935      0.8976      0.8775      0.7849
+fan_id03                0.1474      0.9861      0.9859      0.9582      0.9246      0.9260      0.9375      0.9222      0.9880
+fan_id04                0.2613      0.9133      0.9783      0.9383      0.8192      0.8345      0.8364      0.8131      0.8971
+fan_id05                0.2603      0.9764      0.9759      0.9693      0.9302      0.9321      0.9366      0.9246      0.9750
+fan_id06                0.0561      0.9993      0.9992      0.9956      0.9777      0.9780      0.9784      0.9726      0.9992
+pump_id00               1.2800      0.7482      0.8849      0.8808      0.7727      0.8104      0.7688      0.8378      0.8493
+평균                      0.4066      0.8996      0.9397      0.9178      0.8585      0.8691      0.8722      0.8628      0.8862
+
+--- [9/40] pump_id01
+[pump_id01] method=supervised bs=512 epochs=60 sched=cosine clip_loss hop=16
+  train 정상 14634 seg, 다른 ID 풀 936 seg, val 1800 seg, test 1580 seg
+  파일 단위 손실: 정상 813파일, 이상 52파일
+  ep   1 | train 1.0286/0.589 | val 1.3730/0.631 auc 0.651 | test AUC 0.705 pAUC 0.626 | 1.5s
+  ep  10 | train 0.1032/0.844 | val 0.2360/0.797 auc 0.882 | test AUC 0.907 pAUC 0.787 | 1.4s
+  ep  20 | train 0.0281/0.958 | val 0.4697/0.682 auc 0.918 | test AUC 0.942 pAUC 0.893 | 1.4s
+  ep  30 | train 0.0232/0.977 | val 1.3547/0.691 auc 0.818 | test AUC 0.935 pAUC 0.838 | 1.5s
+  ep  40 | train 0.0023/0.998 | val 0.9147/0.720 auc 0.891 | test AUC 0.940 pAUC 0.893 | 1.5s
+  ep  50 | train 0.0008/0.999 | val 0.6690/0.809 auc 0.893 | test AUC 0.939 pAUC 0.884 | 1.5s
+  ep  60 | train 0.0006/1.000 | val 0.7971/0.746 auc 0.905 | test AUC 0.934 pAUC 0.886 | 1.4s
+  완료 → /mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/software/runs/all40/pump_id01
+
+unit                  val_loss     val_auc    test_auc   test_pauc test_f1_bal test_acc_bal test_seg_f1 test_seg_acc test_auc_bestval
+fan_id00                0.4140      0.6645      0.7376      0.6930      0.6330      0.6515      0.6946      0.6401      0.6223
+fan_id01                0.1860      0.9832      0.9848      0.9755      0.9234      0.9265      0.9278      0.9148      0.9740
+fan_id02                0.6474      0.9257      0.9712      0.9316      0.8868      0.8935      0.8976      0.8775      0.7849
+fan_id03                0.1474      0.9861      0.9859      0.9582      0.9246      0.9260      0.9375      0.9222      0.9880
+fan_id04                0.2613      0.9133      0.9783      0.9383      0.8192      0.8345      0.8364      0.8131      0.8971
+fan_id05                0.2603      0.9764      0.9759      0.9693      0.9302      0.9321      0.9366      0.9246      0.9750
+fan_id06                0.0561      0.9993      0.9992      0.9956      0.9777      0.9780      0.9784      0.9726      0.9992
+pump_id00               1.2800      0.7482      0.8849      0.8808      0.7727      0.8104      0.7688      0.8378      0.8493
+pump_id01               0.7971      0.9046      0.9343      0.8857      0.8008      0.8293      0.7920      0.8677      0.8710
+평균                      0.4500      0.9001      0.9391      0.9142      0.8520      0.8646      0.8633      0.8634      0.8845
+
+--- [10/40] pump_id02
+[pump_id02] method=supervised bs=512 epochs=60 sched=cosine clip_loss hop=16
+  train 정상 14670 seg, 다른 ID 풀 882 seg, val 1800 seg, test 1560 seg
+  파일 단위 손실: 정상 815파일, 이상 49파일
+  ep   1 | train 0.9250/0.691 | val 0.5099/0.637 auc 0.714 | test AUC 0.829 pAUC 0.734 | 1.6s
+  ep  10 | train 0.1060/0.888 | val 0.1726/0.788 auc 0.920 | test AUC 0.960 pAUC 0.921 | 1.8s
+  ep  20 | train 0.0046/0.994 | val 0.4016/0.792 auc 0.955 | test AUC 0.993 pAUC 0.967 | 5.4s
+  ep  30 | train 0.0034/0.996 | val 0.7968/0.788 auc 0.962 | test AUC 0.992 pAUC 0.976 | 1.4s
+  ep  40 | train 0.0014/0.999 | val 0.3597/0.846 auc 0.968 | test AUC 0.989 pAUC 0.972 | 1.6s
+  ep  50 | train 0.0003/1.000 | val 0.3044/0.886 auc 0.971 | test AUC 0.991 pAUC 0.977 | 1.6s
+  ep  60 | train 0.0003/1.000 | val 0.3668/0.871 auc 0.971 | test AUC 0.991 pAUC 0.974 | 1.5s
+  완료 → /mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/software/runs/all40/pump_id02
+
+unit                  val_loss     val_auc    test_auc   test_pauc test_f1_bal test_acc_bal test_seg_f1 test_seg_acc test_auc_bestval
+fan_id00                0.4140      0.6645      0.7376      0.6930      0.6330      0.6515      0.6946      0.6401      0.6223
+fan_id01                0.1860      0.9832      0.9848      0.9755      0.9234      0.9265      0.9278      0.9148      0.9740
+fan_id02                0.6474      0.9257      0.9712      0.9316      0.8868      0.8935      0.8976      0.8775      0.7849
+fan_id03                0.1474      0.9861      0.9859      0.9582      0.9246      0.9260      0.9375      0.9222      0.9880
+fan_id04                0.2613      0.9133      0.9783      0.9383      0.8192      0.8345      0.8364      0.8131      0.8971
+fan_id05                0.2603      0.9764      0.9759      0.9693      0.9302      0.9321      0.9366      0.9246      0.9750
+fan_id06                0.0561      0.9993      0.9992      0.9956      0.9777      0.9780      0.9784      0.9726      0.9992
+pump_id00               1.2800      0.7482      0.8849      0.8808      0.7727      0.8104      0.7688      0.8378      0.8493
+pump_id01               0.7971      0.9046      0.9343      0.8857      0.8008      0.8293      0.7920      0.8677      0.8710
+pump_id02               0.3668      0.9709      0.9909      0.9737      0.9355      0.9384      0.9285      0.9506      0.9896
+평균                      0.4416      0.9072      0.9443      0.9202      0.8604      0.8720      0.8698      0.8721      0.8950
+
+--- [11/40] pump_id03
+[pump_id03] method=supervised bs=512 epochs=60 sched=cosine clip_loss hop=16
+  train 정상 9810 seg, 다른 ID 풀 900 seg, val 1220 seg, test 1570 seg
+  파일 단위 손실: 정상 545파일, 이상 50파일
+  ep   1 | train 1.3989/0.625 | val 0.1698/0.682 auc 0.724 | test AUC 0.837 pAUC 0.703 | 1.0s
+  ep  10 | train 0.0768/0.916 | val 0.1401/0.789 auc 0.830 | test AUC 0.932 pAUC 0.890 | 1.0s
+  ep  20 | train 0.0089/0.987 | val 0.4890/0.775 auc 0.847 | test AUC 0.937 pAUC 0.890 | 1.0s
+  ep  30 | train 0.0088/0.988 | val 0.6286/0.721 auc 0.845 | test AUC 0.924 pAUC 0.880 | 1.1s
+  ep  40 | train 0.0036/0.994 | val 0.7117/0.713 auc 0.913 | test AUC 0.905 pAUC 0.875 | 1.0s
+  ep  50 | train 0.0004/1.000 | val 0.5188/0.796 auc 0.946 | test AUC 0.928 pAUC 0.886 | 1.0s
+  ep  60 | train 0.0004/1.000 | val 0.5221/0.784 auc 0.944 | test AUC 0.928 pAUC 0.877 | 1.0s
+  완료 → /mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/software/runs/all40/pump_id03
+
+unit                  val_loss     val_auc    test_auc   test_pauc test_f1_bal test_acc_bal test_seg_f1 test_seg_acc test_auc_bestval
+fan_id00                0.4140      0.6645      0.7376      0.6930      0.6330      0.6515      0.6946      0.6401      0.6223
+fan_id01                0.1860      0.9832      0.9848      0.9755      0.9234      0.9265      0.9278      0.9148      0.9740
+fan_id02                0.6474      0.9257      0.9712      0.9316      0.8868      0.8935      0.8976      0.8775      0.7849
+fan_id03                0.1474      0.9861      0.9859      0.9582      0.9246      0.9260      0.9375      0.9222      0.9880
+fan_id04                0.2613      0.9133      0.9783      0.9383      0.8192      0.8345      0.8364      0.8131      0.8971
+fan_id05                0.2603      0.9764      0.9759      0.9693      0.9302      0.9321      0.9366      0.9246      0.9750
+fan_id06                0.0561      0.9993      0.9992      0.9956      0.9777      0.9780      0.9784      0.9726      0.9992
+pump_id00               1.2800      0.7482      0.8849      0.8808      0.7727      0.8104      0.7688      0.8378      0.8493
+pump_id01               0.7971      0.9046      0.9343      0.8857      0.8008      0.8293      0.7920      0.8677      0.8710
+pump_id02               0.3668      0.9709      0.9909      0.9737      0.9355      0.9384      0.9285      0.9506      0.9896
+pump_id03               0.5221      0.9435      0.9282      0.8772      0.8144      0.8412      0.8045      0.8771      0.9318
+평균                      0.4490      0.9105      0.9428      0.9163      0.8562      0.8692      0.8639      0.8726      0.8984
+
+--- [12/40] pump_id04
+[pump_id04] method=supervised bs=512 epochs=60 sched=cosine clip_loss hop=16
+  train 정상 9756 seg, 다른 ID 풀 810 seg, val 1200 seg, test 1500 seg
+  파일 단위 손실: 정상 542파일, 이상 45파일
+  ep   1 | train 1.2692/0.769 | val 0.0248/0.973 auc 0.997 | test AUC 0.993 pAUC 0.964 | 0.9s
+  ep  10 | train 0.0013/0.999 | val 0.0132/0.989 auc 1.000 | test AUC 0.990 pAUC 0.989 | 1.0s
+  ep  20 | train 0.0002/1.000 | val 0.0245/0.988 auc 1.000 | test AUC 1.000 pAUC 1.000 | 0.9s
+  ep  30 | train 0.0000/1.000 | val 0.0273/0.991 auc 1.000 | test AUC 1.000 pAUC 1.000 | 1.0s
+  ep  40 | train 0.0001/1.000 | val 0.0330/0.987 auc 1.000 | test AUC 1.000 pAUC 1.000 | 1.0s
+  ep  50 | train 0.0000/1.000 | val 0.0405/0.988 auc 1.000 | test AUC 1.000 pAUC 1.000 | 1.0s
+  ep  60 | train 0.0000/1.000 | val 0.0389/0.988 auc 1.000 | test AUC 1.000 pAUC 1.000 | 1.0s
+  완료 → /mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/software/runs/all40/pump_id04
+
+unit                  val_loss     val_auc    test_auc   test_pauc test_f1_bal test_acc_bal test_seg_f1 test_seg_acc test_auc_bestval
+fan_id00                0.4140      0.6645      0.7376      0.6930      0.6330      0.6515      0.6946      0.6401      0.6223
+fan_id01                0.1860      0.9832      0.9848      0.9755      0.9234      0.9265      0.9278      0.9148      0.9740
+fan_id02                0.6474      0.9257      0.9712      0.9316      0.8868      0.8935      0.8976      0.8775      0.7849
+fan_id03                0.1474      0.9861      0.9859      0.9582      0.9246      0.9260      0.9375      0.9222      0.9880
+fan_id04                0.2613      0.9133      0.9783      0.9383      0.8192      0.8345      0.8364      0.8131      0.8971
+fan_id05                0.2603      0.9764      0.9759      0.9693      0.9302      0.9321      0.9366      0.9246      0.9750
+fan_id06                0.0561      0.9993      0.9992      0.9956      0.9777      0.9780      0.9784      0.9726      0.9992
+pump_id00               1.2800      0.7482      0.8849      0.8808      0.7727      0.8104      0.7688      0.8378      0.8493
+pump_id01               0.7971      0.9046      0.9343      0.8857      0.8008      0.8293      0.7920      0.8677      0.8710
+pump_id02               0.3668      0.9709      0.9909      0.9737      0.9355      0.9384      0.9285      0.9506      0.9896
+pump_id03               0.5221      0.9435      0.9282      0.8772      0.8144      0.8412      0.8045      0.8771      0.9318
+pump_id04               0.0389      1.0000      1.0000      1.0000      0.9817      0.9820      0.9807      0.9873      1.0000
+평균                      0.4148      0.9180      0.9476      0.9232      0.8667      0.8786      0.8736      0.8821      0.9068
+
+--- [13/40] pump_id05
+[pump_id05] method=supervised bs=512 epochs=60 sched=cosine clip_loss hop=16
+  train 정상 14706 seg, 다른 ID 풀 2016 seg, val 1820 seg, test 2240 seg
+  파일 단위 손실: 정상 817파일, 이상 112파일
+  ep   1 | train 0.8197/0.657 | val 0.3020/0.549 auc 0.688 | test AUC 0.835 pAUC 0.632 | 1.5s
+  ep  10 | train 0.0701/0.894 | val 0.1595/0.848 auc 0.964 | test AUC 0.934 pAUC 0.824 | 1.5s
+  ep  20 | train 0.0730/0.914 | val 0.0475/0.953 auc 0.993 | test AUC 0.969 pAUC 0.889 | 1.5s
+  ep  30 | train 0.0326/0.952 | val 0.0975/0.932 auc 0.993 | test AUC 0.968 pAUC 0.902 | 2.3s
+  ep  40 | train 0.0112/0.983 | val 0.0216/0.983 auc 0.998 | test AUC 0.965 pAUC 0.875 | 1.5s
+  ep  50 | train 0.0042/0.996 | val 0.0932/0.955 auc 0.997 | test AUC 0.968 pAUC 0.891 | 1.6s
+  ep  60 | train 0.0029/0.998 | val 0.0531/0.974 auc 0.998 | test AUC 0.971 pAUC 0.898 | 1.5s
+  완료 → /mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/software/runs/all40/pump_id05
+
+unit                  val_loss     val_auc    test_auc   test_pauc test_f1_bal test_acc_bal test_seg_f1 test_seg_acc test_auc_bestval
+fan_id00                0.4140      0.6645      0.7376      0.6930      0.6330      0.6515      0.6946      0.6401      0.6223
+fan_id01                0.1860      0.9832      0.9848      0.9755      0.9234      0.9265      0.9278      0.9148      0.9740
+fan_id02                0.6474      0.9257      0.9712      0.9316      0.8868      0.8935      0.8976      0.8775      0.7849
+fan_id03                0.1474      0.9861      0.9859      0.9582      0.9246      0.9260      0.9375      0.9222      0.9880
+fan_id04                0.2613      0.9133      0.9783      0.9383      0.8192      0.8345      0.8364      0.8131      0.8971
+fan_id05                0.2603      0.9764      0.9759      0.9693      0.9302      0.9321      0.9366      0.9246      0.9750
+fan_id06                0.0561      0.9993      0.9992      0.9956      0.9777      0.9780      0.9784      0.9726      0.9992
+pump_id00               1.2800      0.7482      0.8849      0.8808      0.7727      0.8104      0.7688      0.8378      0.8493
+pump_id01               0.7971      0.9046      0.9343      0.8857      0.8008      0.8293      0.7920      0.8677      0.8710
+pump_id02               0.3668      0.9709      0.9909      0.9737      0.9355      0.9384      0.9285      0.9506      0.9896
+pump_id03               0.5221      0.9435      0.9282      0.8772      0.8144      0.8412      0.8045      0.8771      0.9318
+pump_id04               0.0389      1.0000      1.0000      1.0000      0.9817      0.9820      0.9807      0.9873      1.0000
+pump_id05               0.0531      0.9980      0.9709      0.8981      0.8669      0.8770      0.8725      0.8701      0.9642
+평균                      0.3870      0.9241      0.9494      0.9213      0.8667      0.8785      0.8735      0.8812      0.9113
+
+--- [14/40] pump_id06
+[pump_id06] method=supervised bs=512 epochs=60 sched=cosine clip_loss hop=16
+  train 정상 15156 seg, 다른 ID 풀 828 seg, val 1880 seg, test 1510 seg
+  파일 단위 손실: 정상 842파일, 이상 46파일
+  ep   1 | train 0.8411/0.652 | val 0.1429/0.754 auc 0.820 | test AUC 0.738 pAUC 0.545 | 1.5s
+  ep  10 | train 0.0597/0.917 | val 0.2128/0.855 auc 0.946 | test AUC 0.917 pAUC 0.859 | 1.5s
+  ep  20 | train 0.0258/0.965 | val 0.2776/0.870 auc 0.940 | test AUC 0.914 pAUC 0.826 | 1.6s
+  ep  30 | train 0.0148/0.982 | val 0.3392/0.890 auc 0.947 | test AUC 0.926 pAUC 0.874 | 1.8s
+  ep  40 | train 0.0050/0.995 | val 0.6639/0.860 auc 0.942 | test AUC 0.920 pAUC 0.838 | 1.8s
+  ep  50 | train 0.0028/0.997 | val 0.8175/0.868 auc 0.934 | test AUC 0.926 pAUC 0.900 | 1.5s
+  ep  60 | train 0.0016/0.999 | val 1.1283/0.837 auc 0.926 | test AUC 0.925 pAUC 0.870 | 1.5s
+  완료 → /mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/software/runs/all40/pump_id06
+
+unit                  val_loss     val_auc    test_auc   test_pauc test_f1_bal test_acc_bal test_seg_f1 test_seg_acc test_auc_bestval
+fan_id00                0.4140      0.6645      0.7376      0.6930      0.6330      0.6515      0.6946      0.6401      0.6223
+fan_id01                0.1860      0.9832      0.9848      0.9755      0.9234      0.9265      0.9278      0.9148      0.9740
+fan_id02                0.6474      0.9257      0.9712      0.9316      0.8868      0.8935      0.8976      0.8775      0.7849
+fan_id03                0.1474      0.9861      0.9859      0.9582      0.9246      0.9260      0.9375      0.9222      0.9880
+fan_id04                0.2613      0.9133      0.9783      0.9383      0.8192      0.8345      0.8364      0.8131      0.8971
+fan_id05                0.2603      0.9764      0.9759      0.9693      0.9302      0.9321      0.9366      0.9246      0.9750
+fan_id06                0.0561      0.9993      0.9992      0.9956      0.9777      0.9780      0.9784      0.9726      0.9992
+pump_id00               1.2800      0.7482      0.8849      0.8808      0.7727      0.8104      0.7688      0.8378      0.8493
+pump_id01               0.7971      0.9046      0.9343      0.8857      0.8008      0.8293      0.7920      0.8677      0.8710
+pump_id02               0.3668      0.9709      0.9909      0.9737      0.9355      0.9384      0.9285      0.9506      0.9896
+pump_id03               0.5221      0.9435      0.9282      0.8772      0.8144      0.8412      0.8045      0.8771      0.9318
+pump_id04               0.0389      1.0000      1.0000      1.0000      0.9817      0.9820      0.9807      0.9873      1.0000
+pump_id05               0.0531      0.9980      0.9709      0.8981      0.8669      0.8770      0.8725      0.8701      0.9642
+pump_id06               1.1283      0.9259      0.9247      0.8700      0.7719      0.8059      0.7614      0.8609      0.7380
+평균                      0.4399      0.9243      0.9476      0.9176      0.8599      0.8733      0.8655      0.8797      0.8989
+
+--- [15/40] slider_id00
+[slider_id00] method=supervised bs=512 epochs=60 sched=cosine clip_loss hop=16
+  train 정상 15678 seg, 다른 ID 풀 2880 seg, val 1940 seg, test 2780 seg
+  파일 단위 손실: 정상 871파일, 이상 160파일
+  ep   1 | train 0.6511/0.830 | val 0.5588/0.751 auc 0.927 | test AUC 0.977 pAUC 0.896 | 1.9s
+  ep  10 | train 0.0148/0.986 | val 0.2332/0.945 auc 0.969 | test AUC 0.999 pAUC 0.996 | 1.5s
+  ep  20 | train 0.0187/0.982 | val 0.2117/0.961 auc 0.986 | test AUC 0.999 pAUC 0.996 | 1.6s
+  ep  30 | train 0.0018/0.998 | val 0.2051/0.929 auc 0.967 | test AUC 0.999 pAUC 0.996 | 1.6s
+  ep  40 | train 0.0001/1.000 | val 0.1835/0.920 auc 0.979 | test AUC 0.999 pAUC 0.997 | 1.6s
+  ep  50 | train 0.0001/1.000 | val 0.2116/0.937 auc 0.974 | test AUC 0.998 pAUC 0.997 | 1.5s
+  ep  60 | train 0.0001/1.000 | val 0.2287/0.942 auc 0.972 | test AUC 0.998 pAUC 0.996 | 1.6s
+  완료 → /mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/software/runs/all40/slider_id00
+
+unit                  val_loss     val_auc    test_auc   test_pauc test_f1_bal test_acc_bal test_seg_f1 test_seg_acc test_auc_bestval
+fan_id00                0.4140      0.6645      0.7376      0.6930      0.6330      0.6515      0.6946      0.6401      0.6223
+fan_id01                0.1860      0.9832      0.9848      0.9755      0.9234      0.9265      0.9278      0.9148      0.9740
+fan_id02                0.6474      0.9257      0.9712      0.9316      0.8868      0.8935      0.8976      0.8775      0.7849
+fan_id03                0.1474      0.9861      0.9859      0.9582      0.9246      0.9260      0.9375      0.9222      0.9880
+fan_id04                0.2613      0.9133      0.9783      0.9383      0.8192      0.8345      0.8364      0.8131      0.8971
+fan_id05                0.2603      0.9764      0.9759      0.9693      0.9302      0.9321      0.9366      0.9246      0.9750
+fan_id06                0.0561      0.9993      0.9992      0.9956      0.9777      0.9780      0.9784      0.9726      0.9992
+pump_id00               1.2800      0.7482      0.8849      0.8808      0.7727      0.8104      0.7688      0.8378      0.8493
+pump_id01               0.7971      0.9046      0.9343      0.8857      0.8008      0.8293      0.7920      0.8677      0.8710
+pump_id02               0.3668      0.9709      0.9909      0.9737      0.9355      0.9384      0.9285      0.9506      0.9896
+pump_id03               0.5221      0.9435      0.9282      0.8772      0.8144      0.8412      0.8045      0.8771      0.9318
+pump_id04               0.0389      1.0000      1.0000      1.0000      0.9817      0.9820      0.9807      0.9873      1.0000
+pump_id05               0.0531      0.9980      0.9709      0.8981      0.8669      0.8770      0.8725      0.8701      0.9642
+pump_id06               1.1283      0.9259      0.9247      0.8700      0.7719      0.8059      0.7614      0.8609      0.7380
+slider_id00             0.2287      0.9719      0.9979      0.9965      0.9411      0.9440      0.9401      0.9273      0.9987
+평균                      0.4258      0.9274      0.9510      0.9229      0.8653      0.8780      0.8705      0.8829      0.9055
+
+--- [16/40] slider_id01
+[slider_id01] method=supervised bs=512 epochs=60 sched=cosine clip_loss hop=16
+  train 정상 15678 seg, 다른 ID 풀 1440 seg, val 1940 seg, test 1890 seg
+  파일 단위 손실: 정상 871파일, 이상 80파일
+  ep   1 | train 0.8154/0.692 | val 0.2565/0.782 auc 0.856 | test AUC 0.893 pAUC 0.653 | 1.6s
+  ep  10 | train 0.0320/0.963 | val 0.2757/0.877 auc 0.920 | test AUC 0.956 pAUC 0.782 | 1.5s
+  ep  20 | train 0.0177/0.983 | val 0.3309/0.879 auc 0.912 | test AUC 0.975 pAUC 0.883 | 1.5s
+  ep  30 | train 0.0067/0.992 | val 0.3497/0.855 auc 0.900 | test AUC 0.983 pAUC 0.927 | 1.6s
+  ep  40 | train 0.0042/0.995 | val 0.3927/0.863 auc 0.930 | test AUC 0.984 pAUC 0.931 | 1.5s
+  ep  50 | train 0.0012/0.999 | val 0.2965/0.891 auc 0.966 | test AUC 0.989 pAUC 0.940 | 1.6s
+  ep  60 | train 0.0015/0.998 | val 0.3166/0.874 auc 0.957 | test AUC 0.986 pAUC 0.937 | 1.6s
+  완료 → /mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/software/runs/all40/slider_id01
+
+unit                  val_loss     val_auc    test_auc   test_pauc test_f1_bal test_acc_bal test_seg_f1 test_seg_acc test_auc_bestval
+fan_id00                0.4140      0.6645      0.7376      0.6930      0.6330      0.6515      0.6946      0.6401      0.6223
+fan_id01                0.1860      0.9832      0.9848      0.9755      0.9234      0.9265      0.9278      0.9148      0.9740
+fan_id02                0.6474      0.9257      0.9712      0.9316      0.8868      0.8935      0.8976      0.8775      0.7849
+fan_id03                0.1474      0.9861      0.9859      0.9582      0.9246      0.9260      0.9375      0.9222      0.9880
+fan_id04                0.2613      0.9133      0.9783      0.9383      0.8192      0.8345      0.8364      0.8131      0.8971
+fan_id05                0.2603      0.9764      0.9759      0.9693      0.9302      0.9321      0.9366      0.9246      0.9750
+fan_id06                0.0561      0.9993      0.9992      0.9956      0.9777      0.9780      0.9784      0.9726      0.9992
+pump_id00               1.2800      0.7482      0.8849      0.8808      0.7727      0.8104      0.7688      0.8378      0.8493
+pump_id01               0.7971      0.9046      0.9343      0.8857      0.8008      0.8293      0.7920      0.8677      0.8710
+pump_id02               0.3668      0.9709      0.9909      0.9737      0.9355      0.9384      0.9285      0.9506      0.9896
+pump_id03               0.5221      0.9435      0.9282      0.8772      0.8144      0.8412      0.8045      0.8771      0.9318
+pump_id04               0.0389      1.0000      1.0000      1.0000      0.9817      0.9820      0.9807      0.9873      1.0000
+pump_id05               0.0531      0.9980      0.9709      0.8981      0.8669      0.8770      0.8725      0.8701      0.9642
+pump_id06               1.1283      0.9259      0.9247      0.8700      0.7719      0.8059      0.7614      0.8609      0.7380
+slider_id00             0.2287      0.9719      0.9979      0.9965      0.9411      0.9440      0.9401      0.9273      0.9987
+slider_id01             0.3166      0.9574      0.9861      0.9367      0.8602      0.8736      0.8575      0.8783      0.9457
+평균                      0.4190      0.9293      0.9532      0.9238      0.8650      0.8777      0.8697      0.8826      0.9080
+
+--- [17/40] slider_id02
+[slider_id02] method=supervised bs=512 epochs=60 sched=cosine clip_loss hop=16
+  train 정상 15678 seg, 다른 ID 풀 2160 seg, val 1940 seg, test 2340 seg
+  파일 단위 손실: 정상 871파일, 이상 120파일
+  ep   1 | train 0.6183/0.704 | val 0.1039/0.794 auc 0.885 | test AUC 0.862 pAUC 0.783 | 1.8s
+  ep  10 | train 0.0699/0.901 | val 0.1261/0.819 auc 0.937 | test AUC 0.955 pAUC 0.921 | 1.8s
+  ep  20 | train 0.0398/0.944 | val 0.6226/0.820 auc 0.946 | test AUC 0.959 pAUC 0.885 | 1.6s
+  ep  30 | train 0.0238/0.967 | val 0.5437/0.852 auc 0.951 | test AUC 0.931 pAUC 0.856 | 1.7s
+  ep  40 | train 0.0098/0.989 | val 0.4067/0.848 auc 0.955 | test AUC 0.937 pAUC 0.883 | 1.6s
+  ep  50 | train 0.0046/0.993 | val 0.6050/0.847 auc 0.955 | test AUC 0.938 pAUC 0.867 | 1.6s
+  ep  60 | train 0.0019/0.998 | val 0.6722/0.853 auc 0.955 | test AUC 0.940 pAUC 0.868 | 1.6s
+  완료 → /mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/software/runs/all40/slider_id02
+
+unit                  val_loss     val_auc    test_auc   test_pauc test_f1_bal test_acc_bal test_seg_f1 test_seg_acc test_auc_bestval
+fan_id00                0.4140      0.6645      0.7376      0.6930      0.6330      0.6515      0.6946      0.6401      0.6223
+fan_id01                0.1860      0.9832      0.9848      0.9755      0.9234      0.9265      0.9278      0.9148      0.9740
+fan_id02                0.6474      0.9257      0.9712      0.9316      0.8868      0.8935      0.8976      0.8775      0.7849
+fan_id03                0.1474      0.9861      0.9859      0.9582      0.9246      0.9260      0.9375      0.9222      0.9880
+fan_id04                0.2613      0.9133      0.9783      0.9383      0.8192      0.8345      0.8364      0.8131      0.8971
+fan_id05                0.2603      0.9764      0.9759      0.9693      0.9302      0.9321      0.9366      0.9246      0.9750
+fan_id06                0.0561      0.9993      0.9992      0.9956      0.9777      0.9780      0.9784      0.9726      0.9992
+pump_id00               1.2800      0.7482      0.8849      0.8808      0.7727      0.8104      0.7688      0.8378      0.8493
+pump_id01               0.7971      0.9046      0.9343      0.8857      0.8008      0.8293      0.7920      0.8677      0.8710
+pump_id02               0.3668      0.9709      0.9909      0.9737      0.9355      0.9384      0.9285      0.9506      0.9896
+pump_id03               0.5221      0.9435      0.9282      0.8772      0.8144      0.8412      0.8045      0.8771      0.9318
+pump_id04               0.0389      1.0000      1.0000      1.0000      0.9817      0.9820      0.9807      0.9873      1.0000
+pump_id05               0.0531      0.9980      0.9709      0.8981      0.8669      0.8770      0.8725      0.8701      0.9642
+pump_id06               1.1283      0.9259      0.9247      0.8700      0.7719      0.8059      0.7614      0.8609      0.7380
+slider_id00             0.2287      0.9719      0.9979      0.9965      0.9411      0.9440      0.9401      0.9273      0.9987
+slider_id01             0.3166      0.9574      0.9861      0.9367      0.8602      0.8736      0.8575      0.8783      0.9457
+slider_id02             0.6722      0.9548      0.9397      0.8676      0.8313      0.8190      0.8578      0.8303      0.9490
+평균                      0.4339      0.9308      0.9524      0.9205      0.8630      0.8743      0.8690      0.8795      0.9105
+
+--- [18/40] slider_id03
+[slider_id03] method=supervised bs=512 epochs=60 sched=cosine clip_loss hop=16
+  train 정상 15678 seg, 다른 ID 풀 1440 seg, val 1940 seg, test 1890 seg
+  파일 단위 손실: 정상 871파일, 이상 80파일
+  ep   1 | train 0.8117/0.546 | val 0.1365/0.822 auc 0.870 | test AUC 0.726 pAUC 0.542 | 1.7s
+  ep  10 | train 0.1194/0.818 | val 0.1841/0.806 auc 0.869 | test AUC 0.920 pAUC 0.710 | 1.6s
+  ep  20 | train 0.0613/0.900 | val 0.2170/0.870 auc 0.924 | test AUC 0.949 pAUC 0.884 | 2.1s
+  ep  30 | train 0.0665/0.906 | val 0.3391/0.863 auc 0.919 | test AUC 0.925 pAUC 0.853 | 1.7s
+  ep  40 | train 0.0128/0.983 | val 0.3647/0.887 auc 0.931 | test AUC 0.928 pAUC 0.881 | 1.6s
+  ep  50 | train 0.0042/0.996 | val 0.5144/0.874 auc 0.927 | test AUC 0.925 pAUC 0.892 | 1.5s
+  ep  60 | train 0.0035/0.997 | val 0.4822/0.899 auc 0.932 | test AUC 0.926 pAUC 0.902 | 1.6s
+  완료 → /mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/software/runs/all40/slider_id03
+
+unit                  val_loss     val_auc    test_auc   test_pauc test_f1_bal test_acc_bal test_seg_f1 test_seg_acc test_auc_bestval
+fan_id00                0.4140      0.6645      0.7376      0.6930      0.6330      0.6515      0.6946      0.6401      0.6223
+fan_id01                0.1860      0.9832      0.9848      0.9755      0.9234      0.9265      0.9278      0.9148      0.9740
+fan_id02                0.6474      0.9257      0.9712      0.9316      0.8868      0.8935      0.8976      0.8775      0.7849
+fan_id03                0.1474      0.9861      0.9859      0.9582      0.9246      0.9260      0.9375      0.9222      0.9880
+fan_id04                0.2613      0.9133      0.9783      0.9383      0.8192      0.8345      0.8364      0.8131      0.8971
+fan_id05                0.2603      0.9764      0.9759      0.9693      0.9302      0.9321      0.9366      0.9246      0.9750
+fan_id06                0.0561      0.9993      0.9992      0.9956      0.9777      0.9780      0.9784      0.9726      0.9992
+pump_id00               1.2800      0.7482      0.8849      0.8808      0.7727      0.8104      0.7688      0.8378      0.8493
+pump_id01               0.7971      0.9046      0.9343      0.8857      0.8008      0.8293      0.7920      0.8677      0.8710
+pump_id02               0.3668      0.9709      0.9909      0.9737      0.9355      0.9384      0.9285      0.9506      0.9896
+pump_id03               0.5221      0.9435      0.9282      0.8772      0.8144      0.8412      0.8045      0.8771      0.9318
+pump_id04               0.0389      1.0000      1.0000      1.0000      0.9817      0.9820      0.9807      0.9873      1.0000
+pump_id05               0.0531      0.9980      0.9709      0.8981      0.8669      0.8770      0.8725      0.8701      0.9642
+pump_id06               1.1283      0.9259      0.9247      0.8700      0.7719      0.8059      0.7614      0.8609      0.7380
+slider_id00             0.2287      0.9719      0.9979      0.9965      0.9411      0.9440      0.9401      0.9273      0.9987
+slider_id01             0.3166      0.9574      0.9861      0.9367      0.8602      0.8736      0.8575      0.8783      0.9457
+slider_id02             0.6722      0.9548      0.9397      0.8676      0.8313      0.8190      0.8578      0.8303      0.9490
+slider_id03             0.4822      0.9318      0.9255      0.9018      0.7668      0.8011      0.7638      0.8095      0.9192
+평균                      0.4366      0.9309      0.9509      0.9194      0.8577      0.8702      0.8631      0.8757      0.9109
+
+--- [19/40] slider_id04
+[slider_id04] method=supervised bs=512 epochs=60 sched=cosine clip_loss hop=16
+  train 정상 7038 seg, 다른 ID 풀 1440 seg, val 860 seg, test 1890 seg
+  파일 단위 손실: 정상 391파일, 이상 80파일
+  ep   1 | train 1.3465/0.526 | val 0.2116/0.566 auc 0.668 | test AUC 0.761 pAUC 0.597 | 0.7s
+  ep  10 | train 0.0113/0.991 | val 0.0629/0.973 auc 0.990 | test AUC 1.000 pAUC 0.999 | 0.7s
+  ep  20 | train 0.0026/0.997 | val 0.0294/0.972 auc 0.997 | test AUC 1.000 pAUC 1.000 | 0.8s
+  ep  30 | train 0.0080/0.992 | val 0.0738/0.924 auc 0.994 | test AUC 1.000 pAUC 1.000 | 0.9s
+  ep  40 | train 0.0001/1.000 | val 0.0537/0.964 auc 0.993 | test AUC 1.000 pAUC 1.000 | 0.7s
+  ep  50 | train 0.0001/1.000 | val 0.0726/0.970 auc 0.990 | test AUC 1.000 pAUC 1.000 | 0.7s
+  ep  60 | train 0.0000/1.000 | val 0.0623/0.969 auc 0.992 | test AUC 1.000 pAUC 1.000 | 0.8s
+  완료 → /mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/software/runs/all40/slider_id04
+
+unit                  val_loss     val_auc    test_auc   test_pauc test_f1_bal test_acc_bal test_seg_f1 test_seg_acc test_auc_bestval
+fan_id00                0.4140      0.6645      0.7376      0.6930      0.6330      0.6515      0.6946      0.6401      0.6223
+fan_id01                0.1860      0.9832      0.9848      0.9755      0.9234      0.9265      0.9278      0.9148      0.9740
+fan_id02                0.6474      0.9257      0.9712      0.9316      0.8868      0.8935      0.8976      0.8775      0.7849
+fan_id03                0.1474      0.9861      0.9859      0.9582      0.9246      0.9260      0.9375      0.9222      0.9880
+fan_id04                0.2613      0.9133      0.9783      0.9383      0.8192      0.8345      0.8364      0.8131      0.8971
+fan_id05                0.2603      0.9764      0.9759      0.9693      0.9302      0.9321      0.9366      0.9246      0.9750
+fan_id06                0.0561      0.9993      0.9992      0.9956      0.9777      0.9780      0.9784      0.9726      0.9992
+pump_id00               1.2800      0.7482      0.8849      0.8808      0.7727      0.8104      0.7688      0.8378      0.8493
+pump_id01               0.7971      0.9046      0.9343      0.8857      0.8008      0.8293      0.7920      0.8677      0.8710
+pump_id02               0.3668      0.9709      0.9909      0.9737      0.9355      0.9384      0.9285      0.9506      0.9896
+pump_id03               0.5221      0.9435      0.9282      0.8772      0.8144      0.8412      0.8045      0.8771      0.9318
+pump_id04               0.0389      1.0000      1.0000      1.0000      0.9817      0.9820      0.9807      0.9873      1.0000
+pump_id05               0.0531      0.9980      0.9709      0.8981      0.8669      0.8770      0.8725      0.8701      0.9642
+pump_id06               1.1283      0.9259      0.9247      0.8700      0.7719      0.8059      0.7614      0.8609      0.7380
+slider_id00             0.2287      0.9719      0.9979      0.9965      0.9411      0.9440      0.9401      0.9273      0.9987
+slider_id01             0.3166      0.9574      0.9861      0.9367      0.8602      0.8736      0.8575      0.8783      0.9457
+slider_id02             0.6722      0.9548      0.9397      0.8676      0.8313      0.8190      0.8578      0.8303      0.9490
+slider_id03             0.4822      0.9318      0.9255      0.9018      0.7668      0.8011      0.7638      0.8095      0.9192
+slider_id04             0.0623      0.9922      1.0000      1.0000      0.9390      0.9416      0.9390      0.9450      0.9999
+평균                      0.4169      0.9341      0.9535      0.9237      0.8620      0.8740      0.8671      0.8793      0.9156
+
+--- [20/40] slider_id05
+[slider_id05] method=supervised bs=512 epochs=60 sched=cosine clip_loss hop=16
+  train 정상 7038 seg, 다른 ID 풀 1440 seg, val 860 seg, test 1890 seg
+  파일 단위 손실: 정상 391파일, 이상 80파일
+  ep   1 | train 1.4411/0.500 | val 0.1704/0.577 auc 0.642 | test AUC 0.618 pAUC 0.539 | 0.7s
+  ep  10 | train 0.1495/0.673 | val 0.1556/0.588 auc 0.723 | test AUC 0.900 pAUC 0.804 | 0.9s
+  ep  20 | train 0.0474/0.935 | val 0.2036/0.872 auc 0.899 | test AUC 0.972 pAUC 0.887 | 1.1s
+  ep  30 | train 0.0132/0.986 | val 0.2899/0.848 auc 0.949 | test AUC 0.987 pAUC 0.938 | 0.7s
+  ep  40 | train 0.0051/0.992 | val 0.2185/0.915 auc 0.945 | test AUC 0.988 pAUC 0.947 | 0.7s
+  ep  50 | train 0.0018/0.999 | val 0.2895/0.909 auc 0.943 | test AUC 0.990 pAUC 0.956 | 0.7s
+  ep  60 | train 0.0011/1.000 | val 0.3280/0.908 auc 0.940 | test AUC 0.989 pAUC 0.956 | 0.7s
+  완료 → /mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/software/runs/all40/slider_id05
+
+unit                  val_loss     val_auc    test_auc   test_pauc test_f1_bal test_acc_bal test_seg_f1 test_seg_acc test_auc_bestval
+fan_id00                0.4140      0.6645      0.7376      0.6930      0.6330      0.6515      0.6946      0.6401      0.6223
+fan_id01                0.1860      0.9832      0.9848      0.9755      0.9234      0.9265      0.9278      0.9148      0.9740
+fan_id02                0.6474      0.9257      0.9712      0.9316      0.8868      0.8935      0.8976      0.8775      0.7849
+fan_id03                0.1474      0.9861      0.9859      0.9582      0.9246      0.9260      0.9375      0.9222      0.9880
+fan_id04                0.2613      0.9133      0.9783      0.9383      0.8192      0.8345      0.8364      0.8131      0.8971
+fan_id05                0.2603      0.9764      0.9759      0.9693      0.9302      0.9321      0.9366      0.9246      0.9750
+fan_id06                0.0561      0.9993      0.9992      0.9956      0.9777      0.9780      0.9784      0.9726      0.9992
+pump_id00               1.2800      0.7482      0.8849      0.8808      0.7727      0.8104      0.7688      0.8378      0.8493
+pump_id01               0.7971      0.9046      0.9343      0.8857      0.8008      0.8293      0.7920      0.8677      0.8710
+pump_id02               0.3668      0.9709      0.9909      0.9737      0.9355      0.9384      0.9285      0.9506      0.9896
+pump_id03               0.5221      0.9435      0.9282      0.8772      0.8144      0.8412      0.8045      0.8771      0.9318
+pump_id04               0.0389      1.0000      1.0000      1.0000      0.9817      0.9820      0.9807      0.9873      1.0000
+pump_id05               0.0531      0.9980      0.9709      0.8981      0.8669      0.8770      0.8725      0.8701      0.9642
+pump_id06               1.1283      0.9259      0.9247      0.8700      0.7719      0.8059      0.7614      0.8609      0.7380
+slider_id00             0.2287      0.9719      0.9979      0.9965      0.9411      0.9440      0.9401      0.9273      0.9987
+slider_id01             0.3166      0.9574      0.9861      0.9367      0.8602      0.8736      0.8575      0.8783      0.9457
+slider_id02             0.6722      0.9548      0.9397      0.8676      0.8313      0.8190      0.8578      0.8303      0.9490
+slider_id03             0.4822      0.9318      0.9255      0.9018      0.7668      0.8011      0.7638      0.8095      0.9192
+slider_id04             0.0623      0.9922      1.0000      1.0000      0.9390      0.9416      0.9390      0.9450      0.9999
+slider_id05             0.3280      0.9399      0.9893      0.9556      0.8843      0.8921      0.8827      0.8968      0.9760
+평균                      0.4124      0.9344      0.9553      0.9253      0.8631      0.8749      0.8679      0.8802      0.9186
+
+--- [21/40] valve_id00
+[valve_id00] method=supervised bs=512 epochs=60 sched=cosine clip_loss hop=16
+  train 정상 14436 seg, 다른 ID 풀 954 seg, val 1780 seg, test 1600 seg
+  파일 단위 손실: 정상 802파일, 이상 53파일
+  ep   1 | train 0.8123/0.548 | val 0.1754/0.467 auc 0.485 | test AUC 0.594 pAUC 0.535 | 1.8s
+  ep  10 | train 0.0967/0.878 | val 0.5122/0.723 auc 0.799 | test AUC 0.908 pAUC 0.804 | 1.6s
+  ep  20 | train 0.0599/0.938 | val 1.1684/0.744 auc 0.773 | test AUC 0.927 pAUC 0.928 | 1.4s
+  ep  30 | train 0.0113/0.992 | val 1.2203/0.758 auc 0.796 | test AUC 0.916 pAUC 0.911 | 1.5s
+  ep  40 | train 0.0023/0.999 | val 0.9819/0.766 auc 0.822 | test AUC 0.939 pAUC 0.919 | 1.4s
+  ep  50 | train 0.0015/1.000 | val 1.0425/0.761 auc 0.789 | test AUC 0.939 pAUC 0.919 | 1.4s
+  ep  60 | train 0.0016/0.998 | val 1.0722/0.753 auc 0.793 | test AUC 0.929 pAUC 0.896 | 1.4s
+  완료 → /mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/software/runs/all40/valve_id00
+
+unit                  val_loss     val_auc    test_auc   test_pauc test_f1_bal test_acc_bal test_seg_f1 test_seg_acc test_auc_bestval
+fan_id00                0.4140      0.6645      0.7376      0.6930      0.6330      0.6515      0.6946      0.6401      0.6223
+fan_id01                0.1860      0.9832      0.9848      0.9755      0.9234      0.9265      0.9278      0.9148      0.9740
+fan_id02                0.6474      0.9257      0.9712      0.9316      0.8868      0.8935      0.8976      0.8775      0.7849
+fan_id03                0.1474      0.9861      0.9859      0.9582      0.9246      0.9260      0.9375      0.9222      0.9880
+fan_id04                0.2613      0.9133      0.9783      0.9383      0.8192      0.8345      0.8364      0.8131      0.8971
+fan_id05                0.2603      0.9764      0.9759      0.9693      0.9302      0.9321      0.9366      0.9246      0.9750
+fan_id06                0.0561      0.9993      0.9992      0.9956      0.9777      0.9780      0.9784      0.9726      0.9992
+pump_id00               1.2800      0.7482      0.8849      0.8808      0.7727      0.8104      0.7688      0.8378      0.8493
+pump_id01               0.7971      0.9046      0.9343      0.8857      0.8008      0.8293      0.7920      0.8677      0.8710
+pump_id02               0.3668      0.9709      0.9909      0.9737      0.9355      0.9384      0.9285      0.9506      0.9896
+pump_id03               0.5221      0.9435      0.9282      0.8772      0.8144      0.8412      0.8045      0.8771      0.9318
+pump_id04               0.0389      1.0000      1.0000      1.0000      0.9817      0.9820      0.9807      0.9873      1.0000
+pump_id05               0.0531      0.9980      0.9709      0.8981      0.8669      0.8770      0.8725      0.8701      0.9642
+pump_id06               1.1283      0.9259      0.9247      0.8700      0.7719      0.8059      0.7614      0.8609      0.7380
+slider_id00             0.2287      0.9719      0.9979      0.9965      0.9411      0.9440      0.9401      0.9273      0.9987
+slider_id01             0.3166      0.9574      0.9861      0.9367      0.8602      0.8736      0.8575      0.8783      0.9457
+slider_id02             0.6722      0.9548      0.9397      0.8676      0.8313      0.8190      0.8578      0.8303      0.9490
+slider_id03             0.4822      0.9318      0.9255      0.9018      0.7668      0.8011      0.7638      0.8095      0.9192
+slider_id04             0.0623      0.9922      1.0000      1.0000      0.9390      0.9416      0.9390      0.9450      0.9999
+slider_id05             0.3280      0.9399      0.9893      0.9556      0.8843      0.8921      0.8827      0.8968      0.9760
+valve_id00              1.0722      0.7926      0.9292      0.8956      0.7509      0.7208      0.6769      0.6987      0.7023
+평균                      0.4439      0.9276      0.9540      0.9238      0.8577      0.8675      0.8588      0.8715      0.9083
+
+--- [22/40] valve_id01
+[valve_id01] method=supervised bs=512 epochs=60 sched=cosine clip_loss hop=16
+  train 정상 12456 seg, 다른 ID 풀 972 seg, val 1540 seg, test 1600 seg
+  파일 단위 손실: 정상 692파일, 이상 54파일
+  ep   1 | train 0.9823/0.530 | val 0.2036/0.495 auc 0.411 | test AUC 0.484 pAUC 0.499 | 1.2s
+  ep  10 | train 0.0390/0.945 | val 1.0034/0.652 auc 0.689 | test AUC 0.925 pAUC 0.882 | 1.2s
+  ep  20 | train 0.0124/0.988 | val 0.7077/0.681 auc 0.737 | test AUC 0.949 pAUC 0.939 | 1.2s
+  ep  30 | train 0.0064/0.995 | val 1.4866/0.690 auc 0.732 | test AUC 0.950 pAUC 0.925 | 1.2s
+  ep  40 | train 0.0022/0.998 | val 2.5692/0.565 auc 0.692 | test AUC 0.878 pAUC 0.867 | 1.2s
+  ep  50 | train 0.0012/0.999 | val 2.8868/0.614 auc 0.699 | test AUC 0.839 pAUC 0.816 | 1.2s
+  ep  60 | train 0.0006/1.000 | val 2.0592/0.581 auc 0.713 | test AUC 0.886 pAUC 0.887 | 1.2s
+  완료 → /mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/software/runs/all40/valve_id01
+
+unit                  val_loss     val_auc    test_auc   test_pauc test_f1_bal test_acc_bal test_seg_f1 test_seg_acc test_auc_bestval
+fan_id00                0.4140      0.6645      0.7376      0.6930      0.6330      0.6515      0.6946      0.6401      0.6223
+fan_id01                0.1860      0.9832      0.9848      0.9755      0.9234      0.9265      0.9278      0.9148      0.9740
+fan_id02                0.6474      0.9257      0.9712      0.9316      0.8868      0.8935      0.8976      0.8775      0.7849
+fan_id03                0.1474      0.9861      0.9859      0.9582      0.9246      0.9260      0.9375      0.9222      0.9880
+fan_id04                0.2613      0.9133      0.9783      0.9383      0.8192      0.8345      0.8364      0.8131      0.8971
+fan_id05                0.2603      0.9764      0.9759      0.9693      0.9302      0.9321      0.9366      0.9246      0.9750
+fan_id06                0.0561      0.9993      0.9992      0.9956      0.9777      0.9780      0.9784      0.9726      0.9992
+pump_id00               1.2800      0.7482      0.8849      0.8808      0.7727      0.8104      0.7688      0.8378      0.8493
+pump_id01               0.7971      0.9046      0.9343      0.8857      0.8008      0.8293      0.7920      0.8677      0.8710
+pump_id02               0.3668      0.9709      0.9909      0.9737      0.9355      0.9384      0.9285      0.9506      0.9896
+pump_id03               0.5221      0.9435      0.9282      0.8772      0.8144      0.8412      0.8045      0.8771      0.9318
+pump_id04               0.0389      1.0000      1.0000      1.0000      0.9817      0.9820      0.9807      0.9873      1.0000
+pump_id05               0.0531      0.9980      0.9709      0.8981      0.8669      0.8770      0.8725      0.8701      0.9642
+pump_id06               1.1283      0.9259      0.9247      0.8700      0.7719      0.8059      0.7614      0.8609      0.7380
+slider_id00             0.2287      0.9719      0.9979      0.9965      0.9411      0.9440      0.9401      0.9273      0.9987
+slider_id01             0.3166      0.9574      0.9861      0.9367      0.8602      0.8736      0.8575      0.8783      0.9457
+slider_id02             0.6722      0.9548      0.9397      0.8676      0.8313      0.8190      0.8578      0.8303      0.9490
+slider_id03             0.4822      0.9318      0.9255      0.9018      0.7668      0.8011      0.7638      0.8095      0.9192
+slider_id04             0.0623      0.9922      1.0000      1.0000      0.9390      0.9416      0.9390      0.9450      0.9999
+slider_id05             0.3280      0.9399      0.9893      0.9556      0.8843      0.8921      0.8827      0.8968      0.9760
+valve_id00              1.0722      0.7926      0.9292      0.8956      0.7509      0.7208      0.6769      0.6987      0.7023
+valve_id01              2.0592      0.7135      0.8858      0.8868      0.7749      0.7725      0.7121      0.7625      0.4840
+평균                      0.5173      0.9179      0.9509      0.9222      0.8540      0.8632      0.8521      0.8666      0.8891
+
+--- [23/40] valve_id02
+[valve_id02] method=supervised bs=512 epochs=60 sched=cosine clip_loss hop=16
+  train 정상 9846 seg, 다른 ID 풀 972 seg, val 1220 seg, test 1600 seg
+  파일 단위 손실: 정상 547파일, 이상 54파일
+  ep   1 | train 1.0489/0.525 | val 0.1777/0.509 auc 0.500 | test AUC 0.427 pAUC 0.476 | 1.0s
+  ep  10 | train 0.1663/0.591 | val 0.1681/0.550 auc 0.585 | test AUC 0.647 pAUC 0.554 | 1.0s
+  ep  20 | train 0.0574/0.932 | val 0.4289/0.676 auc 0.756 | test AUC 0.867 pAUC 0.759 | 1.0s
+  ep  30 | train 0.0405/0.941 | val 0.3282/0.764 auc 0.899 | test AUC 0.952 pAUC 0.943 | 1.0s
+  ep  40 | train 0.0228/0.978 | val 0.3803/0.761 auc 0.865 | test AUC 0.966 pAUC 0.945 | 1.0s
+  ep  50 | train 0.0046/0.995 | val 0.5164/0.771 auc 0.859 | test AUC 0.983 pAUC 0.929 | 1.0s
+  ep  60 | train 0.0040/0.995 | val 0.7266/0.753 auc 0.842 | test AUC 0.974 pAUC 0.942 | 1.0s
+  완료 → /mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/software/runs/all40/valve_id02
+
+unit                  val_loss     val_auc    test_auc   test_pauc test_f1_bal test_acc_bal test_seg_f1 test_seg_acc test_auc_bestval
+fan_id00                0.4140      0.6645      0.7376      0.6930      0.6330      0.6515      0.6946      0.6401      0.6223
+fan_id01                0.1860      0.9832      0.9848      0.9755      0.9234      0.9265      0.9278      0.9148      0.9740
+fan_id02                0.6474      0.9257      0.9712      0.9316      0.8868      0.8935      0.8976      0.8775      0.7849
+fan_id03                0.1474      0.9861      0.9859      0.9582      0.9246      0.9260      0.9375      0.9222      0.9880
+fan_id04                0.2613      0.9133      0.9783      0.9383      0.8192      0.8345      0.8364      0.8131      0.8971
+fan_id05                0.2603      0.9764      0.9759      0.9693      0.9302      0.9321      0.9366      0.9246      0.9750
+fan_id06                0.0561      0.9993      0.9992      0.9956      0.9777      0.9780      0.9784      0.9726      0.9992
+pump_id00               1.2800      0.7482      0.8849      0.8808      0.7727      0.8104      0.7688      0.8378      0.8493
+pump_id01               0.7971      0.9046      0.9343      0.8857      0.8008      0.8293      0.7920      0.8677      0.8710
+pump_id02               0.3668      0.9709      0.9909      0.9737      0.9355      0.9384      0.9285      0.9506      0.9896
+pump_id03               0.5221      0.9435      0.9282      0.8772      0.8144      0.8412      0.8045      0.8771      0.9318
+pump_id04               0.0389      1.0000      1.0000      1.0000      0.9817      0.9820      0.9807      0.9873      1.0000
+pump_id05               0.0531      0.9980      0.9709      0.8981      0.8669      0.8770      0.8725      0.8701      0.9642
+pump_id06               1.1283      0.9259      0.9247      0.8700      0.7719      0.8059      0.7614      0.8609      0.7380
+slider_id00             0.2287      0.9719      0.9979      0.9965      0.9411      0.9440      0.9401      0.9273      0.9987
+slider_id01             0.3166      0.9574      0.9861      0.9367      0.8602      0.8736      0.8575      0.8783      0.9457
+slider_id02             0.6722      0.9548      0.9397      0.8676      0.8313      0.8190      0.8578      0.8303      0.9490
+slider_id03             0.4822      0.9318      0.9255      0.9018      0.7668      0.8011      0.7638      0.8095      0.9192
+slider_id04             0.0623      0.9922      1.0000      1.0000      0.9390      0.9416      0.9390      0.9450      0.9999
+slider_id05             0.3280      0.9399      0.9893      0.9556      0.8843      0.8921      0.8827      0.8968      0.9760
+valve_id00              1.0722      0.7926      0.9292      0.8956      0.7509      0.7208      0.6769      0.6987      0.7023
+valve_id01              2.0592      0.7135      0.8858      0.8868      0.7749      0.7725      0.7121      0.7625      0.4840
+valve_id02              0.7266      0.8417      0.9742      0.9421      0.7482      0.7925      0.7378      0.8356      0.8813
+평균                      0.5264      0.9146      0.9519      0.9230      0.8494      0.8602      0.8472      0.8652      0.8887
+
+--- [24/40] valve_id03
+[valve_id03] method=supervised bs=512 epochs=60 sched=cosine clip_loss hop=16
+  train 정상 13986 seg, 다른 ID 풀 972 seg, val 1720 seg, test 1600 seg
+  파일 단위 손실: 정상 777파일, 이상 54파일
+  ep   1 | train 0.8747/0.542 | val 0.1821/0.553 auc 0.620 | test AUC 0.534 pAUC 0.506 | 1.3s
+  ep  10 | train 0.0655/0.915 | val 1.5968/0.660 auc 0.611 | test AUC 0.900 pAUC 0.725 | 1.4s
+  ep  20 | train 0.0238/0.972 | val 3.2883/0.640 auc 0.656 | test AUC 0.910 pAUC 0.904 | 1.5s
+  ep  30 | train 0.0117/0.990 | val 3.9204/0.675 auc 0.668 | test AUC 0.899 pAUC 0.900 | 1.5s
+  ep  40 | train 0.0028/0.999 | val 4.5450/0.698 auc 0.695 | test AUC 0.890 pAUC 0.883 | 1.3s
+  ep  50 | train 0.0012/0.999 | val 4.8069/0.693 auc 0.704 | test AUC 0.886 pAUC 0.887 | 1.5s
+  ep  60 | train 0.0008/1.000 | val 4.7344/0.708 auc 0.708 | test AUC 0.877 pAUC 0.881 | 1.3s
+  완료 → /mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/software/runs/all40/valve_id03
+
+unit                  val_loss     val_auc    test_auc   test_pauc test_f1_bal test_acc_bal test_seg_f1 test_seg_acc test_auc_bestval
+fan_id00                0.4140      0.6645      0.7376      0.6930      0.6330      0.6515      0.6946      0.6401      0.6223
+fan_id01                0.1860      0.9832      0.9848      0.9755      0.9234      0.9265      0.9278      0.9148      0.9740
+fan_id02                0.6474      0.9257      0.9712      0.9316      0.8868      0.8935      0.8976      0.8775      0.7849
+fan_id03                0.1474      0.9861      0.9859      0.9582      0.9246      0.9260      0.9375      0.9222      0.9880
+fan_id04                0.2613      0.9133      0.9783      0.9383      0.8192      0.8345      0.8364      0.8131      0.8971
+fan_id05                0.2603      0.9764      0.9759      0.9693      0.9302      0.9321      0.9366      0.9246      0.9750
+fan_id06                0.0561      0.9993      0.9992      0.9956      0.9777      0.9780      0.9784      0.9726      0.9992
+pump_id00               1.2800      0.7482      0.8849      0.8808      0.7727      0.8104      0.7688      0.8378      0.8493
+pump_id01               0.7971      0.9046      0.9343      0.8857      0.8008      0.8293      0.7920      0.8677      0.8710
+pump_id02               0.3668      0.9709      0.9909      0.9737      0.9355      0.9384      0.9285      0.9506      0.9896
+pump_id03               0.5221      0.9435      0.9282      0.8772      0.8144      0.8412      0.8045      0.8771      0.9318
+pump_id04               0.0389      1.0000      1.0000      1.0000      0.9817      0.9820      0.9807      0.9873      1.0000
+pump_id05               0.0531      0.9980      0.9709      0.8981      0.8669      0.8770      0.8725      0.8701      0.9642
+pump_id06               1.1283      0.9259      0.9247      0.8700      0.7719      0.8059      0.7614      0.8609      0.7380
+slider_id00             0.2287      0.9719      0.9979      0.9965      0.9411      0.9440      0.9401      0.9273      0.9987
+slider_id01             0.3166      0.9574      0.9861      0.9367      0.8602      0.8736      0.8575      0.8783      0.9457
+slider_id02             0.6722      0.9548      0.9397      0.8676      0.8313      0.8190      0.8578      0.8303      0.9490
+slider_id03             0.4822      0.9318      0.9255      0.9018      0.7668      0.8011      0.7638      0.8095      0.9192
+slider_id04             0.0623      0.9922      1.0000      1.0000      0.9390      0.9416      0.9390      0.9450      0.9999
+slider_id05             0.3280      0.9399      0.9893      0.9556      0.8843      0.8921      0.8827      0.8968      0.9760
+valve_id00              1.0722      0.7926      0.9292      0.8956      0.7509      0.7208      0.6769      0.6987      0.7023
+valve_id01              2.0592      0.7135      0.8858      0.8868      0.7749      0.7725      0.7121      0.7625      0.4840
+valve_id02              0.7266      0.8417      0.9742      0.9421      0.7482      0.7925      0.7378      0.8356      0.8813
+valve_id03              4.7344      0.7079      0.8770      0.8807      0.7735      0.7608      0.7005      0.7381      0.5343
+평균                      0.7017      0.9060      0.9488      0.9213      0.8462      0.8560      0.8411      0.8599      0.8739
+
+--- [25/40] valve_id04
+[valve_id04] method=supervised bs=512 epochs=60 sched=cosine clip_loss hop=16
+  train 정상 14580 seg, 다른 ID 풀 972 seg, val 1800 seg, test 1600 seg
+  파일 단위 손실: 정상 810파일, 이상 54파일
+  ep   1 | train 0.8187/0.522 | val 0.1853/0.504 auc 0.486 | test AUC 0.527 pAUC 0.493 | 1.4s
+  ep  10 | train 0.1948/0.520 | val 0.2115/0.501 auc 0.475 | test AUC 0.594 pAUC 0.589 | 1.4s
+  ep  20 | train 0.1376/0.824 | val 0.4140/0.691 auc 0.754 | test AUC 0.957 pAUC 0.946 | 1.4s
+  ep  30 | train 0.0176/0.984 | val 1.4777/0.765 auc 0.784 | test AUC 0.956 pAUC 0.912 | 1.4s
+  ep  40 | train 0.0032/0.998 | val 2.1438/0.741 auc 0.760 | test AUC 0.948 pAUC 0.922 | 1.4s
+  ep  50 | train 0.0024/0.998 | val 2.2335/0.743 auc 0.764 | test AUC 0.936 pAUC 0.914 | 1.4s
+  ep  60 | train 0.0021/0.999 | val 2.7683/0.731 auc 0.762 | test AUC 0.929 pAUC 0.906 | 1.4s
+  완료 → /mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/software/runs/all40/valve_id04
+
+unit                  val_loss     val_auc    test_auc   test_pauc test_f1_bal test_acc_bal test_seg_f1 test_seg_acc test_auc_bestval
+fan_id00                0.4140      0.6645      0.7376      0.6930      0.6330      0.6515      0.6946      0.6401      0.6223
+fan_id01                0.1860      0.9832      0.9848      0.9755      0.9234      0.9265      0.9278      0.9148      0.9740
+fan_id02                0.6474      0.9257      0.9712      0.9316      0.8868      0.8935      0.8976      0.8775      0.7849
+fan_id03                0.1474      0.9861      0.9859      0.9582      0.9246      0.9260      0.9375      0.9222      0.9880
+fan_id04                0.2613      0.9133      0.9783      0.9383      0.8192      0.8345      0.8364      0.8131      0.8971
+fan_id05                0.2603      0.9764      0.9759      0.9693      0.9302      0.9321      0.9366      0.9246      0.9750
+fan_id06                0.0561      0.9993      0.9992      0.9956      0.9777      0.9780      0.9784      0.9726      0.9992
+pump_id00               1.2800      0.7482      0.8849      0.8808      0.7727      0.8104      0.7688      0.8378      0.8493
+pump_id01               0.7971      0.9046      0.9343      0.8857      0.8008      0.8293      0.7920      0.8677      0.8710
+pump_id02               0.3668      0.9709      0.9909      0.9737      0.9355      0.9384      0.9285      0.9506      0.9896
+pump_id03               0.5221      0.9435      0.9282      0.8772      0.8144      0.8412      0.8045      0.8771      0.9318
+pump_id04               0.0389      1.0000      1.0000      1.0000      0.9817      0.9820      0.9807      0.9873      1.0000
+pump_id05               0.0531      0.9980      0.9709      0.8981      0.8669      0.8770      0.8725      0.8701      0.9642
+pump_id06               1.1283      0.9259      0.9247      0.8700      0.7719      0.8059      0.7614      0.8609      0.7380
+slider_id00             0.2287      0.9719      0.9979      0.9965      0.9411      0.9440      0.9401      0.9273      0.9987
+slider_id01             0.3166      0.9574      0.9861      0.9367      0.8602      0.8736      0.8575      0.8783      0.9457
+slider_id02             0.6722      0.9548      0.9397      0.8676      0.8313      0.8190      0.8578      0.8303      0.9490
+slider_id03             0.4822      0.9318      0.9255      0.9018      0.7668      0.8011      0.7638      0.8095      0.9192
+slider_id04             0.0623      0.9922      1.0000      1.0000      0.9390      0.9416      0.9390      0.9450      0.9999
+slider_id05             0.3280      0.9399      0.9893      0.9556      0.8843      0.8921      0.8827      0.8968      0.9760
+valve_id00              1.0722      0.7926      0.9292      0.8956      0.7509      0.7208      0.6769      0.6987      0.7023
+valve_id01              2.0592      0.7135      0.8858      0.8868      0.7749      0.7725      0.7121      0.7625      0.4840
+valve_id02              0.7266      0.8417      0.9742      0.9421      0.7482      0.7925      0.7378      0.8356      0.8813
+valve_id03              4.7344      0.7079      0.8770      0.8807      0.7735      0.7608      0.7005      0.7381      0.5343
+valve_id04              2.7683      0.7619      0.9287      0.9061      0.7583      0.7467      0.6964      0.7400      0.6596
+평균                      0.7844      0.9002      0.9480      0.9207      0.8427      0.8516      0.8353      0.8551      0.8654
+
+--- [26/40] valve_id05
+[valve_id05] method=supervised bs=512 epochs=60 sched=cosine clip_loss hop=16
+  train 정상 14562 seg, 다른 ID 풀 3240 seg, val 1800 seg, test 3000 seg
+  파일 단위 손실: 정상 809파일, 이상 180파일
+  ep   1 | train 0.6226/0.507 | val 0.1791/0.497 auc 0.505 | test AUC 0.508 pAUC 0.496 | 1.4s
+  ep  10 | train 0.1594/0.642 | val 0.1685/0.607 auc 0.690 | test AUC 0.796 pAUC 0.576 | 1.4s
+  ep  20 | train 0.0921/0.850 | val 0.5932/0.682 auc 0.716 | test AUC 0.900 pAUC 0.784 | 1.5s
+  ep  30 | train 0.0791/0.892 | val 0.1993/0.733 auc 0.758 | test AUC 0.936 pAUC 0.823 | 1.4s
+  ep  40 | train 0.0580/0.926 | val 0.4960/0.762 auc 0.817 | test AUC 0.942 pAUC 0.858 | 1.4s
+  ep  50 | train 0.0341/0.952 | val 0.4323/0.766 auc 0.854 | test AUC 0.938 pAUC 0.830 | 1.4s
+  ep  60 | train 0.0232/0.967 | val 0.5580/0.784 auc 0.849 | test AUC 0.935 pAUC 0.838 | 1.4s
+  완료 → /mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/software/runs/all40/valve_id05
+
+unit                  val_loss     val_auc    test_auc   test_pauc test_f1_bal test_acc_bal test_seg_f1 test_seg_acc test_auc_bestval
+fan_id00                0.4140      0.6645      0.7376      0.6930      0.6330      0.6515      0.6946      0.6401      0.6223
+fan_id01                0.1860      0.9832      0.9848      0.9755      0.9234      0.9265      0.9278      0.9148      0.9740
+fan_id02                0.6474      0.9257      0.9712      0.9316      0.8868      0.8935      0.8976      0.8775      0.7849
+fan_id03                0.1474      0.9861      0.9859      0.9582      0.9246      0.9260      0.9375      0.9222      0.9880
+fan_id04                0.2613      0.9133      0.9783      0.9383      0.8192      0.8345      0.8364      0.8131      0.8971
+fan_id05                0.2603      0.9764      0.9759      0.9693      0.9302      0.9321      0.9366      0.9246      0.9750
+fan_id06                0.0561      0.9993      0.9992      0.9956      0.9777      0.9780      0.9784      0.9726      0.9992
+pump_id00               1.2800      0.7482      0.8849      0.8808      0.7727      0.8104      0.7688      0.8378      0.8493
+pump_id01               0.7971      0.9046      0.9343      0.8857      0.8008      0.8293      0.7920      0.8677      0.8710
+pump_id02               0.3668      0.9709      0.9909      0.9737      0.9355      0.9384      0.9285      0.9506      0.9896
+pump_id03               0.5221      0.9435      0.9282      0.8772      0.8144      0.8412      0.8045      0.8771      0.9318
+pump_id04               0.0389      1.0000      1.0000      1.0000      0.9817      0.9820      0.9807      0.9873      1.0000
+pump_id05               0.0531      0.9980      0.9709      0.8981      0.8669      0.8770      0.8725      0.8701      0.9642
+pump_id06               1.1283      0.9259      0.9247      0.8700      0.7719      0.8059      0.7614      0.8609      0.7380
+slider_id00             0.2287      0.9719      0.9979      0.9965      0.9411      0.9440      0.9401      0.9273      0.9987
+slider_id01             0.3166      0.9574      0.9861      0.9367      0.8602      0.8736      0.8575      0.8783      0.9457
+slider_id02             0.6722      0.9548      0.9397      0.8676      0.8313      0.8190      0.8578      0.8303      0.9490
+slider_id03             0.4822      0.9318      0.9255      0.9018      0.7668      0.8011      0.7638      0.8095      0.9192
+slider_id04             0.0623      0.9922      1.0000      1.0000      0.9390      0.9416      0.9390      0.9450      0.9999
+slider_id05             0.3280      0.9399      0.9893      0.9556      0.8843      0.8921      0.8827      0.8968      0.9760
+valve_id00              1.0722      0.7926      0.9292      0.8956      0.7509      0.7208      0.6769      0.6987      0.7023
+valve_id01              2.0592      0.7135      0.8858      0.8868      0.7749      0.7725      0.7121      0.7625      0.4840
+valve_id02              0.7266      0.8417      0.9742      0.9421      0.7482      0.7925      0.7378      0.8356      0.8813
+valve_id03              4.7344      0.7079      0.8770      0.8807      0.7735      0.7608      0.7005      0.7381      0.5343
+valve_id04              2.7683      0.7619      0.9287      0.9061      0.7583      0.7467      0.6964      0.7400      0.6596
+valve_id05              0.5580      0.8494      0.9347      0.8376      0.7781      0.7570      0.8443      0.7900      0.9270
+평균                      0.7757      0.8983      0.9475      0.9175      0.8402      0.8480      0.8356      0.8526      0.8677
+
+--- [27/40] valve_id06
+[valve_id06] method=supervised bs=512 epochs=60 sched=cosine clip_loss hop=16
+  train 정상 14454 seg, 다른 ID 풀 972 seg, val 1780 seg, test 1600 seg
+  파일 단위 손실: 정상 803파일, 이상 54파일
+  ep   1 | train 0.8644/0.520 | val 0.1978/0.438 auc 0.394 | test AUC 0.474 pAUC 0.520 | 1.4s
+  ep  10 | train 0.1610/0.599 | val 0.2437/0.455 auc 0.399 | test AUC 0.668 pAUC 0.582 | 1.4s
+  ep  20 | train 0.1122/0.792 | val 2.2874/0.538 auc 0.510 | test AUC 0.771 pAUC 0.688 | 1.4s
+  ep  30 | train 0.0551/0.912 | val 1.9672/0.571 auc 0.537 | test AUC 0.820 pAUC 0.831 | 1.4s
+  ep  40 | train 0.0370/0.945 | val 1.7412/0.582 auc 0.586 | test AUC 0.843 pAUC 0.842 | 1.6s
+  ep  50 | train 0.0212/0.976 | val 2.2116/0.592 auc 0.603 | test AUC 0.820 pAUC 0.797 | 1.5s
+  ep  60 | train 0.0186/0.978 | val 2.2401/0.587 auc 0.620 | test AUC 0.818 pAUC 0.799 | 1.6s
+  완료 → /mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/software/runs/all40/valve_id06
+
+unit                  val_loss     val_auc    test_auc   test_pauc test_f1_bal test_acc_bal test_seg_f1 test_seg_acc test_auc_bestval
+fan_id00                0.4140      0.6645      0.7376      0.6930      0.6330      0.6515      0.6946      0.6401      0.6223
+fan_id01                0.1860      0.9832      0.9848      0.9755      0.9234      0.9265      0.9278      0.9148      0.9740
+fan_id02                0.6474      0.9257      0.9712      0.9316      0.8868      0.8935      0.8976      0.8775      0.7849
+fan_id03                0.1474      0.9861      0.9859      0.9582      0.9246      0.9260      0.9375      0.9222      0.9880
+fan_id04                0.2613      0.9133      0.9783      0.9383      0.8192      0.8345      0.8364      0.8131      0.8971
+fan_id05                0.2603      0.9764      0.9759      0.9693      0.9302      0.9321      0.9366      0.9246      0.9750
+fan_id06                0.0561      0.9993      0.9992      0.9956      0.9777      0.9780      0.9784      0.9726      0.9992
+pump_id00               1.2800      0.7482      0.8849      0.8808      0.7727      0.8104      0.7688      0.8378      0.8493
+pump_id01               0.7971      0.9046      0.9343      0.8857      0.8008      0.8293      0.7920      0.8677      0.8710
+pump_id02               0.3668      0.9709      0.9909      0.9737      0.9355      0.9384      0.9285      0.9506      0.9896
+pump_id03               0.5221      0.9435      0.9282      0.8772      0.8144      0.8412      0.8045      0.8771      0.9318
+pump_id04               0.0389      1.0000      1.0000      1.0000      0.9817      0.9820      0.9807      0.9873      1.0000
+pump_id05               0.0531      0.9980      0.9709      0.8981      0.8669      0.8770      0.8725      0.8701      0.9642
+pump_id06               1.1283      0.9259      0.9247      0.8700      0.7719      0.8059      0.7614      0.8609      0.7380
+slider_id00             0.2287      0.9719      0.9979      0.9965      0.9411      0.9440      0.9401      0.9273      0.9987
+slider_id01             0.3166      0.9574      0.9861      0.9367      0.8602      0.8736      0.8575      0.8783      0.9457
+slider_id02             0.6722      0.9548      0.9397      0.8676      0.8313      0.8190      0.8578      0.8303      0.9490
+slider_id03             0.4822      0.9318      0.9255      0.9018      0.7668      0.8011      0.7638      0.8095      0.9192
+slider_id04             0.0623      0.9922      1.0000      1.0000      0.9390      0.9416      0.9390      0.9450      0.9999
+slider_id05             0.3280      0.9399      0.9893      0.9556      0.8843      0.8921      0.8827      0.8968      0.9760
+valve_id00              1.0722      0.7926      0.9292      0.8956      0.7509      0.7208      0.6769      0.6987      0.7023
+valve_id01              2.0592      0.7135      0.8858      0.8868      0.7749      0.7725      0.7121      0.7625      0.4840
+valve_id02              0.7266      0.8417      0.9742      0.9421      0.7482      0.7925      0.7378      0.8356      0.8813
+valve_id03              4.7344      0.7079      0.8770      0.8807      0.7735      0.7608      0.7005      0.7381      0.5343
+valve_id04              2.7683      0.7619      0.9287      0.9061      0.7583      0.7467      0.6964      0.7400      0.6596
+valve_id05              0.5580      0.8494      0.9347      0.8376      0.7781      0.7570      0.8443      0.7900      0.9270
+valve_id06              2.2401      0.6195      0.8175      0.7991      0.6963      0.7208      0.6368      0.7262      0.4343
+평균                      0.8299      0.8879      0.9427      0.9131      0.8349      0.8433      0.8283      0.8480      0.8517
+
+--- [28/40] ToyCar_id01
+[ToyCar_id01] method=supervised bs=512 epochs=60 sched=cosine clip_loss hop=16
+  train 정상 18000 seg, 다른 ID 풀 2380 seg, val 2200 seg, test 5302 seg
+  파일 단위 손실: 정상 900파일, 이상 119파일
+  ep   1 | train 0.8066/0.526 | val 0.2034/0.498 auc 0.455 | test AUC 0.555 pAUC 0.546 | 2.0s
+  ep  10 | train 0.1656/0.607 | val 0.3388/0.585 auc 0.626 | test AUC 0.870 pAUC 0.760 | 1.8s
+  ep  20 | train 0.1075/0.824 | val 0.3619/0.702 auc 0.789 | test AUC 0.942 pAUC 0.815 | 1.7s
+  ep  30 | train 0.0995/0.838 | val 0.2683/0.768 auc 0.867 | test AUC 0.968 pAUC 0.904 | 1.8s
+  ep  40 | train 0.0520/0.918 | val 0.3336/0.761 auc 0.856 | test AUC 0.968 pAUC 0.888 | 1.7s
+  ep  50 | train 0.0395/0.935 | val 0.3687/0.776 auc 0.875 | test AUC 0.962 pAUC 0.899 | 1.8s
+  ep  60 | train 0.0391/0.944 | val 0.2481/0.785 auc 0.883 | test AUC 0.967 pAUC 0.896 | 1.7s
+  완료 → /mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/software/runs/all40/ToyCar_id01
+
+unit                  val_loss     val_auc    test_auc   test_pauc test_f1_bal test_acc_bal test_seg_f1 test_seg_acc test_auc_bestval
+fan_id00                0.4140      0.6645      0.7376      0.6930      0.6330      0.6515      0.6946      0.6401      0.6223
+fan_id01                0.1860      0.9832      0.9848      0.9755      0.9234      0.9265      0.9278      0.9148      0.9740
+fan_id02                0.6474      0.9257      0.9712      0.9316      0.8868      0.8935      0.8976      0.8775      0.7849
+fan_id03                0.1474      0.9861      0.9859      0.9582      0.9246      0.9260      0.9375      0.9222      0.9880
+fan_id04                0.2613      0.9133      0.9783      0.9383      0.8192      0.8345      0.8364      0.8131      0.8971
+fan_id05                0.2603      0.9764      0.9759      0.9693      0.9302      0.9321      0.9366      0.9246      0.9750
+fan_id06                0.0561      0.9993      0.9992      0.9956      0.9777      0.9780      0.9784      0.9726      0.9992
+pump_id00               1.2800      0.7482      0.8849      0.8808      0.7727      0.8104      0.7688      0.8378      0.8493
+pump_id01               0.7971      0.9046      0.9343      0.8857      0.8008      0.8293      0.7920      0.8677      0.8710
+pump_id02               0.3668      0.9709      0.9909      0.9737      0.9355      0.9384      0.9285      0.9506      0.9896
+pump_id03               0.5221      0.9435      0.9282      0.8772      0.8144      0.8412      0.8045      0.8771      0.9318
+pump_id04               0.0389      1.0000      1.0000      1.0000      0.9817      0.9820      0.9807      0.9873      1.0000
+pump_id05               0.0531      0.9980      0.9709      0.8981      0.8669      0.8770      0.8725      0.8701      0.9642
+pump_id06               1.1283      0.9259      0.9247      0.8700      0.7719      0.8059      0.7614      0.8609      0.7380
+slider_id00             0.2287      0.9719      0.9979      0.9965      0.9411      0.9440      0.9401      0.9273      0.9987
+slider_id01             0.3166      0.9574      0.9861      0.9367      0.8602      0.8736      0.8575      0.8783      0.9457
+slider_id02             0.6722      0.9548      0.9397      0.8676      0.8313      0.8190      0.8578      0.8303      0.9490
+slider_id03             0.4822      0.9318      0.9255      0.9018      0.7668      0.8011      0.7638      0.8095      0.9192
+slider_id04             0.0623      0.9922      1.0000      1.0000      0.9390      0.9416      0.9390      0.9450      0.9999
+slider_id05             0.3280      0.9399      0.9893      0.9556      0.8843      0.8921      0.8827      0.8968      0.9760
+valve_id00              1.0722      0.7926      0.9292      0.8956      0.7509      0.7208      0.6769      0.6987      0.7023
+valve_id01              2.0592      0.7135      0.8858      0.8868      0.7749      0.7725      0.7121      0.7625      0.4840
+valve_id02              0.7266      0.8417      0.9742      0.9421      0.7482      0.7925      0.7378      0.8356      0.8813
+valve_id03              4.7344      0.7079      0.8770      0.8807      0.7735      0.7608      0.7005      0.7381      0.5343
+valve_id04              2.7683      0.7619      0.9287      0.9061      0.7583      0.7467      0.6964      0.7400      0.6596
+valve_id05              0.5580      0.8494      0.9347      0.8376      0.7781      0.7570      0.8443      0.7900      0.9270
+valve_id06              2.2401      0.6195      0.8175      0.7991      0.6963      0.7208      0.6368      0.7262      0.4343
+ToyCar_id01             0.2481      0.8829      0.9672      0.8959      0.7634      0.7621      0.6359      0.7591      0.9756
+평균                      0.8091      0.8877      0.9436      0.9125      0.8323      0.8404      0.8214      0.8448      0.8561
+
+--- [29/40] ToyCar_id02
+[ToyCar_id02] method=supervised bs=512 epochs=60 sched=cosine clip_loss hop=16
+  train 정상 18000 seg, 다른 ID 풀 2380 seg, val 2200 seg, test 5313 seg
+  파일 단위 손실: 정상 900파일, 이상 119파일
+  ep   1 | train 0.7985/0.539 | val 0.1802/0.507 auc 0.568 | test AUC 0.712 pAUC 0.559 | 1.9s
+  ep  10 | train 0.0850/0.881 | val 0.3382/0.775 auc 0.899 | test AUC 0.943 pAUC 0.915 | 1.7s
+  ep  20 | train 0.0779/0.879 | val 0.2129/0.787 auc 0.905 | test AUC 0.965 pAUC 0.943 | 2.0s
+  ep  30 | train 0.0415/0.941 | val 0.2823/0.794 auc 0.910 | test AUC 0.977 pAUC 0.949 | 2.0s
+  ep  40 | train 0.0365/0.945 | val 0.4844/0.800 auc 0.904 | test AUC 0.977 pAUC 0.946 | 2.0s
+  ep  50 | train 0.0102/0.990 | val 0.6048/0.807 auc 0.912 | test AUC 0.977 pAUC 0.955 | 2.0s
+  ep  60 | train 0.0077/0.992 | val 0.5884/0.808 auc 0.906 | test AUC 0.977 pAUC 0.961 | 1.7s
+  완료 → /mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/software/runs/all40/ToyCar_id02
+
+unit                  val_loss     val_auc    test_auc   test_pauc test_f1_bal test_acc_bal test_seg_f1 test_seg_acc test_auc_bestval
+fan_id00                0.4140      0.6645      0.7376      0.6930      0.6330      0.6515      0.6946      0.6401      0.6223
+fan_id01                0.1860      0.9832      0.9848      0.9755      0.9234      0.9265      0.9278      0.9148      0.9740
+fan_id02                0.6474      0.9257      0.9712      0.9316      0.8868      0.8935      0.8976      0.8775      0.7849
+fan_id03                0.1474      0.9861      0.9859      0.9582      0.9246      0.9260      0.9375      0.9222      0.9880
+fan_id04                0.2613      0.9133      0.9783      0.9383      0.8192      0.8345      0.8364      0.8131      0.8971
+fan_id05                0.2603      0.9764      0.9759      0.9693      0.9302      0.9321      0.9366      0.9246      0.9750
+fan_id06                0.0561      0.9993      0.9992      0.9956      0.9777      0.9780      0.9784      0.9726      0.9992
+pump_id00               1.2800      0.7482      0.8849      0.8808      0.7727      0.8104      0.7688      0.8378      0.8493
+pump_id01               0.7971      0.9046      0.9343      0.8857      0.8008      0.8293      0.7920      0.8677      0.8710
+pump_id02               0.3668      0.9709      0.9909      0.9737      0.9355      0.9384      0.9285      0.9506      0.9896
+pump_id03               0.5221      0.9435      0.9282      0.8772      0.8144      0.8412      0.8045      0.8771      0.9318
+pump_id04               0.0389      1.0000      1.0000      1.0000      0.9817      0.9820      0.9807      0.9873      1.0000
+pump_id05               0.0531      0.9980      0.9709      0.8981      0.8669      0.8770      0.8725      0.8701      0.9642
+pump_id06               1.1283      0.9259      0.9247      0.8700      0.7719      0.8059      0.7614      0.8609      0.7380
+slider_id00             0.2287      0.9719      0.9979      0.9965      0.9411      0.9440      0.9401      0.9273      0.9987
+slider_id01             0.3166      0.9574      0.9861      0.9367      0.8602      0.8736      0.8575      0.8783      0.9457
+slider_id02             0.6722      0.9548      0.9397      0.8676      0.8313      0.8190      0.8578      0.8303      0.9490
+slider_id03             0.4822      0.9318      0.9255      0.9018      0.7668      0.8011      0.7638      0.8095      0.9192
+slider_id04             0.0623      0.9922      1.0000      1.0000      0.9390      0.9416      0.9390      0.9450      0.9999
+slider_id05             0.3280      0.9399      0.9893      0.9556      0.8843      0.8921      0.8827      0.8968      0.9760
+valve_id00              1.0722      0.7926      0.9292      0.8956      0.7509      0.7208      0.6769      0.6987      0.7023
+valve_id01              2.0592      0.7135      0.8858      0.8868      0.7749      0.7725      0.7121      0.7625      0.4840
+valve_id02              0.7266      0.8417      0.9742      0.9421      0.7482      0.7925      0.7378      0.8356      0.8813
+valve_id03              4.7344      0.7079      0.8770      0.8807      0.7735      0.7608      0.7005      0.7381      0.5343
+valve_id04              2.7683      0.7619      0.9287      0.9061      0.7583      0.7467      0.6964      0.7400      0.6596
+valve_id05              0.5580      0.8494      0.9347      0.8376      0.7781      0.7570      0.8443      0.7900      0.9270
+valve_id06              2.2401      0.6195      0.8175      0.7991      0.6963      0.7208      0.6368      0.7262      0.4343
+ToyCar_id01             0.2481      0.8829      0.9672      0.8959      0.7634      0.7621      0.6359      0.7591      0.9756
+ToyCar_id02             0.5884      0.9062      0.9770      0.9610      0.7884      0.8062      0.7211      0.8462      0.7115
+평균                      0.8015      0.8884      0.9447      0.9141      0.8308      0.8392      0.8179      0.8448      0.8511
+
+--- [30/40] ToyCar_id03
+[ToyCar_id03] method=supervised bs=512 epochs=60 sched=cosine clip_loss hop=16
+  train 정상 18000 seg, 다른 ID 풀 2380 seg, val 2200 seg, test 5313 seg
+  파일 단위 손실: 정상 900파일, 이상 119파일
+  ep   1 | train 0.7506/0.508 | val 0.1830/0.443 auc 0.422 | test AUC 0.261 pAUC 0.476 | 1.7s
+  ep  10 | train 0.1074/0.819 | val 0.3653/0.674 auc 0.758 | test AUC 0.964 pAUC 0.904 | 1.7s
+  ep  20 | train 0.1069/0.838 | val 0.4444/0.676 auc 0.751 | test AUC 0.957 pAUC 0.901 | 2.0s
+  ep  30 | train 0.0680/0.890 | val 0.5502/0.687 auc 0.791 | test AUC 0.984 pAUC 0.931 | 1.8s
+  ep  40 | train 0.0478/0.924 | val 0.5832/0.724 auc 0.815 | test AUC 0.987 pAUC 0.951 | 2.0s
+  ep  50 | train 0.0303/0.949 | val 0.5190/0.705 auc 0.815 | test AUC 0.987 pAUC 0.947 | 2.0s
+  ep  60 | train 0.0229/0.970 | val 0.5906/0.722 auc 0.812 | test AUC 0.986 pAUC 0.940 | 1.9s
+  완료 → /mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/software/runs/all40/ToyCar_id03
+
+unit                  val_loss     val_auc    test_auc   test_pauc test_f1_bal test_acc_bal test_seg_f1 test_seg_acc test_auc_bestval
+fan_id00                0.4140      0.6645      0.7376      0.6930      0.6330      0.6515      0.6946      0.6401      0.6223
+fan_id01                0.1860      0.9832      0.9848      0.9755      0.9234      0.9265      0.9278      0.9148      0.9740
+fan_id02                0.6474      0.9257      0.9712      0.9316      0.8868      0.8935      0.8976      0.8775      0.7849
+fan_id03                0.1474      0.9861      0.9859      0.9582      0.9246      0.9260      0.9375      0.9222      0.9880
+fan_id04                0.2613      0.9133      0.9783      0.9383      0.8192      0.8345      0.8364      0.8131      0.8971
+fan_id05                0.2603      0.9764      0.9759      0.9693      0.9302      0.9321      0.9366      0.9246      0.9750
+fan_id06                0.0561      0.9993      0.9992      0.9956      0.9777      0.9780      0.9784      0.9726      0.9992
+pump_id00               1.2800      0.7482      0.8849      0.8808      0.7727      0.8104      0.7688      0.8378      0.8493
+pump_id01               0.7971      0.9046      0.9343      0.8857      0.8008      0.8293      0.7920      0.8677      0.8710
+pump_id02               0.3668      0.9709      0.9909      0.9737      0.9355      0.9384      0.9285      0.9506      0.9896
+pump_id03               0.5221      0.9435      0.9282      0.8772      0.8144      0.8412      0.8045      0.8771      0.9318
+pump_id04               0.0389      1.0000      1.0000      1.0000      0.9817      0.9820      0.9807      0.9873      1.0000
+pump_id05               0.0531      0.9980      0.9709      0.8981      0.8669      0.8770      0.8725      0.8701      0.9642
+pump_id06               1.1283      0.9259      0.9247      0.8700      0.7719      0.8059      0.7614      0.8609      0.7380
+slider_id00             0.2287      0.9719      0.9979      0.9965      0.9411      0.9440      0.9401      0.9273      0.9987
+slider_id01             0.3166      0.9574      0.9861      0.9367      0.8602      0.8736      0.8575      0.8783      0.9457
+slider_id02             0.6722      0.9548      0.9397      0.8676      0.8313      0.8190      0.8578      0.8303      0.9490
+slider_id03             0.4822      0.9318      0.9255      0.9018      0.7668      0.8011      0.7638      0.8095      0.9192
+slider_id04             0.0623      0.9922      1.0000      1.0000      0.9390      0.9416      0.9390      0.9450      0.9999
+slider_id05             0.3280      0.9399      0.9893      0.9556      0.8843      0.8921      0.8827      0.8968      0.9760
+valve_id00              1.0722      0.7926      0.9292      0.8956      0.7509      0.7208      0.6769      0.6987      0.7023
+valve_id01              2.0592      0.7135      0.8858      0.8868      0.7749      0.7725      0.7121      0.7625      0.4840
+valve_id02              0.7266      0.8417      0.9742      0.9421      0.7482      0.7925      0.7378      0.8356      0.8813
+valve_id03              4.7344      0.7079      0.8770      0.8807      0.7735      0.7608      0.7005      0.7381      0.5343
+valve_id04              2.7683      0.7619      0.9287      0.9061      0.7583      0.7467      0.6964      0.7400      0.6596
+valve_id05              0.5580      0.8494      0.9347      0.8376      0.7781      0.7570      0.8443      0.7900      0.9270
+valve_id06              2.2401      0.6195      0.8175      0.7991      0.6963      0.7208      0.6368      0.7262      0.4343
+ToyCar_id01             0.2481      0.8829      0.9672      0.8959      0.7634      0.7621      0.6359      0.7591      0.9756
+ToyCar_id02             0.5884      0.9062      0.9770      0.9610      0.7884      0.8062      0.7211      0.8462      0.7115
+ToyCar_id03             0.5906      0.8122      0.9861      0.9396      0.7573      0.7645      0.6292      0.7615      0.2606
+평균                      0.7945      0.8858      0.9461      0.9150      0.8284      0.8367      0.8116      0.8420      0.8314
+
+--- [31/40] ToyCar_id04
+[ToyCar_id04] method=supervised bs=512 epochs=60 sched=cosine clip_loss hop=16
+  train 정상 18000 seg, 다른 ID 풀 2380 seg, val 2200 seg, test 5313 seg
+  파일 단위 손실: 정상 900파일, 이상 119파일
+  ep   1 | train 0.7503/0.634 | val 0.2508/0.651 auc 0.805 | test AUC 0.965 pAUC 0.904 | 1.9s
+  ep  10 | train 0.0479/0.940 | val 0.5006/0.675 auc 0.813 | test AUC 0.987 pAUC 0.957 | 1.9s
+  ep  20 | train 0.0108/0.987 | val 0.3314/0.825 auc 0.914 | test AUC 0.999 pAUC 0.995 | 1.7s
+  ep  30 | train 0.0091/0.989 | val 0.5633/0.774 auc 0.889 | test AUC 0.999 pAUC 0.997 | 1.7s
+  ep  40 | train 0.0073/0.991 | val 0.3859/0.816 auc 0.910 | test AUC 1.000 pAUC 1.000 | 2.0s
+  ep  50 | train 0.0010/0.999 | val 0.6573/0.830 auc 0.914 | test AUC 0.999 pAUC 0.997 | 2.0s
+  ep  60 | train 0.0008/0.998 | val 0.6794/0.833 auc 0.919 | test AUC 1.000 pAUC 0.998 | 1.7s
+  완료 → /mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/software/runs/all40/ToyCar_id04
+
+unit                  val_loss     val_auc    test_auc   test_pauc test_f1_bal test_acc_bal test_seg_f1 test_seg_acc test_auc_bestval
+fan_id00                0.4140      0.6645      0.7376      0.6930      0.6330      0.6515      0.6946      0.6401      0.6223
+fan_id01                0.1860      0.9832      0.9848      0.9755      0.9234      0.9265      0.9278      0.9148      0.9740
+fan_id02                0.6474      0.9257      0.9712      0.9316      0.8868      0.8935      0.8976      0.8775      0.7849
+fan_id03                0.1474      0.9861      0.9859      0.9582      0.9246      0.9260      0.9375      0.9222      0.9880
+fan_id04                0.2613      0.9133      0.9783      0.9383      0.8192      0.8345      0.8364      0.8131      0.8971
+fan_id05                0.2603      0.9764      0.9759      0.9693      0.9302      0.9321      0.9366      0.9246      0.9750
+fan_id06                0.0561      0.9993      0.9992      0.9956      0.9777      0.9780      0.9784      0.9726      0.9992
+pump_id00               1.2800      0.7482      0.8849      0.8808      0.7727      0.8104      0.7688      0.8378      0.8493
+pump_id01               0.7971      0.9046      0.9343      0.8857      0.8008      0.8293      0.7920      0.8677      0.8710
+pump_id02               0.3668      0.9709      0.9909      0.9737      0.9355      0.9384      0.9285      0.9506      0.9896
+pump_id03               0.5221      0.9435      0.9282      0.8772      0.8144      0.8412      0.8045      0.8771      0.9318
+pump_id04               0.0389      1.0000      1.0000      1.0000      0.9817      0.9820      0.9807      0.9873      1.0000
+pump_id05               0.0531      0.9980      0.9709      0.8981      0.8669      0.8770      0.8725      0.8701      0.9642
+pump_id06               1.1283      0.9259      0.9247      0.8700      0.7719      0.8059      0.7614      0.8609      0.7380
+slider_id00             0.2287      0.9719      0.9979      0.9965      0.9411      0.9440      0.9401      0.9273      0.9987
+slider_id01             0.3166      0.9574      0.9861      0.9367      0.8602      0.8736      0.8575      0.8783      0.9457
+slider_id02             0.6722      0.9548      0.9397      0.8676      0.8313      0.8190      0.8578      0.8303      0.9490
+slider_id03             0.4822      0.9318      0.9255      0.9018      0.7668      0.8011      0.7638      0.8095      0.9192
+slider_id04             0.0623      0.9922      1.0000      1.0000      0.9390      0.9416      0.9390      0.9450      0.9999
+slider_id05             0.3280      0.9399      0.9893      0.9556      0.8843      0.8921      0.8827      0.8968      0.9760
+valve_id00              1.0722      0.7926      0.9292      0.8956      0.7509      0.7208      0.6769      0.6987      0.7023
+valve_id01              2.0592      0.7135      0.8858      0.8868      0.7749      0.7725      0.7121      0.7625      0.4840
+valve_id02              0.7266      0.8417      0.9742      0.9421      0.7482      0.7925      0.7378      0.8356      0.8813
+valve_id03              4.7344      0.7079      0.8770      0.8807      0.7735      0.7608      0.7005      0.7381      0.5343
+valve_id04              2.7683      0.7619      0.9287      0.9061      0.7583      0.7467      0.6964      0.7400      0.6596
+valve_id05              0.5580      0.8494      0.9347      0.8376      0.7781      0.7570      0.8443      0.7900      0.9270
+valve_id06              2.2401      0.6195      0.8175      0.7991      0.6963      0.7208      0.6368      0.7262      0.4343
+ToyCar_id01             0.2481      0.8829      0.9672      0.8959      0.7634      0.7621      0.6359      0.7591      0.9756
+ToyCar_id02             0.5884      0.9062      0.9770      0.9610      0.7884      0.8062      0.7211      0.8462      0.7115
+ToyCar_id03             0.5906      0.8122      0.9861      0.9396      0.7573      0.7645      0.6292      0.7615      0.2606
+ToyCar_id04             0.6794      0.9195      0.9995      0.9976      0.8378      0.8172      0.6816      0.7570      0.9792
+평균                      0.7908      0.8869      0.9478      0.9177      0.8287      0.8361      0.8074      0.8393      0.8362
+
+--- [32/40] ToyCar_id05
+[ToyCar_id05] method=supervised bs=512 epochs=60 sched=cosine clip_loss hop=16
+  train 정상 18000 seg, 다른 ID 풀 2380 seg, val 2200 seg, test 4212 seg
+  파일 단위 손실: 정상 900파일, 이상 119파일
+  ep   1 | train 0.6583/0.516 | val 0.1722/0.513 auc 0.544 | test AUC 0.569 pAUC 0.525 | 1.7s
+  ep  10 | train 0.1784/0.557 | val 0.1814/0.583 auc 0.611 | test AUC 0.646 pAUC 0.568 | 1.7s
+  ep  20 | train 0.1663/0.583 | val 0.1645/0.541 auc 0.603 | test AUC 0.620 pAUC 0.587 | 2.0s
+  ep  30 | train 0.1536/0.646 | val 0.2617/0.577 auc 0.611 | test AUC 0.710 pAUC 0.671 | 1.7s
+  ep  40 | train 0.1449/0.686 | val 0.2500/0.609 auc 0.654 | test AUC 0.804 pAUC 0.690 | 1.7s
+  ep  50 | train 0.1142/0.782 | val 0.4449/0.613 auc 0.695 | test AUC 0.803 pAUC 0.702 | 1.9s
+  ep  60 | train 0.1065/0.787 | val 0.3532/0.630 auc 0.724 | test AUC 0.818 pAUC 0.715 | 1.7s
+  완료 → /mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/software/runs/all40/ToyCar_id05
+
+unit                  val_loss     val_auc    test_auc   test_pauc test_f1_bal test_acc_bal test_seg_f1 test_seg_acc test_auc_bestval
+fan_id00                0.4140      0.6645      0.7376      0.6930      0.6330      0.6515      0.6946      0.6401      0.6223
+fan_id01                0.1860      0.9832      0.9848      0.9755      0.9234      0.9265      0.9278      0.9148      0.9740
+fan_id02                0.6474      0.9257      0.9712      0.9316      0.8868      0.8935      0.8976      0.8775      0.7849
+fan_id03                0.1474      0.9861      0.9859      0.9582      0.9246      0.9260      0.9375      0.9222      0.9880
+fan_id04                0.2613      0.9133      0.9783      0.9383      0.8192      0.8345      0.8364      0.8131      0.8971
+fan_id05                0.2603      0.9764      0.9759      0.9693      0.9302      0.9321      0.9366      0.9246      0.9750
+fan_id06                0.0561      0.9993      0.9992      0.9956      0.9777      0.9780      0.9784      0.9726      0.9992
+pump_id00               1.2800      0.7482      0.8849      0.8808      0.7727      0.8104      0.7688      0.8378      0.8493
+pump_id01               0.7971      0.9046      0.9343      0.8857      0.8008      0.8293      0.7920      0.8677      0.8710
+pump_id02               0.3668      0.9709      0.9909      0.9737      0.9355      0.9384      0.9285      0.9506      0.9896
+pump_id03               0.5221      0.9435      0.9282      0.8772      0.8144      0.8412      0.8045      0.8771      0.9318
+pump_id04               0.0389      1.0000      1.0000      1.0000      0.9817      0.9820      0.9807      0.9873      1.0000
+pump_id05               0.0531      0.9980      0.9709      0.8981      0.8669      0.8770      0.8725      0.8701      0.9642
+pump_id06               1.1283      0.9259      0.9247      0.8700      0.7719      0.8059      0.7614      0.8609      0.7380
+slider_id00             0.2287      0.9719      0.9979      0.9965      0.9411      0.9440      0.9401      0.9273      0.9987
+slider_id01             0.3166      0.9574      0.9861      0.9367      0.8602      0.8736      0.8575      0.8783      0.9457
+slider_id02             0.6722      0.9548      0.9397      0.8676      0.8313      0.8190      0.8578      0.8303      0.9490
+slider_id03             0.4822      0.9318      0.9255      0.9018      0.7668      0.8011      0.7638      0.8095      0.9192
+slider_id04             0.0623      0.9922      1.0000      1.0000      0.9390      0.9416      0.9390      0.9450      0.9999
+slider_id05             0.3280      0.9399      0.9893      0.9556      0.8843      0.8921      0.8827      0.8968      0.9760
+valve_id00              1.0722      0.7926      0.9292      0.8956      0.7509      0.7208      0.6769      0.6987      0.7023
+valve_id01              2.0592      0.7135      0.8858      0.8868      0.7749      0.7725      0.7121      0.7625      0.4840
+valve_id02              0.7266      0.8417      0.9742      0.9421      0.7482      0.7925      0.7378      0.8356      0.8813
+valve_id03              4.7344      0.7079      0.8770      0.8807      0.7735      0.7608      0.7005      0.7381      0.5343
+valve_id04              2.7683      0.7619      0.9287      0.9061      0.7583      0.7467      0.6964      0.7400      0.6596
+valve_id05              0.5580      0.8494      0.9347      0.8376      0.7781      0.7570      0.8443      0.7900      0.9270
+valve_id06              2.2401      0.6195      0.8175      0.7991      0.6963      0.7208      0.6368      0.7262      0.4343
+ToyCar_id01             0.2481      0.8829      0.9672      0.8959      0.7634      0.7621      0.6359      0.7591      0.9756
+ToyCar_id02             0.5884      0.9062      0.9770      0.9610      0.7884      0.8062      0.7211      0.8462      0.7115
+ToyCar_id03             0.5906      0.8122      0.9861      0.9396      0.7573      0.7645      0.6292      0.7615      0.2606
+ToyCar_id04             0.6794      0.9195      0.9995      0.9976      0.8378      0.8172      0.6816      0.7570      0.9792
+ToyCar_id05             0.3532      0.7236      0.8175      0.7149      0.5915      0.6382      0.5254      0.6714      0.6203
+평균                      0.7771      0.8818      0.9437      0.9113      0.8213      0.8299      0.7986      0.8341      0.8295
+
+--- [33/40] ToyCar_id06
+[ToyCar_id06] method=supervised bs=512 epochs=60 sched=cosine clip_loss hop=16
+  train 정상 18000 seg, 다른 ID 풀 2380 seg, val 2200 seg, test 4213 seg
+  파일 단위 손실: 정상 900파일, 이상 119파일
+  ep   1 | train 0.7744/0.526 | val 0.1753/0.507 auc 0.525 | test AUC 0.582 pAUC 0.523 | 1.8s
+  ep  10 | train 0.1622/0.659 | val 0.2857/0.647 auc 0.702 | test AUC 0.824 pAUC 0.678 | 1.8s
+  ep  20 | train 0.0887/0.891 | val 0.3413/0.760 auc 0.889 | test AUC 0.977 pAUC 0.952 | 1.7s
+  ep  30 | train 0.0401/0.943 | val 0.2598/0.804 auc 0.917 | test AUC 0.992 pAUC 0.979 | 1.8s
+  ep  40 | train 0.0224/0.967 | val 0.2531/0.782 auc 0.893 | test AUC 0.995 pAUC 0.975 | 1.8s
+  ep  50 | train 0.0091/0.987 | val 0.3113/0.812 auc 0.905 | test AUC 0.994 pAUC 0.981 | 1.7s
+  ep  60 | train 0.0079/0.991 | val 0.3447/0.816 auc 0.912 | test AUC 0.993 pAUC 0.982 | 1.7s
+  완료 → /mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/software/runs/all40/ToyCar_id06
+
+unit                  val_loss     val_auc    test_auc   test_pauc test_f1_bal test_acc_bal test_seg_f1 test_seg_acc test_auc_bestval
+fan_id00                0.4140      0.6645      0.7376      0.6930      0.6330      0.6515      0.6946      0.6401      0.6223
+fan_id01                0.1860      0.9832      0.9848      0.9755      0.9234      0.9265      0.9278      0.9148      0.9740
+fan_id02                0.6474      0.9257      0.9712      0.9316      0.8868      0.8935      0.8976      0.8775      0.7849
+fan_id03                0.1474      0.9861      0.9859      0.9582      0.9246      0.9260      0.9375      0.9222      0.9880
+fan_id04                0.2613      0.9133      0.9783      0.9383      0.8192      0.8345      0.8364      0.8131      0.8971
+fan_id05                0.2603      0.9764      0.9759      0.9693      0.9302      0.9321      0.9366      0.9246      0.9750
+fan_id06                0.0561      0.9993      0.9992      0.9956      0.9777      0.9780      0.9784      0.9726      0.9992
+pump_id00               1.2800      0.7482      0.8849      0.8808      0.7727      0.8104      0.7688      0.8378      0.8493
+pump_id01               0.7971      0.9046      0.9343      0.8857      0.8008      0.8293      0.7920      0.8677      0.8710
+pump_id02               0.3668      0.9709      0.9909      0.9737      0.9355      0.9384      0.9285      0.9506      0.9896
+pump_id03               0.5221      0.9435      0.9282      0.8772      0.8144      0.8412      0.8045      0.8771      0.9318
+pump_id04               0.0389      1.0000      1.0000      1.0000      0.9817      0.9820      0.9807      0.9873      1.0000
+pump_id05               0.0531      0.9980      0.9709      0.8981      0.8669      0.8770      0.8725      0.8701      0.9642
+pump_id06               1.1283      0.9259      0.9247      0.8700      0.7719      0.8059      0.7614      0.8609      0.7380
+slider_id00             0.2287      0.9719      0.9979      0.9965      0.9411      0.9440      0.9401      0.9273      0.9987
+slider_id01             0.3166      0.9574      0.9861      0.9367      0.8602      0.8736      0.8575      0.8783      0.9457
+slider_id02             0.6722      0.9548      0.9397      0.8676      0.8313      0.8190      0.8578      0.8303      0.9490
+slider_id03             0.4822      0.9318      0.9255      0.9018      0.7668      0.8011      0.7638      0.8095      0.9192
+slider_id04             0.0623      0.9922      1.0000      1.0000      0.9390      0.9416      0.9390      0.9450      0.9999
+slider_id05             0.3280      0.9399      0.9893      0.9556      0.8843      0.8921      0.8827      0.8968      0.9760
+valve_id00              1.0722      0.7926      0.9292      0.8956      0.7509      0.7208      0.6769      0.6987      0.7023
+valve_id01              2.0592      0.7135      0.8858      0.8868      0.7749      0.7725      0.7121      0.7625      0.4840
+valve_id02              0.7266      0.8417      0.9742      0.9421      0.7482      0.7925      0.7378      0.8356      0.8813
+valve_id03              4.7344      0.7079      0.8770      0.8807      0.7735      0.7608      0.7005      0.7381      0.5343
+valve_id04              2.7683      0.7619      0.9287      0.9061      0.7583      0.7467      0.6964      0.7400      0.6596
+valve_id05              0.5580      0.8494      0.9347      0.8376      0.7781      0.7570      0.8443      0.7900      0.9270
+valve_id06              2.2401      0.6195      0.8175      0.7991      0.6963      0.7208      0.6368      0.7262      0.4343
+ToyCar_id01             0.2481      0.8829      0.9672      0.8959      0.7634      0.7621      0.6359      0.7591      0.9756
+ToyCar_id02             0.5884      0.9062      0.9770      0.9610      0.7884      0.8062      0.7211      0.8462      0.7115
+ToyCar_id03             0.5906      0.8122      0.9861      0.9396      0.7573      0.7645      0.6292      0.7615      0.2606
+ToyCar_id04             0.6794      0.9195      0.9995      0.9976      0.8378      0.8172      0.6816      0.7570      0.9792
+ToyCar_id05             0.3532      0.7236      0.8175      0.7149      0.5915      0.6382      0.5254      0.6714      0.6203
+ToyCar_id06             0.3447      0.9120      0.9935      0.9818      0.8017      0.7891      0.7185      0.7681      0.9907
+평균                      0.7640      0.8827      0.9452      0.9135      0.8207      0.8287      0.7962      0.8321      0.8344
+
+--- [34/40] ToyCar_id07
+[ToyCar_id07] method=supervised bs=512 epochs=60 sched=cosine clip_loss hop=16
+  train 정상 18000 seg, 다른 ID 풀 2380 seg, val 2200 seg, test 4213 seg
+  파일 단위 손실: 정상 900파일, 이상 119파일
+  ep   1 | train 0.7962/0.576 | val 0.1839/0.536 auc 0.587 | test AUC 0.653 pAUC 0.572 | 1.7s
+  ep  10 | train 0.1002/0.854 | val 0.3805/0.749 auc 0.815 | test AUC 0.928 pAUC 0.868 | 1.9s
+  ep  20 | train 0.0473/0.936 | val 0.6540/0.747 auc 0.840 | test AUC 0.882 pAUC 0.876 | 1.7s
+  ep  30 | train 0.0304/0.962 | val 0.4706/0.755 auc 0.846 | test AUC 0.978 pAUC 0.946 | 1.7s
+  ep  40 | train 0.0214/0.970 | val 0.5715/0.769 auc 0.872 | test AUC 0.964 pAUC 0.944 | 1.7s
+  ep  50 | train 0.0080/0.992 | val 0.7359/0.772 auc 0.877 | test AUC 0.976 pAUC 0.958 | 1.7s
+  ep  60 | train 0.0054/0.996 | val 0.8239/0.774 auc 0.879 | test AUC 0.972 pAUC 0.954 | 1.7s
+  완료 → /mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/software/runs/all40/ToyCar_id07
+
+unit                  val_loss     val_auc    test_auc   test_pauc test_f1_bal test_acc_bal test_seg_f1 test_seg_acc test_auc_bestval
+fan_id00                0.4140      0.6645      0.7376      0.6930      0.6330      0.6515      0.6946      0.6401      0.6223
+fan_id01                0.1860      0.9832      0.9848      0.9755      0.9234      0.9265      0.9278      0.9148      0.9740
+fan_id02                0.6474      0.9257      0.9712      0.9316      0.8868      0.8935      0.8976      0.8775      0.7849
+fan_id03                0.1474      0.9861      0.9859      0.9582      0.9246      0.9260      0.9375      0.9222      0.9880
+fan_id04                0.2613      0.9133      0.9783      0.9383      0.8192      0.8345      0.8364      0.8131      0.8971
+fan_id05                0.2603      0.9764      0.9759      0.9693      0.9302      0.9321      0.9366      0.9246      0.9750
+fan_id06                0.0561      0.9993      0.9992      0.9956      0.9777      0.9780      0.9784      0.9726      0.9992
+pump_id00               1.2800      0.7482      0.8849      0.8808      0.7727      0.8104      0.7688      0.8378      0.8493
+pump_id01               0.7971      0.9046      0.9343      0.8857      0.8008      0.8293      0.7920      0.8677      0.8710
+pump_id02               0.3668      0.9709      0.9909      0.9737      0.9355      0.9384      0.9285      0.9506      0.9896
+pump_id03               0.5221      0.9435      0.9282      0.8772      0.8144      0.8412      0.8045      0.8771      0.9318
+pump_id04               0.0389      1.0000      1.0000      1.0000      0.9817      0.9820      0.9807      0.9873      1.0000
+pump_id05               0.0531      0.9980      0.9709      0.8981      0.8669      0.8770      0.8725      0.8701      0.9642
+pump_id06               1.1283      0.9259      0.9247      0.8700      0.7719      0.8059      0.7614      0.8609      0.7380
+slider_id00             0.2287      0.9719      0.9979      0.9965      0.9411      0.9440      0.9401      0.9273      0.9987
+slider_id01             0.3166      0.9574      0.9861      0.9367      0.8602      0.8736      0.8575      0.8783      0.9457
+slider_id02             0.6722      0.9548      0.9397      0.8676      0.8313      0.8190      0.8578      0.8303      0.9490
+slider_id03             0.4822      0.9318      0.9255      0.9018      0.7668      0.8011      0.7638      0.8095      0.9192
+slider_id04             0.0623      0.9922      1.0000      1.0000      0.9390      0.9416      0.9390      0.9450      0.9999
+slider_id05             0.3280      0.9399      0.9893      0.9556      0.8843      0.8921      0.8827      0.8968      0.9760
+valve_id00              1.0722      0.7926      0.9292      0.8956      0.7509      0.7208      0.6769      0.6987      0.7023
+valve_id01              2.0592      0.7135      0.8858      0.8868      0.7749      0.7725      0.7121      0.7625      0.4840
+valve_id02              0.7266      0.8417      0.9742      0.9421      0.7482      0.7925      0.7378      0.8356      0.8813
+valve_id03              4.7344      0.7079      0.8770      0.8807      0.7735      0.7608      0.7005      0.7381      0.5343
+valve_id04              2.7683      0.7619      0.9287      0.9061      0.7583      0.7467      0.6964      0.7400      0.6596
+valve_id05              0.5580      0.8494      0.9347      0.8376      0.7781      0.7570      0.8443      0.7900      0.9270
+valve_id06              2.2401      0.6195      0.8175      0.7991      0.6963      0.7208      0.6368      0.7262      0.4343
+ToyCar_id01             0.2481      0.8829      0.9672      0.8959      0.7634      0.7621      0.6359      0.7591      0.9756
+ToyCar_id02             0.5884      0.9062      0.9770      0.9610      0.7884      0.8062      0.7211      0.8462      0.7115
+ToyCar_id03             0.5906      0.8122      0.9861      0.9396      0.7573      0.7645      0.6292      0.7615      0.2606
+ToyCar_id04             0.6794      0.9195      0.9995      0.9976      0.8378      0.8172      0.6816      0.7570      0.9792
+ToyCar_id05             0.3532      0.7236      0.8175      0.7149      0.5915      0.6382      0.5254      0.6714      0.6203
+ToyCar_id06             0.3447      0.9120      0.9935      0.9818      0.8017      0.7891      0.7185      0.7681      0.9907
+ToyCar_id07             0.8239      0.8791      0.9722      0.9539      0.7886      0.7591      0.6826      0.7097      0.9010
+평균                      0.7658      0.8826      0.9460      0.9146      0.8197      0.8266      0.7929      0.8285      0.8363
+
+--- [35/40] ToyConveyor_id01
+[ToyConveyor_id01] method=supervised bs=512 epochs=60 sched=cosine clip_loss hop=16
+  train 정상 16200 seg, 다른 ID 풀 3240 seg, val 2000 seg, test 10000 seg
+  파일 단위 손실: 정상 900파일, 이상 180파일
+  ep   1 | train 0.8805/0.533 | val 0.3460/0.503 auc 0.650 | test AUC 0.706 pAUC 0.556 | 1.6s
+  ep  10 | train 0.1298/0.771 | val 0.3338/0.697 auc 0.862 | test AUC 0.936 pAUC 0.824 | 1.6s
+  ep  20 | train 0.1435/0.768 | val 0.2299/0.753 auc 0.866 | test AUC 0.952 pAUC 0.857 | 1.6s
+  ep  30 | train 0.0971/0.849 | val 0.2166/0.797 auc 0.878 | test AUC 0.961 pAUC 0.879 | 1.6s
+  ep  40 | train 0.0782/0.873 | val 0.4322/0.711 auc 0.876 | test AUC 0.954 pAUC 0.845 | 1.6s
+  ep  50 | train 0.0582/0.913 | val 0.2615/0.820 auc 0.895 | test AUC 0.966 pAUC 0.893 | 1.7s
+  ep  60 | train 0.0480/0.936 | val 0.2764/0.811 auc 0.889 | test AUC 0.965 pAUC 0.891 | 1.8s
+  완료 → /mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/software/runs/all40/ToyConveyor_id01
+
+unit                  val_loss     val_auc    test_auc   test_pauc test_f1_bal test_acc_bal test_seg_f1 test_seg_acc test_auc_bestval
+fan_id00                0.4140      0.6645      0.7376      0.6930      0.6330      0.6515      0.6946      0.6401      0.6223
+fan_id01                0.1860      0.9832      0.9848      0.9755      0.9234      0.9265      0.9278      0.9148      0.9740
+fan_id02                0.6474      0.9257      0.9712      0.9316      0.8868      0.8935      0.8976      0.8775      0.7849
+fan_id03                0.1474      0.9861      0.9859      0.9582      0.9246      0.9260      0.9375      0.9222      0.9880
+fan_id04                0.2613      0.9133      0.9783      0.9383      0.8192      0.8345      0.8364      0.8131      0.8971
+fan_id05                0.2603      0.9764      0.9759      0.9693      0.9302      0.9321      0.9366      0.9246      0.9750
+fan_id06                0.0561      0.9993      0.9992      0.9956      0.9777      0.9780      0.9784      0.9726      0.9992
+pump_id00               1.2800      0.7482      0.8849      0.8808      0.7727      0.8104      0.7688      0.8378      0.8493
+pump_id01               0.7971      0.9046      0.9343      0.8857      0.8008      0.8293      0.7920      0.8677      0.8710
+pump_id02               0.3668      0.9709      0.9909      0.9737      0.9355      0.9384      0.9285      0.9506      0.9896
+pump_id03               0.5221      0.9435      0.9282      0.8772      0.8144      0.8412      0.8045      0.8771      0.9318
+pump_id04               0.0389      1.0000      1.0000      1.0000      0.9817      0.9820      0.9807      0.9873      1.0000
+pump_id05               0.0531      0.9980      0.9709      0.8981      0.8669      0.8770      0.8725      0.8701      0.9642
+pump_id06               1.1283      0.9259      0.9247      0.8700      0.7719      0.8059      0.7614      0.8609      0.7380
+slider_id00             0.2287      0.9719      0.9979      0.9965      0.9411      0.9440      0.9401      0.9273      0.9987
+slider_id01             0.3166      0.9574      0.9861      0.9367      0.8602      0.8736      0.8575      0.8783      0.9457
+slider_id02             0.6722      0.9548      0.9397      0.8676      0.8313      0.8190      0.8578      0.8303      0.9490
+slider_id03             0.4822      0.9318      0.9255      0.9018      0.7668      0.8011      0.7638      0.8095      0.9192
+slider_id04             0.0623      0.9922      1.0000      1.0000      0.9390      0.9416      0.9390      0.9450      0.9999
+slider_id05             0.3280      0.9399      0.9893      0.9556      0.8843      0.8921      0.8827      0.8968      0.9760
+valve_id00              1.0722      0.7926      0.9292      0.8956      0.7509      0.7208      0.6769      0.6987      0.7023
+valve_id01              2.0592      0.7135      0.8858      0.8868      0.7749      0.7725      0.7121      0.7625      0.4840
+valve_id02              0.7266      0.8417      0.9742      0.9421      0.7482      0.7925      0.7378      0.8356      0.8813
+valve_id03              4.7344      0.7079      0.8770      0.8807      0.7735      0.7608      0.7005      0.7381      0.5343
+valve_id04              2.7683      0.7619      0.9287      0.9061      0.7583      0.7467      0.6964      0.7400      0.6596
+valve_id05              0.5580      0.8494      0.9347      0.8376      0.7781      0.7570      0.8443      0.7900      0.9270
+valve_id06              2.2401      0.6195      0.8175      0.7991      0.6963      0.7208      0.6368      0.7262      0.4343
+ToyCar_id01             0.2481      0.8829      0.9672      0.8959      0.7634      0.7621      0.6359      0.7591      0.9756
+ToyCar_id02             0.5884      0.9062      0.9770      0.9610      0.7884      0.8062      0.7211      0.8462      0.7115
+ToyCar_id03             0.5906      0.8122      0.9861      0.9396      0.7573      0.7645      0.6292      0.7615      0.2606
+ToyCar_id04             0.6794      0.9195      0.9995      0.9976      0.8378      0.8172      0.6816      0.7570      0.9792
+ToyCar_id05             0.3532      0.7236      0.8175      0.7149      0.5915      0.6382      0.5254      0.6714      0.6203
+ToyCar_id06             0.3447      0.9120      0.9935      0.9818      0.8017      0.7891      0.7185      0.7681      0.9907
+ToyCar_id07             0.8239      0.8791      0.9722      0.9539      0.7886      0.7591      0.6826      0.7097      0.9010
+ToyConveyor_id01        0.2764      0.8887      0.9654      0.8909      0.7917      0.7935      0.6027      0.7930      0.9554
+평균                      0.7518      0.8828      0.9466      0.9140      0.8189      0.8257      0.7874      0.8274      0.8397
+
+--- [36/40] ToyConveyor_id02
+[ToyConveyor_id02] method=supervised bs=512 epochs=60 sched=cosine clip_loss hop=16
+  train 정상 16200 seg, 다른 ID 풀 2862 seg, val 2000 seg, test 9780 seg
+  파일 단위 손실: 정상 900파일, 이상 159파일
+  ep   1 | train 0.7923/0.499 | val 0.1763/0.514 auc 0.485 | test AUC 0.434 pAUC 0.485 | 1.8s
+  ep  10 | train 0.1838/0.532 | val 0.1798/0.522 auc 0.562 | test AUC 0.603 pAUC 0.508 | 1.7s
+  ep  20 | train 0.1644/0.608 | val 0.1670/0.609 auc 0.663 | test AUC 0.677 pAUC 0.550 | 1.7s
+  ep  30 | train 0.1354/0.746 | val 0.5653/0.658 auc 0.754 | test AUC 0.778 pAUC 0.630 | 1.6s
+  ep  40 | train 0.1048/0.815 | val 0.3068/0.705 auc 0.776 | test AUC 0.871 pAUC 0.740 | 1.6s
+  ep  50 | train 0.0825/0.861 | val 0.3512/0.733 auc 0.803 | test AUC 0.910 pAUC 0.800 | 1.6s
+  ep  60 | train 0.0671/0.888 | val 0.3995/0.749 auc 0.803 | test AUC 0.922 pAUC 0.808 | 1.6s
+  완료 → /mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/software/runs/all40/ToyConveyor_id02
+
+unit                  val_loss     val_auc    test_auc   test_pauc test_f1_bal test_acc_bal test_seg_f1 test_seg_acc test_auc_bestval
+fan_id00                0.4140      0.6645      0.7376      0.6930      0.6330      0.6515      0.6946      0.6401      0.6223
+fan_id01                0.1860      0.9832      0.9848      0.9755      0.9234      0.9265      0.9278      0.9148      0.9740
+fan_id02                0.6474      0.9257      0.9712      0.9316      0.8868      0.8935      0.8976      0.8775      0.7849
+fan_id03                0.1474      0.9861      0.9859      0.9582      0.9246      0.9260      0.9375      0.9222      0.9880
+fan_id04                0.2613      0.9133      0.9783      0.9383      0.8192      0.8345      0.8364      0.8131      0.8971
+fan_id05                0.2603      0.9764      0.9759      0.9693      0.9302      0.9321      0.9366      0.9246      0.9750
+fan_id06                0.0561      0.9993      0.9992      0.9956      0.9777      0.9780      0.9784      0.9726      0.9992
+pump_id00               1.2800      0.7482      0.8849      0.8808      0.7727      0.8104      0.7688      0.8378      0.8493
+pump_id01               0.7971      0.9046      0.9343      0.8857      0.8008      0.8293      0.7920      0.8677      0.8710
+pump_id02               0.3668      0.9709      0.9909      0.9737      0.9355      0.9384      0.9285      0.9506      0.9896
+pump_id03               0.5221      0.9435      0.9282      0.8772      0.8144      0.8412      0.8045      0.8771      0.9318
+pump_id04               0.0389      1.0000      1.0000      1.0000      0.9817      0.9820      0.9807      0.9873      1.0000
+pump_id05               0.0531      0.9980      0.9709      0.8981      0.8669      0.8770      0.8725      0.8701      0.9642
+pump_id06               1.1283      0.9259      0.9247      0.8700      0.7719      0.8059      0.7614      0.8609      0.7380
+slider_id00             0.2287      0.9719      0.9979      0.9965      0.9411      0.9440      0.9401      0.9273      0.9987
+slider_id01             0.3166      0.9574      0.9861      0.9367      0.8602      0.8736      0.8575      0.8783      0.9457
+slider_id02             0.6722      0.9548      0.9397      0.8676      0.8313      0.8190      0.8578      0.8303      0.9490
+slider_id03             0.4822      0.9318      0.9255      0.9018      0.7668      0.8011      0.7638      0.8095      0.9192
+slider_id04             0.0623      0.9922      1.0000      1.0000      0.9390      0.9416      0.9390      0.9450      0.9999
+slider_id05             0.3280      0.9399      0.9893      0.9556      0.8843      0.8921      0.8827      0.8968      0.9760
+valve_id00              1.0722      0.7926      0.9292      0.8956      0.7509      0.7208      0.6769      0.6987      0.7023
+valve_id01              2.0592      0.7135      0.8858      0.8868      0.7749      0.7725      0.7121      0.7625      0.4840
+valve_id02              0.7266      0.8417      0.9742      0.9421      0.7482      0.7925      0.7378      0.8356      0.8813
+valve_id03              4.7344      0.7079      0.8770      0.8807      0.7735      0.7608      0.7005      0.7381      0.5343
+valve_id04              2.7683      0.7619      0.9287      0.9061      0.7583      0.7467      0.6964      0.7400      0.6596
+valve_id05              0.5580      0.8494      0.9347      0.8376      0.7781      0.7570      0.8443      0.7900      0.9270
+valve_id06              2.2401      0.6195      0.8175      0.7991      0.6963      0.7208      0.6368      0.7262      0.4343
+ToyCar_id01             0.2481      0.8829      0.9672      0.8959      0.7634      0.7621      0.6359      0.7591      0.9756
+ToyCar_id02             0.5884      0.9062      0.9770      0.9610      0.7884      0.8062      0.7211      0.8462      0.7115
+ToyCar_id03             0.5906      0.8122      0.9861      0.9396      0.7573      0.7645      0.6292      0.7615      0.2606
+ToyCar_id04             0.6794      0.9195      0.9995      0.9976      0.8378      0.8172      0.6816      0.7570      0.9792
+ToyCar_id05             0.3532      0.7236      0.8175      0.7149      0.5915      0.6382      0.5254      0.6714      0.6203
+ToyCar_id06             0.3447      0.9120      0.9935      0.9818      0.8017      0.7891      0.7185      0.7681      0.9907
+ToyCar_id07             0.8239      0.8791      0.9722      0.9539      0.7886      0.7591      0.6826      0.7097      0.9010
+ToyConveyor_id01        0.2764      0.8887      0.9654      0.8909      0.7917      0.7935      0.6027      0.7930      0.9554
+ToyConveyor_id02        0.3995      0.8030      0.9218      0.8081      0.7239      0.7292      0.4916      0.7327      0.6775
+평균                      0.7420      0.8806      0.9459      0.9110      0.8163      0.8230      0.7792      0.8248      0.8352
+
+--- [37/40] ToyConveyor_id03
+[ToyConveyor_id03] method=supervised bs=512 epochs=60 sched=cosine clip_loss hop=16
+  train 정상 16200 seg, 다른 ID 풀 2862 seg, val 2000 seg, test 9770 seg
+  파일 단위 손실: 정상 900파일, 이상 159파일
+  ep   1 | train 0.7858/0.584 | val 0.5275/0.540 auc 0.715 | test AUC 0.851 pAUC 0.705 | 1.6s
+  ep  10 | train 0.1012/0.847 | val 0.2816/0.752 auc 0.829 | test AUC 0.976 pAUC 0.897 | 1.6s
+  ep  20 | train 0.0780/0.886 | val 0.5580/0.771 auc 0.840 | test AUC 0.983 pAUC 0.912 | 1.6s
+  ep  30 | train 0.0503/0.921 | val 0.5664/0.793 auc 0.844 | test AUC 0.984 pAUC 0.918 | 1.6s
+  ep  40 | train 0.0264/0.967 | val 0.5163/0.773 auc 0.850 | test AUC 0.987 pAUC 0.940 | 1.6s
+  ep  50 | train 0.0226/0.973 | val 0.6295/0.764 auc 0.858 | test AUC 0.986 pAUC 0.940 | 1.6s
+  ep  60 | train 0.0193/0.976 | val 0.6844/0.769 auc 0.856 | test AUC 0.986 pAUC 0.941 | 1.6s
+  완료 → /mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/software/runs/all40/ToyConveyor_id03
+
+unit                  val_loss     val_auc    test_auc   test_pauc test_f1_bal test_acc_bal test_seg_f1 test_seg_acc test_auc_bestval
+fan_id00                0.4140      0.6645      0.7376      0.6930      0.6330      0.6515      0.6946      0.6401      0.6223
+fan_id01                0.1860      0.9832      0.9848      0.9755      0.9234      0.9265      0.9278      0.9148      0.9740
+fan_id02                0.6474      0.9257      0.9712      0.9316      0.8868      0.8935      0.8976      0.8775      0.7849
+fan_id03                0.1474      0.9861      0.9859      0.9582      0.9246      0.9260      0.9375      0.9222      0.9880
+fan_id04                0.2613      0.9133      0.9783      0.9383      0.8192      0.8345      0.8364      0.8131      0.8971
+fan_id05                0.2603      0.9764      0.9759      0.9693      0.9302      0.9321      0.9366      0.9246      0.9750
+fan_id06                0.0561      0.9993      0.9992      0.9956      0.9777      0.9780      0.9784      0.9726      0.9992
+pump_id00               1.2800      0.7482      0.8849      0.8808      0.7727      0.8104      0.7688      0.8378      0.8493
+pump_id01               0.7971      0.9046      0.9343      0.8857      0.8008      0.8293      0.7920      0.8677      0.8710
+pump_id02               0.3668      0.9709      0.9909      0.9737      0.9355      0.9384      0.9285      0.9506      0.9896
+pump_id03               0.5221      0.9435      0.9282      0.8772      0.8144      0.8412      0.8045      0.8771      0.9318
+pump_id04               0.0389      1.0000      1.0000      1.0000      0.9817      0.9820      0.9807      0.9873      1.0000
+pump_id05               0.0531      0.9980      0.9709      0.8981      0.8669      0.8770      0.8725      0.8701      0.9642
+pump_id06               1.1283      0.9259      0.9247      0.8700      0.7719      0.8059      0.7614      0.8609      0.7380
+slider_id00             0.2287      0.9719      0.9979      0.9965      0.9411      0.9440      0.9401      0.9273      0.9987
+slider_id01             0.3166      0.9574      0.9861      0.9367      0.8602      0.8736      0.8575      0.8783      0.9457
+slider_id02             0.6722      0.9548      0.9397      0.8676      0.8313      0.8190      0.8578      0.8303      0.9490
+slider_id03             0.4822      0.9318      0.9255      0.9018      0.7668      0.8011      0.7638      0.8095      0.9192
+slider_id04             0.0623      0.9922      1.0000      1.0000      0.9390      0.9416      0.9390      0.9450      0.9999
+slider_id05             0.3280      0.9399      0.9893      0.9556      0.8843      0.8921      0.8827      0.8968      0.9760
+valve_id00              1.0722      0.7926      0.9292      0.8956      0.7509      0.7208      0.6769      0.6987      0.7023
+valve_id01              2.0592      0.7135      0.8858      0.8868      0.7749      0.7725      0.7121      0.7625      0.4840
+valve_id02              0.7266      0.8417      0.9742      0.9421      0.7482      0.7925      0.7378      0.8356      0.8813
+valve_id03              4.7344      0.7079      0.8770      0.8807      0.7735      0.7608      0.7005      0.7381      0.5343
+valve_id04              2.7683      0.7619      0.9287      0.9061      0.7583      0.7467      0.6964      0.7400      0.6596
+valve_id05              0.5580      0.8494      0.9347      0.8376      0.7781      0.7570      0.8443      0.7900      0.9270
+valve_id06              2.2401      0.6195      0.8175      0.7991      0.6963      0.7208      0.6368      0.7262      0.4343
+ToyCar_id01             0.2481      0.8829      0.9672      0.8959      0.7634      0.7621      0.6359      0.7591      0.9756
+ToyCar_id02             0.5884      0.9062      0.9770      0.9610      0.7884      0.8062      0.7211      0.8462      0.7115
+ToyCar_id03             0.5906      0.8122      0.9861      0.9396      0.7573      0.7645      0.6292      0.7615      0.2606
+ToyCar_id04             0.6794      0.9195      0.9995      0.9976      0.8378      0.8172      0.6816      0.7570      0.9792
+ToyCar_id05             0.3532      0.7236      0.8175      0.7149      0.5915      0.6382      0.5254      0.6714      0.6203
+ToyCar_id06             0.3447      0.9120      0.9935      0.9818      0.8017      0.7891      0.7185      0.7681      0.9907
+ToyCar_id07             0.8239      0.8791      0.9722      0.9539      0.7886      0.7591      0.6826      0.7097      0.9010
+ToyConveyor_id01        0.2764      0.8887      0.9654      0.8909      0.7917      0.7935      0.6027      0.7930      0.9554
+ToyConveyor_id02        0.3995      0.8030      0.9218      0.8081      0.7239      0.7292      0.4916      0.7327      0.6775
+ToyConveyor_id03        0.6844      0.8556      0.9863      0.9405      0.8309      0.8244      0.5906      0.7822      0.9646
+평균                      0.7404      0.8799      0.9470      0.9118      0.8167      0.8230      0.7741      0.8237      0.8387
+
+--- [38/40] ToyConveyor_id04
+[ToyConveyor_id04] method=supervised bs=512 epochs=60 sched=cosine clip_loss hop=16
+  train 정상 16200 seg, 다른 ID 풀 2862 seg, val 2000 seg, test 3780 seg
+  파일 단위 손실: 정상 900파일, 이상 159파일
+  ep   1 | train 0.6112/0.663 | val 0.1401/0.708 auc 0.807 | test AUC 0.894 pAUC 0.788 | 1.6s
+  ep  10 | train 0.0812/0.908 | val 0.2123/0.841 auc 0.935 | test AUC 0.994 pAUC 0.970 | 1.7s
+  ep  20 | train 0.0513/0.926 | val 0.2287/0.852 auc 0.938 | test AUC 0.992 pAUC 0.964 | 1.7s
+  ep  30 | train 0.0389/0.945 | val 0.2254/0.809 auc 0.915 | test AUC 0.997 pAUC 0.984 | 1.5s
+  ep  40 | train 0.0199/0.969 | val 0.2883/0.858 auc 0.946 | test AUC 0.998 pAUC 0.990 | 1.5s
+  ep  50 | train 0.0174/0.972 | val 0.3761/0.848 auc 0.943 | test AUC 0.998 pAUC 0.988 | 1.6s
+  ep  60 | train 0.0090/0.985 | val 0.4125/0.852 auc 0.942 | test AUC 0.998 pAUC 0.990 | 1.5s
+  완료 → /mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/software/runs/all40/ToyConveyor_id04
+
+unit                  val_loss     val_auc    test_auc   test_pauc test_f1_bal test_acc_bal test_seg_f1 test_seg_acc test_auc_bestval
+fan_id00                0.4140      0.6645      0.7376      0.6930      0.6330      0.6515      0.6946      0.6401      0.6223
+fan_id01                0.1860      0.9832      0.9848      0.9755      0.9234      0.9265      0.9278      0.9148      0.9740
+fan_id02                0.6474      0.9257      0.9712      0.9316      0.8868      0.8935      0.8976      0.8775      0.7849
+fan_id03                0.1474      0.9861      0.9859      0.9582      0.9246      0.9260      0.9375      0.9222      0.9880
+fan_id04                0.2613      0.9133      0.9783      0.9383      0.8192      0.8345      0.8364      0.8131      0.8971
+fan_id05                0.2603      0.9764      0.9759      0.9693      0.9302      0.9321      0.9366      0.9246      0.9750
+fan_id06                0.0561      0.9993      0.9992      0.9956      0.9777      0.9780      0.9784      0.9726      0.9992
+pump_id00               1.2800      0.7482      0.8849      0.8808      0.7727      0.8104      0.7688      0.8378      0.8493
+pump_id01               0.7971      0.9046      0.9343      0.8857      0.8008      0.8293      0.7920      0.8677      0.8710
+pump_id02               0.3668      0.9709      0.9909      0.9737      0.9355      0.9384      0.9285      0.9506      0.9896
+pump_id03               0.5221      0.9435      0.9282      0.8772      0.8144      0.8412      0.8045      0.8771      0.9318
+pump_id04               0.0389      1.0000      1.0000      1.0000      0.9817      0.9820      0.9807      0.9873      1.0000
+pump_id05               0.0531      0.9980      0.9709      0.8981      0.8669      0.8770      0.8725      0.8701      0.9642
+pump_id06               1.1283      0.9259      0.9247      0.8700      0.7719      0.8059      0.7614      0.8609      0.7380
+slider_id00             0.2287      0.9719      0.9979      0.9965      0.9411      0.9440      0.9401      0.9273      0.9987
+slider_id01             0.3166      0.9574      0.9861      0.9367      0.8602      0.8736      0.8575      0.8783      0.9457
+slider_id02             0.6722      0.9548      0.9397      0.8676      0.8313      0.8190      0.8578      0.8303      0.9490
+slider_id03             0.4822      0.9318      0.9255      0.9018      0.7668      0.8011      0.7638      0.8095      0.9192
+slider_id04             0.0623      0.9922      1.0000      1.0000      0.9390      0.9416      0.9390      0.9450      0.9999
+slider_id05             0.3280      0.9399      0.9893      0.9556      0.8843      0.8921      0.8827      0.8968      0.9760
+valve_id00              1.0722      0.7926      0.9292      0.8956      0.7509      0.7208      0.6769      0.6987      0.7023
+valve_id01              2.0592      0.7135      0.8858      0.8868      0.7749      0.7725      0.7121      0.7625      0.4840
+valve_id02              0.7266      0.8417      0.9742      0.9421      0.7482      0.7925      0.7378      0.8356      0.8813
+valve_id03              4.7344      0.7079      0.8770      0.8807      0.7735      0.7608      0.7005      0.7381      0.5343
+valve_id04              2.7683      0.7619      0.9287      0.9061      0.7583      0.7467      0.6964      0.7400      0.6596
+valve_id05              0.5580      0.8494      0.9347      0.8376      0.7781      0.7570      0.8443      0.7900      0.9270
+valve_id06              2.2401      0.6195      0.8175      0.7991      0.6963      0.7208      0.6368      0.7262      0.4343
+ToyCar_id01             0.2481      0.8829      0.9672      0.8959      0.7634      0.7621      0.6359      0.7591      0.9756
+ToyCar_id02             0.5884      0.9062      0.9770      0.9610      0.7884      0.8062      0.7211      0.8462      0.7115
+ToyCar_id03             0.5906      0.8122      0.9861      0.9396      0.7573      0.7645      0.6292      0.7615      0.2606
+ToyCar_id04             0.6794      0.9195      0.9995      0.9976      0.8378      0.8172      0.6816      0.7570      0.9792
+ToyCar_id05             0.3532      0.7236      0.8175      0.7149      0.5915      0.6382      0.5254      0.6714      0.6203
+ToyCar_id06             0.3447      0.9120      0.9935      0.9818      0.8017      0.7891      0.7185      0.7681      0.9907
+ToyCar_id07             0.8239      0.8791      0.9722      0.9539      0.7886      0.7591      0.6826      0.7097      0.9010
+ToyConveyor_id01        0.2764      0.8887      0.9654      0.8909      0.7917      0.7935      0.6027      0.7930      0.9554
+ToyConveyor_id02        0.3995      0.8030      0.9218      0.8081      0.7239      0.7292      0.4916      0.7327      0.6775
+ToyConveyor_id03        0.6844      0.8556      0.9863      0.9405      0.8309      0.8244      0.5906      0.7822      0.9646
+ToyConveyor_id04        0.4125      0.9417      0.9981      0.9901      0.8522      0.8657      0.8509      0.8722      0.9782
+평균                      0.7318      0.8815      0.9483      0.9139      0.8176      0.8242      0.7761      0.8249      0.8424
+
+--- [39/40] ToyConveyor_id05
+[ToyConveyor_id05] method=supervised bs=512 epochs=60 sched=cosine clip_loss hop=16
+  train 정상 16200 seg, 다른 ID 풀 2866 seg, val 2000 seg, test 3783 seg
+  파일 단위 손실: 정상 900파일, 이상 159파일
+  ep   1 | train 0.7671/0.561 | val 0.1875/0.484 auc 0.490 | test AUC 0.564 pAUC 0.531 | 1.8s
+  ep  10 | train 0.1040/0.823 | val 0.1986/0.776 auc 0.824 | test AUC 0.950 pAUC 0.768 | 1.6s
+  ep  20 | train 0.0908/0.855 | val 0.1889/0.777 auc 0.841 | test AUC 0.962 pAUC 0.833 | 1.7s
+  ep  30 | train 0.0864/0.864 | val 0.1831/0.783 auc 0.838 | test AUC 0.967 pAUC 0.847 | 1.6s
+  ep  40 | train 0.0694/0.898 | val 0.2196/0.790 auc 0.836 | test AUC 0.973 pAUC 0.877 | 1.5s
+  ep  50 | train 0.0575/0.910 | val 0.2574/0.790 auc 0.842 | test AUC 0.976 pAUC 0.892 | 1.6s
+  ep  60 | train 0.0529/0.926 | val 0.2733/0.786 auc 0.839 | test AUC 0.976 pAUC 0.893 | 1.6s
+  완료 → /mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/software/runs/all40/ToyConveyor_id05
+
+unit                  val_loss     val_auc    test_auc   test_pauc test_f1_bal test_acc_bal test_seg_f1 test_seg_acc test_auc_bestval
+fan_id00                0.4140      0.6645      0.7376      0.6930      0.6330      0.6515      0.6946      0.6401      0.6223
+fan_id01                0.1860      0.9832      0.9848      0.9755      0.9234      0.9265      0.9278      0.9148      0.9740
+fan_id02                0.6474      0.9257      0.9712      0.9316      0.8868      0.8935      0.8976      0.8775      0.7849
+fan_id03                0.1474      0.9861      0.9859      0.9582      0.9246      0.9260      0.9375      0.9222      0.9880
+fan_id04                0.2613      0.9133      0.9783      0.9383      0.8192      0.8345      0.8364      0.8131      0.8971
+fan_id05                0.2603      0.9764      0.9759      0.9693      0.9302      0.9321      0.9366      0.9246      0.9750
+fan_id06                0.0561      0.9993      0.9992      0.9956      0.9777      0.9780      0.9784      0.9726      0.9992
+pump_id00               1.2800      0.7482      0.8849      0.8808      0.7727      0.8104      0.7688      0.8378      0.8493
+pump_id01               0.7971      0.9046      0.9343      0.8857      0.8008      0.8293      0.7920      0.8677      0.8710
+pump_id02               0.3668      0.9709      0.9909      0.9737      0.9355      0.9384      0.9285      0.9506      0.9896
+pump_id03               0.5221      0.9435      0.9282      0.8772      0.8144      0.8412      0.8045      0.8771      0.9318
+pump_id04               0.0389      1.0000      1.0000      1.0000      0.9817      0.9820      0.9807      0.9873      1.0000
+pump_id05               0.0531      0.9980      0.9709      0.8981      0.8669      0.8770      0.8725      0.8701      0.9642
+pump_id06               1.1283      0.9259      0.9247      0.8700      0.7719      0.8059      0.7614      0.8609      0.7380
+slider_id00             0.2287      0.9719      0.9979      0.9965      0.9411      0.9440      0.9401      0.9273      0.9987
+slider_id01             0.3166      0.9574      0.9861      0.9367      0.8602      0.8736      0.8575      0.8783      0.9457
+slider_id02             0.6722      0.9548      0.9397      0.8676      0.8313      0.8190      0.8578      0.8303      0.9490
+slider_id03             0.4822      0.9318      0.9255      0.9018      0.7668      0.8011      0.7638      0.8095      0.9192
+slider_id04             0.0623      0.9922      1.0000      1.0000      0.9390      0.9416      0.9390      0.9450      0.9999
+slider_id05             0.3280      0.9399      0.9893      0.9556      0.8843      0.8921      0.8827      0.8968      0.9760
+valve_id00              1.0722      0.7926      0.9292      0.8956      0.7509      0.7208      0.6769      0.6987      0.7023
+valve_id01              2.0592      0.7135      0.8858      0.8868      0.7749      0.7725      0.7121      0.7625      0.4840
+valve_id02              0.7266      0.8417      0.9742      0.9421      0.7482      0.7925      0.7378      0.8356      0.8813
+valve_id03              4.7344      0.7079      0.8770      0.8807      0.7735      0.7608      0.7005      0.7381      0.5343
+valve_id04              2.7683      0.7619      0.9287      0.9061      0.7583      0.7467      0.6964      0.7400      0.6596
+valve_id05              0.5580      0.8494      0.9347      0.8376      0.7781      0.7570      0.8443      0.7900      0.9270
+valve_id06              2.2401      0.6195      0.8175      0.7991      0.6963      0.7208      0.6368      0.7262      0.4343
+ToyCar_id01             0.2481      0.8829      0.9672      0.8959      0.7634      0.7621      0.6359      0.7591      0.9756
+ToyCar_id02             0.5884      0.9062      0.9770      0.9610      0.7884      0.8062      0.7211      0.8462      0.7115
+ToyCar_id03             0.5906      0.8122      0.9861      0.9396      0.7573      0.7645      0.6292      0.7615      0.2606
+ToyCar_id04             0.6794      0.9195      0.9995      0.9976      0.8378      0.8172      0.6816      0.7570      0.9792
+ToyCar_id05             0.3532      0.7236      0.8175      0.7149      0.5915      0.6382      0.5254      0.6714      0.6203
+ToyCar_id06             0.3447      0.9120      0.9935      0.9818      0.8017      0.7891      0.7185      0.7681      0.9907
+ToyCar_id07             0.8239      0.8791      0.9722      0.9539      0.7886      0.7591      0.6826      0.7097      0.9010
+ToyConveyor_id01        0.2764      0.8887      0.9654      0.8909      0.7917      0.7935      0.6027      0.7930      0.9554
+ToyConveyor_id02        0.3995      0.8030      0.9218      0.8081      0.7239      0.7292      0.4916      0.7327      0.6775
+ToyConveyor_id03        0.6844      0.8556      0.9863      0.9405      0.8309      0.8244      0.5906      0.7822      0.9646
+ToyConveyor_id04        0.4125      0.9417      0.9981      0.9901      0.8522      0.8657      0.8509      0.8722      0.9782
+ToyConveyor_id05        0.2733      0.8391      0.9758      0.8934      0.8182      0.8045      0.8064      0.8010      0.9539
+평균                      0.7201      0.8805      0.9490      0.9134      0.8176      0.8237      0.7769      0.8243      0.8452
+
+--- [40/40] ToyConveyor_id06
+[ToyConveyor_id06] method=supervised bs=512 epochs=60 sched=cosine clip_loss hop=16
+  train 정상 16200 seg, 다른 ID 풀 2862 seg, val 2000 seg, test 3780 seg
+  파일 단위 손실: 정상 900파일, 이상 159파일
+  ep   1 | train 0.8110/0.553 | val 0.1959/0.525 auc 0.570 | test AUC 0.494 pAUC 0.489 | 1.5s
+  ep  10 | train 0.1071/0.822 | val 0.2502/0.756 auc 0.809 | test AUC 0.952 pAUC 0.861 | 1.7s
+  ep  20 | train 0.1131/0.839 | val 0.2472/0.772 auc 0.834 | test AUC 0.961 pAUC 0.865 | 1.6s
+  ep  30 | train 0.0653/0.895 | val 0.2462/0.809 auc 0.870 | test AUC 0.972 pAUC 0.897 | 1.8s
+  ep  40 | train 0.0695/0.898 | val 0.3631/0.756 auc 0.838 | test AUC 0.974 pAUC 0.891 | 1.6s
+  ep  50 | train 0.0353/0.951 | val 0.4935/0.797 auc 0.871 | test AUC 0.980 pAUC 0.913 | 1.5s
+  ep  60 | train 0.0297/0.962 | val 0.3954/0.815 auc 0.881 | test AUC 0.979 pAUC 0.917 | 1.6s
+  완료 → /mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/software/runs/all40/ToyConveyor_id06
+
+unit                  val_loss     val_auc    test_auc   test_pauc test_f1_bal test_acc_bal test_seg_f1 test_seg_acc test_auc_bestval
+fan_id00                0.4140      0.6645      0.7376      0.6930      0.6330      0.6515      0.6946      0.6401      0.6223
+fan_id01                0.1860      0.9832      0.9848      0.9755      0.9234      0.9265      0.9278      0.9148      0.9740
+fan_id02                0.6474      0.9257      0.9712      0.9316      0.8868      0.8935      0.8976      0.8775      0.7849
+fan_id03                0.1474      0.9861      0.9859      0.9582      0.9246      0.9260      0.9375      0.9222      0.9880
+fan_id04                0.2613      0.9133      0.9783      0.9383      0.8192      0.8345      0.8364      0.8131      0.8971
+fan_id05                0.2603      0.9764      0.9759      0.9693      0.9302      0.9321      0.9366      0.9246      0.9750
+fan_id06                0.0561      0.9993      0.9992      0.9956      0.9777      0.9780      0.9784      0.9726      0.9992
+pump_id00               1.2800      0.7482      0.8849      0.8808      0.7727      0.8104      0.7688      0.8378      0.8493
+pump_id01               0.7971      0.9046      0.9343      0.8857      0.8008      0.8293      0.7920      0.8677      0.8710
+pump_id02               0.3668      0.9709      0.9909      0.9737      0.9355      0.9384      0.9285      0.9506      0.9896
+pump_id03               0.5221      0.9435      0.9282      0.8772      0.8144      0.8412      0.8045      0.8771      0.9318
+pump_id04               0.0389      1.0000      1.0000      1.0000      0.9817      0.9820      0.9807      0.9873      1.0000
+pump_id05               0.0531      0.9980      0.9709      0.8981      0.8669      0.8770      0.8725      0.8701      0.9642
+pump_id06               1.1283      0.9259      0.9247      0.8700      0.7719      0.8059      0.7614      0.8609      0.7380
+slider_id00             0.2287      0.9719      0.9979      0.9965      0.9411      0.9440      0.9401      0.9273      0.9987
+slider_id01             0.3166      0.9574      0.9861      0.9367      0.8602      0.8736      0.8575      0.8783      0.9457
+slider_id02             0.6722      0.9548      0.9397      0.8676      0.8313      0.8190      0.8578      0.8303      0.9490
+slider_id03             0.4822      0.9318      0.9255      0.9018      0.7668      0.8011      0.7638      0.8095      0.9192
+slider_id04             0.0623      0.9922      1.0000      1.0000      0.9390      0.9416      0.9390      0.9450      0.9999
+slider_id05             0.3280      0.9399      0.9893      0.9556      0.8843      0.8921      0.8827      0.8968      0.9760
+valve_id00              1.0722      0.7926      0.9292      0.8956      0.7509      0.7208      0.6769      0.6987      0.7023
+valve_id01              2.0592      0.7135      0.8858      0.8868      0.7749      0.7725      0.7121      0.7625      0.4840
+valve_id02              0.7266      0.8417      0.9742      0.9421      0.7482      0.7925      0.7378      0.8356      0.8813
+valve_id03              4.7344      0.7079      0.8770      0.8807      0.7735      0.7608      0.7005      0.7381      0.5343
+valve_id04              2.7683      0.7619      0.9287      0.9061      0.7583      0.7467      0.6964      0.7400      0.6596
+valve_id05              0.5580      0.8494      0.9347      0.8376      0.7781      0.7570      0.8443      0.7900      0.9270
+valve_id06              2.2401      0.6195      0.8175      0.7991      0.6963      0.7208      0.6368      0.7262      0.4343
+ToyCar_id01             0.2481      0.8829      0.9672      0.8959      0.7634      0.7621      0.6359      0.7591      0.9756
+ToyCar_id02             0.5884      0.9062      0.9770      0.9610      0.7884      0.8062      0.7211      0.8462      0.7115
+ToyCar_id03             0.5906      0.8122      0.9861      0.9396      0.7573      0.7645      0.6292      0.7615      0.2606
+ToyCar_id04             0.6794      0.9195      0.9995      0.9976      0.8378      0.8172      0.6816      0.7570      0.9792
+ToyCar_id05             0.3532      0.7236      0.8175      0.7149      0.5915      0.6382      0.5254      0.6714      0.6203
+ToyCar_id06             0.3447      0.9120      0.9935      0.9818      0.8017      0.7891      0.7185      0.7681      0.9907
+ToyCar_id07             0.8239      0.8791      0.9722      0.9539      0.7886      0.7591      0.6826      0.7097      0.9010
+ToyConveyor_id01        0.2764      0.8887      0.9654      0.8909      0.7917      0.7935      0.6027      0.7930      0.9554
+ToyConveyor_id02        0.3995      0.8030      0.9218      0.8081      0.7239      0.7292      0.4916      0.7327      0.6775
+ToyConveyor_id03        0.6844      0.8556      0.9863      0.9405      0.8309      0.8244      0.5906      0.7822      0.9646
+ToyConveyor_id04        0.4125      0.9417      0.9981      0.9901      0.8522      0.8657      0.8509      0.8722      0.9782
+ToyConveyor_id05        0.2733      0.8391      0.9758      0.8934      0.8182      0.8045      0.8064      0.8010      0.9539
+ToyConveyor_id06        0.3954      0.8812      0.9787      0.9168      0.8146      0.8028      0.8021      0.7987      0.9592
+평균                      0.7119      0.8805      0.9498      0.9134      0.8175      0.8231      0.7775      0.8237      0.8481
+
+ALL DONE

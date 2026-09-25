@@ -1,0 +1,3 @@
+normal   mel(31, 40) mem_npy=True spk_npy=True mem_hex=True 판정=0
+anomaly  mel(31, 40) mem_npy=True spk_npy=True mem_hex=True 판정=0
+선행 재현: PASS

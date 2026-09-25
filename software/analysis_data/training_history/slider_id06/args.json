@@ -1,0 +1,16 @@
+{
+  "machine": "slider",
+  "mid": "06",
+  "method": "supervised",
+  "epochs": 60,
+  "batch_size": 512,
+  "lr": 0.002,
+  "sched": "cosine",
+  "mask_p": 0.5,
+  "clip_loss": true,
+  "hop": 16,
+  "val_frac": 0.1,
+  "seed": 42,
+  "out_dir": null,
+  "weight_dir": null
+}
