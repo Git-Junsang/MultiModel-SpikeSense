@@ -1,0 +1,1309 @@
+{
+  "format_version": 1,
+  "integer_reference": "software/model_develop/snn_int8.py",
+  "real_vector_count": 80,
+  "records": [
+    {
+      "model_id": 0,
+      "unit": "fan_id01",
+      "tag": "normal",
+      "label": 0,
+      "cache": "software/data/mel_dcase/fan_id01_test_seg31.npz",
+      "segment_index": 0,
+      "timesteps": 31,
+      "prediction": 0,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 0,
+      "unit": "fan_id01",
+      "tag": "anomaly",
+      "label": 1,
+      "cache": "software/data/mel_dcase/fan_id01_test_seg31.npz",
+      "segment_index": 10,
+      "timesteps": 31,
+      "prediction": 1,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 1,
+      "unit": "fan_id02",
+      "tag": "normal",
+      "label": 0,
+      "cache": "software/data/mel_dcase/fan_id02_test_seg31.npz",
+      "segment_index": 0,
+      "timesteps": 31,
+      "prediction": 0,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 1,
+      "unit": "fan_id02",
+      "tag": "anomaly",
+      "label": 1,
+      "cache": "software/data/mel_dcase/fan_id02_test_seg31.npz",
+      "segment_index": 1000,
+      "timesteps": 31,
+      "prediction": 1,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 2,
+      "unit": "fan_id03",
+      "tag": "normal",
+      "label": 0,
+      "cache": "software/data/mel_dcase/fan_id03_test_seg31.npz",
+      "segment_index": 0,
+      "timesteps": 31,
+      "prediction": 0,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 2,
+      "unit": "fan_id03",
+      "tag": "anomaly",
+      "label": 1,
+      "cache": "software/data/mel_dcase/fan_id03_test_seg31.npz",
+      "segment_index": 30,
+      "timesteps": 31,
+      "prediction": 1,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 3,
+      "unit": "fan_id04",
+      "tag": "normal",
+      "label": 0,
+      "cache": "software/data/mel_dcase/fan_id04_test_seg31.npz",
+      "segment_index": 0,
+      "timesteps": 31,
+      "prediction": 0,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 3,
+      "unit": "fan_id04",
+      "tag": "anomaly",
+      "label": 1,
+      "cache": "software/data/mel_dcase/fan_id04_test_seg31.npz",
+      "segment_index": 1000,
+      "timesteps": 31,
+      "prediction": 1,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 4,
+      "unit": "fan_id05",
+      "tag": "normal",
+      "label": 0,
+      "cache": "software/data/mel_dcase/fan_id05_test_seg31.npz",
+      "segment_index": 40,
+      "timesteps": 31,
+      "prediction": 0,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 4,
+      "unit": "fan_id05",
+      "tag": "anomaly",
+      "label": 1,
+      "cache": "software/data/mel_dcase/fan_id05_test_seg31.npz",
+      "segment_index": 0,
+      "timesteps": 31,
+      "prediction": 1,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 5,
+      "unit": "fan_id06",
+      "tag": "normal",
+      "label": 0,
+      "cache": "software/data/mel_dcase/fan_id06_test_seg31.npz",
+      "segment_index": 0,
+      "timesteps": 31,
+      "prediction": 0,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 5,
+      "unit": "fan_id06",
+      "tag": "anomaly",
+      "label": 1,
+      "cache": "software/data/mel_dcase/fan_id06_test_seg31.npz",
+      "segment_index": 1000,
+      "timesteps": 31,
+      "prediction": 1,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 6,
+      "unit": "pump_id00",
+      "tag": "normal",
+      "label": 0,
+      "cache": "software/data/mel_dcase/pump_id00_test_seg31.npz",
+      "segment_index": 0,
+      "timesteps": 31,
+      "prediction": 0,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 6,
+      "unit": "pump_id00",
+      "tag": "anomaly",
+      "label": 1,
+      "cache": "software/data/mel_dcase/pump_id00_test_seg31.npz",
+      "segment_index": 1000,
+      "timesteps": 31,
+      "prediction": 1,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 7,
+      "unit": "pump_id01",
+      "tag": "normal",
+      "label": 0,
+      "cache": "software/data/mel_dcase/pump_id01_test_seg31.npz",
+      "segment_index": 40,
+      "timesteps": 31,
+      "prediction": 0,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 7,
+      "unit": "pump_id01",
+      "tag": "anomaly",
+      "label": 1,
+      "cache": "software/data/mel_dcase/pump_id01_test_seg31.npz",
+      "segment_index": 0,
+      "timesteps": 31,
+      "prediction": 1,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 8,
+      "unit": "pump_id02",
+      "tag": "normal",
+      "label": 0,
+      "cache": "software/data/mel_dcase/pump_id02_test_seg31.npz",
+      "segment_index": 0,
+      "timesteps": 31,
+      "prediction": 0,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 8,
+      "unit": "pump_id02",
+      "tag": "anomaly",
+      "label": 1,
+      "cache": "software/data/mel_dcase/pump_id02_test_seg31.npz",
+      "segment_index": 1000,
+      "timesteps": 31,
+      "prediction": 1,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 9,
+      "unit": "pump_id03",
+      "tag": "normal",
+      "label": 0,
+      "cache": "software/data/mel_dcase/pump_id03_test_seg31.npz",
+      "segment_index": 10,
+      "timesteps": 31,
+      "prediction": 0,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 9,
+      "unit": "pump_id03",
+      "tag": "anomaly",
+      "label": 1,
+      "cache": "software/data/mel_dcase/pump_id03_test_seg31.npz",
+      "segment_index": 0,
+      "timesteps": 31,
+      "prediction": 1,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 10,
+      "unit": "pump_id04",
+      "tag": "normal",
+      "label": 0,
+      "cache": "software/data/mel_dcase/pump_id04_test_seg31.npz",
+      "segment_index": 0,
+      "timesteps": 31,
+      "prediction": 0,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 10,
+      "unit": "pump_id04",
+      "tag": "anomaly",
+      "label": 1,
+      "cache": "software/data/mel_dcase/pump_id04_test_seg31.npz",
+      "segment_index": 1000,
+      "timesteps": 31,
+      "prediction": 0,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 11,
+      "unit": "pump_id05",
+      "tag": "normal",
+      "label": 0,
+      "cache": "software/data/mel_dcase/pump_id05_test_seg31.npz",
+      "segment_index": 30,
+      "timesteps": 31,
+      "prediction": 0,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 11,
+      "unit": "pump_id05",
+      "tag": "anomaly",
+      "label": 1,
+      "cache": "software/data/mel_dcase/pump_id05_test_seg31.npz",
+      "segment_index": 0,
+      "timesteps": 31,
+      "prediction": 1,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 12,
+      "unit": "pump_id06",
+      "tag": "normal",
+      "label": 0,
+      "cache": "software/data/mel_dcase/pump_id06_test_seg31.npz",
+      "segment_index": 0,
+      "timesteps": 31,
+      "prediction": 0,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 12,
+      "unit": "pump_id06",
+      "tag": "anomaly",
+      "label": 1,
+      "cache": "software/data/mel_dcase/pump_id06_test_seg31.npz",
+      "segment_index": 1000,
+      "timesteps": 31,
+      "prediction": 0,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 13,
+      "unit": "slider_id00",
+      "tag": "normal",
+      "label": 0,
+      "cache": "software/data/mel_dcase/slider_id00_test_seg31.npz",
+      "segment_index": 0,
+      "timesteps": 31,
+      "prediction": 0,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 13,
+      "unit": "slider_id00",
+      "tag": "anomaly",
+      "label": 1,
+      "cache": "software/data/mel_dcase/slider_id00_test_seg31.npz",
+      "segment_index": 1000,
+      "timesteps": 31,
+      "prediction": 0,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 14,
+      "unit": "slider_id01",
+      "tag": "normal",
+      "label": 0,
+      "cache": "software/data/mel_dcase/slider_id01_test_seg31.npz",
+      "segment_index": 20,
+      "timesteps": 31,
+      "prediction": 0,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 14,
+      "unit": "slider_id01",
+      "tag": "anomaly",
+      "label": 1,
+      "cache": "software/data/mel_dcase/slider_id01_test_seg31.npz",
+      "segment_index": 0,
+      "timesteps": 31,
+      "prediction": 1,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 15,
+      "unit": "slider_id02",
+      "tag": "normal",
+      "label": 0,
+      "cache": "software/data/mel_dcase/slider_id02_test_seg31.npz",
+      "segment_index": 0,
+      "timesteps": 31,
+      "prediction": 1,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 15,
+      "unit": "slider_id02",
+      "tag": "anomaly",
+      "label": 1,
+      "cache": "software/data/mel_dcase/slider_id02_test_seg31.npz",
+      "segment_index": 1000,
+      "timesteps": 31,
+      "prediction": 1,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 16,
+      "unit": "slider_id03",
+      "tag": "normal",
+      "label": 0,
+      "cache": "software/data/mel_dcase/slider_id03_test_seg31.npz",
+      "segment_index": 30,
+      "timesteps": 31,
+      "prediction": 0,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 16,
+      "unit": "slider_id03",
+      "tag": "anomaly",
+      "label": 1,
+      "cache": "software/data/mel_dcase/slider_id03_test_seg31.npz",
+      "segment_index": 0,
+      "timesteps": 31,
+      "prediction": 0,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 17,
+      "unit": "slider_id04",
+      "tag": "normal",
+      "label": 0,
+      "cache": "software/data/mel_dcase/slider_id04_test_seg31.npz",
+      "segment_index": 0,
+      "timesteps": 31,
+      "prediction": 0,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 17,
+      "unit": "slider_id04",
+      "tag": "anomaly",
+      "label": 1,
+      "cache": "software/data/mel_dcase/slider_id04_test_seg31.npz",
+      "segment_index": 1000,
+      "timesteps": 31,
+      "prediction": 1,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 18,
+      "unit": "slider_id05",
+      "tag": "normal",
+      "label": 0,
+      "cache": "software/data/mel_dcase/slider_id05_test_seg31.npz",
+      "segment_index": 0,
+      "timesteps": 31,
+      "prediction": 1,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 18,
+      "unit": "slider_id05",
+      "tag": "anomaly",
+      "label": 1,
+      "cache": "software/data/mel_dcase/slider_id05_test_seg31.npz",
+      "segment_index": 10,
+      "timesteps": 31,
+      "prediction": 1,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 19,
+      "unit": "slider_id06",
+      "tag": "normal",
+      "label": 0,
+      "cache": "software/data/mel_dcase/slider_id06_test_seg31.npz",
+      "segment_index": 0,
+      "timesteps": 31,
+      "prediction": 0,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 19,
+      "unit": "slider_id06",
+      "tag": "anomaly",
+      "label": 1,
+      "cache": "software/data/mel_dcase/slider_id06_test_seg31.npz",
+      "segment_index": 1000,
+      "timesteps": 31,
+      "prediction": 1,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 20,
+      "unit": "valve_id00",
+      "tag": "normal",
+      "label": 0,
+      "cache": "software/data/mel_dcase/valve_id00_test_seg31.npz",
+      "segment_index": 0,
+      "timesteps": 31,
+      "prediction": 1,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 20,
+      "unit": "valve_id00",
+      "tag": "anomaly",
+      "label": 1,
+      "cache": "software/data/mel_dcase/valve_id00_test_seg31.npz",
+      "segment_index": 1000,
+      "timesteps": 31,
+      "prediction": 1,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 21,
+      "unit": "valve_id01",
+      "tag": "normal",
+      "label": 0,
+      "cache": "software/data/mel_dcase/valve_id01_test_seg31.npz",
+      "segment_index": 20,
+      "timesteps": 31,
+      "prediction": 0,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 21,
+      "unit": "valve_id01",
+      "tag": "anomaly",
+      "label": 1,
+      "cache": "software/data/mel_dcase/valve_id01_test_seg31.npz",
+      "segment_index": 0,
+      "timesteps": 31,
+      "prediction": 1,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 22,
+      "unit": "valve_id02",
+      "tag": "normal",
+      "label": 0,
+      "cache": "software/data/mel_dcase/valve_id02_test_seg31.npz",
+      "segment_index": 0,
+      "timesteps": 31,
+      "prediction": 0,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 22,
+      "unit": "valve_id02",
+      "tag": "anomaly",
+      "label": 1,
+      "cache": "software/data/mel_dcase/valve_id02_test_seg31.npz",
+      "segment_index": 1000,
+      "timesteps": 31,
+      "prediction": 0,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 23,
+      "unit": "valve_id03",
+      "tag": "normal",
+      "label": 0,
+      "cache": "software/data/mel_dcase/valve_id03_test_seg31.npz",
+      "segment_index": 10,
+      "timesteps": 31,
+      "prediction": 0,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 23,
+      "unit": "valve_id03",
+      "tag": "anomaly",
+      "label": 1,
+      "cache": "software/data/mel_dcase/valve_id03_test_seg31.npz",
+      "segment_index": 0,
+      "timesteps": 31,
+      "prediction": 1,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 24,
+      "unit": "valve_id04",
+      "tag": "normal",
+      "label": 0,
+      "cache": "software/data/mel_dcase/valve_id04_test_seg31.npz",
+      "segment_index": 0,
+      "timesteps": 31,
+      "prediction": 0,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 24,
+      "unit": "valve_id04",
+      "tag": "anomaly",
+      "label": 1,
+      "cache": "software/data/mel_dcase/valve_id04_test_seg31.npz",
+      "segment_index": 1000,
+      "timesteps": 31,
+      "prediction": 1,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 25,
+      "unit": "valve_id05",
+      "tag": "normal",
+      "label": 0,
+      "cache": "software/data/mel_dcase/valve_id05_test_seg31.npz",
+      "segment_index": 90,
+      "timesteps": 31,
+      "prediction": 1,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 25,
+      "unit": "valve_id05",
+      "tag": "anomaly",
+      "label": 1,
+      "cache": "software/data/mel_dcase/valve_id05_test_seg31.npz",
+      "segment_index": 0,
+      "timesteps": 31,
+      "prediction": 1,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 26,
+      "unit": "valve_id06",
+      "tag": "normal",
+      "label": 0,
+      "cache": "software/data/mel_dcase/valve_id06_test_seg31.npz",
+      "segment_index": 0,
+      "timesteps": 31,
+      "prediction": 0,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 26,
+      "unit": "valve_id06",
+      "tag": "anomaly",
+      "label": 1,
+      "cache": "software/data/mel_dcase/valve_id06_test_seg31.npz",
+      "segment_index": 1000,
+      "timesteps": 31,
+      "prediction": 1,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 27,
+      "unit": "ToyCar_id01",
+      "tag": "normal",
+      "label": 0,
+      "cache": "software/data/mel_dcase/ToyCar_id01_test_seg31.npz",
+      "segment_index": 0,
+      "timesteps": 31,
+      "prediction": 1,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 27,
+      "unit": "ToyCar_id01",
+      "tag": "anomaly",
+      "label": 1,
+      "cache": "software/data/mel_dcase/ToyCar_id01_test_seg31.npz",
+      "segment_index": 3850,
+      "timesteps": 31,
+      "prediction": 0,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 28,
+      "unit": "ToyCar_id02",
+      "tag": "normal",
+      "label": 0,
+      "cache": "software/data/mel_dcase/ToyCar_id02_test_seg31.npz",
+      "segment_index": 0,
+      "timesteps": 31,
+      "prediction": 0,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 28,
+      "unit": "ToyCar_id02",
+      "tag": "anomaly",
+      "label": 1,
+      "cache": "software/data/mel_dcase/ToyCar_id02_test_seg31.npz",
+      "segment_index": 3850,
+      "timesteps": 31,
+      "prediction": 0,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 29,
+      "unit": "ToyCar_id03",
+      "tag": "normal",
+      "label": 0,
+      "cache": "software/data/mel_dcase/ToyCar_id03_test_seg31.npz",
+      "segment_index": 0,
+      "timesteps": 31,
+      "prediction": 0,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 29,
+      "unit": "ToyCar_id03",
+      "tag": "anomaly",
+      "label": 1,
+      "cache": "software/data/mel_dcase/ToyCar_id03_test_seg31.npz",
+      "segment_index": 3850,
+      "timesteps": 31,
+      "prediction": 1,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 30,
+      "unit": "ToyCar_id04",
+      "tag": "normal",
+      "label": 0,
+      "cache": "software/data/mel_dcase/ToyCar_id04_test_seg31.npz",
+      "segment_index": 0,
+      "timesteps": 31,
+      "prediction": 1,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 30,
+      "unit": "ToyCar_id04",
+      "tag": "anomaly",
+      "label": 1,
+      "cache": "software/data/mel_dcase/ToyCar_id04_test_seg31.npz",
+      "segment_index": 3850,
+      "timesteps": 31,
+      "prediction": 1,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 31,
+      "unit": "ToyCar_id05",
+      "tag": "normal",
+      "label": 0,
+      "cache": "software/data/mel_dcase/ToyCar_id05_test_seg31.npz",
+      "segment_index": 11,
+      "timesteps": 31,
+      "prediction": 0,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 31,
+      "unit": "ToyCar_id05",
+      "tag": "anomaly",
+      "label": 1,
+      "cache": "software/data/mel_dcase/ToyCar_id05_test_seg31.npz",
+      "segment_index": 0,
+      "timesteps": 31,
+      "prediction": 0,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 32,
+      "unit": "ToyCar_id06",
+      "tag": "normal",
+      "label": 0,
+      "cache": "software/data/mel_dcase/ToyCar_id06_test_seg31.npz",
+      "segment_index": 0,
+      "timesteps": 31,
+      "prediction": 1,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 32,
+      "unit": "ToyCar_id06",
+      "tag": "anomaly",
+      "label": 1,
+      "cache": "software/data/mel_dcase/ToyCar_id06_test_seg31.npz",
+      "segment_index": 33,
+      "timesteps": 31,
+      "prediction": 1,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 33,
+      "unit": "ToyCar_id07",
+      "tag": "normal",
+      "label": 0,
+      "cache": "software/data/mel_dcase/ToyCar_id07_test_seg31.npz",
+      "segment_index": 11,
+      "timesteps": 31,
+      "prediction": 1,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 33,
+      "unit": "ToyCar_id07",
+      "tag": "anomaly",
+      "label": 1,
+      "cache": "software/data/mel_dcase/ToyCar_id07_test_seg31.npz",
+      "segment_index": 0,
+      "timesteps": 31,
+      "prediction": 1,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 34,
+      "unit": "ToyConveyor_id01",
+      "tag": "normal",
+      "label": 0,
+      "cache": "software/data/mel_dcase/ToyConveyor_id01_test_seg31.npz",
+      "segment_index": 0,
+      "timesteps": 31,
+      "prediction": 0,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 34,
+      "unit": "ToyConveyor_id01",
+      "tag": "anomaly",
+      "label": 1,
+      "cache": "software/data/mel_dcase/ToyConveyor_id01_test_seg31.npz",
+      "segment_index": 8000,
+      "timesteps": 31,
+      "prediction": 1,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 35,
+      "unit": "ToyConveyor_id02",
+      "tag": "normal",
+      "label": 0,
+      "cache": "software/data/mel_dcase/ToyConveyor_id02_test_seg31.npz",
+      "segment_index": 0,
+      "timesteps": 31,
+      "prediction": 0,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 35,
+      "unit": "ToyConveyor_id02",
+      "tag": "anomaly",
+      "label": 1,
+      "cache": "software/data/mel_dcase/ToyConveyor_id02_test_seg31.npz",
+      "segment_index": 8000,
+      "timesteps": 31,
+      "prediction": 0,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 36,
+      "unit": "ToyConveyor_id03",
+      "tag": "normal",
+      "label": 0,
+      "cache": "software/data/mel_dcase/ToyConveyor_id03_test_seg31.npz",
+      "segment_index": 0,
+      "timesteps": 31,
+      "prediction": 1,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 36,
+      "unit": "ToyConveyor_id03",
+      "tag": "anomaly",
+      "label": 1,
+      "cache": "software/data/mel_dcase/ToyConveyor_id03_test_seg31.npz",
+      "segment_index": 7990,
+      "timesteps": 31,
+      "prediction": 0,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 37,
+      "unit": "ToyConveyor_id04",
+      "tag": "normal",
+      "label": 0,
+      "cache": "software/data/mel_dcase/ToyConveyor_id04_test_seg31.npz",
+      "segment_index": 40,
+      "timesteps": 31,
+      "prediction": 0,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 37,
+      "unit": "ToyConveyor_id04",
+      "tag": "anomaly",
+      "label": 1,
+      "cache": "software/data/mel_dcase/ToyConveyor_id04_test_seg31.npz",
+      "segment_index": 0,
+      "timesteps": 31,
+      "prediction": 1,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 38,
+      "unit": "ToyConveyor_id05",
+      "tag": "normal",
+      "label": 0,
+      "cache": "software/data/mel_dcase/ToyConveyor_id05_test_seg31.npz",
+      "segment_index": 20,
+      "timesteps": 31,
+      "prediction": 1,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 38,
+      "unit": "ToyConveyor_id05",
+      "tag": "anomaly",
+      "label": 1,
+      "cache": "software/data/mel_dcase/ToyConveyor_id05_test_seg31.npz",
+      "segment_index": 0,
+      "timesteps": 31,
+      "prediction": 1,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 39,
+      "unit": "ToyConveyor_id06",
+      "tag": "normal",
+      "label": 0,
+      "cache": "software/data/mel_dcase/ToyConveyor_id06_test_seg31.npz",
+      "segment_index": 0,
+      "timesteps": 31,
+      "prediction": 1,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "model_id": 39,
+      "unit": "ToyConveyor_id06",
+      "tag": "anomaly",
+      "label": 1,
+      "cache": "software/data/mel_dcase/ToyConveyor_id06_test_seg31.npz",
+      "segment_index": 10,
+      "timesteps": 31,
+      "prediction": 1,
+      "saturation_counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "stress": [
+    {
+      "tag": "stress_positive",
+      "timesteps": 31,
+      "saturation_counts": [
+        9600,
+        7936,
+        1920,
+        54
+      ]
+    },
+    {
+      "tag": "stress_negative",
+      "timesteps": 31,
+      "saturation_counts": [
+        9600,
+        0,
+        0,
+        0
+      ]
+    }
+  ]
+}

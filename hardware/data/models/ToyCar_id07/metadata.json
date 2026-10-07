@@ -1,0 +1,31 @@
+{
+  "format_version": 1,
+  "model_id": 33,
+  "unit": "ToyCar_id07",
+  "checkpoint": "software/model_weights/ToyCar_id07/last.pth",
+  "layer_sizes": [
+    40,
+    384,
+    256,
+    64,
+    2
+  ],
+  "weight_scales": [
+    0.011826012078232653,
+    0.00951753451129583,
+    0.009719043266116164,
+    0.021192657665943537
+  ],
+  "weights_bytes": 130176,
+  "params_bytes": 1412,
+  "slot_bytes": 135168,
+  "slot_offset": 4460544,
+  "slot_offset_hex": "0x00441000",
+  "ddr_address": 4460544,
+  "ddr_address_hex": "0x00441000",
+  "sha256": {
+    "weights.bin": "5d173d2f175273084be39b094686d1abff887f77743d77e669a6084b7f3acd3e",
+    "params.bin": "a0fa736c2d6b382600c0dae204426d2463e24b13dace25c2e238fd6a34d839fe",
+    "model.slot.bin": "6051812478c0229721d244670608b56dbf3f6da847f9464199af33ac495dcb1b"
+  }
+}

@@ -1,6 +1,6 @@
-# 개발 환경 기록 — Phase 0
+# 개발 환경 기록 — Phase 1
 
-작성일: 2026-09-23 | 개정: r4 | 관련 task: [TASKS.md](TASKS.md) P0.1~P0.7
+작성일: 2026-09-23 | 개정: r4 | 관련 task: [TASKS.md](TASKS.md) P1.1~P1.7
 
 이 문서는 실제로 명령을 실행해 확인한 값만 적는다(§2~§5는 2026-09-22, §6은 2026-09-23). 버전이 바뀌면 다시 확인하고 개정 번호를 올린다.
 
@@ -13,7 +13,7 @@
 
 접속 비밀번호는 저장소에 기록하지 않는다.
 
-## 2. P0.1 개발·학습 서버 (`Dev-Ubuntu`)
+## 2. P1.1 개발·학습 서버 (`Dev-Ubuntu`)
 
 | 항목 | 확인 값 | 확인 방법 |
 |---|---|---|
@@ -31,7 +31,7 @@
 - **학습 GPU**: 이 서버의 RTX 3090 Ti를 쓴다. FPGA Host의 RTX 3090도 재부팅 후 쓸 수 있지만, 공용 호스트라 학습 기본값으로 두지 않는다.
 - 처음 확인할 때 GPU 메모리 22,993 MiB가 사용 중이었다가 이후 365 MiB로 줄었다. 다른 VM이나 사용자가 GPU를 함께 쓰는 것으로 보이므로, 학습 시작 전에 `nvidia-smi`로 여유 메모리를 확인한다.
 
-## 3. P0.2 툴체인
+## 3. P1.2 툴체인
 
 | 도구 | 버전·상태 | 확인 |
 |---|---|---|
@@ -54,7 +54,7 @@
 
 **한글 경로**: 선행 저장소(Windows, SMB)에서는 경로에 한글이 있으면 프로젝트 모드 `launch_runs` 합성이 크래시했다. 이 서버에서 한글이 들어간 저장소 경로에 프로젝트를 만들고 `launch_runs synth_1`을 돌렸을 때는 정상 완료됐다(합성만 확인). MIG·XDMA IP 생성에서 문제가 생기면 [create_project.tcl](../../hardware/vivado/create_project.tcl)의 `-proj_dir`로 ASCII 경로를 지정한다.
 
-## 4. P0.3 보드 연결 (FPGA Host `sdsl-llm`)
+## 4. P1.3 보드 연결 (FPGA Host `sdsl-llm`)
 
 | 항목 | 확인 값 |
 |---|---|
@@ -90,7 +90,7 @@ Host의 `hw_server`를 네트워크에 열어 두는 방식은 쓰지 않는다.
 
 처음에는 Host에 Vivado가 없어 개발 서버의 `hw_server`와 Digilent 라이브러리만 복사해 썼다. Vivado 래퍼(`loader`)가 설정하는 `DIGILENT_DATA_DIR`이 없으면 케이블이 보이지 않았다(`USBC::FInit() failed to get firmware image path`). 임시 파일은 정식 설치 뒤 지웠다.
 
-## 5. P0.4 보드 제약과 프로젝트 스크립트
+## 5. P1.4 보드 제약과 프로젝트 스크립트
 
 | 파일 | 내용 |
 |---|---|
@@ -117,9 +117,9 @@ vivado -mode batch -source hardware/vivado/create_project.tcl \
 - DRC는 BUFC-1(입력 버퍼 미연결) 경고 9건뿐이며, 더미 설계가 일부 입력을 로직에 연결하지 않아서 생긴 것이다
 - 배선이 끝난 설계에서 포트 87개의 `PACKAGE_PIN`을 읽어 XDC와 대조 → 불일치 0건
 - 첫 빌드에서 DDR3 DQ/DQS에 `SSTL15_T_DCI`를 넣었다가 "파트가 지원하지 않는 I/O 표준" 경고가 났다. Artix-7은 HR 뱅크만 있어 DCI가 없으므로 `SSTL15`/`DIFF_SSTL15` + `IN_TERM UNTUNED_SPLIT_50`으로 고쳤다
-- 이 비트스트림은 DDR3 핀을 임의로 구동하므로 보드에 올리지 않았다. 보드 동작은 P0.5 LED 점멸로 확인한다
+- 이 비트스트림은 DDR3 핀을 임의로 구동하므로 보드에 올리지 않았다. 보드 동작은 P1.5 LED 점멸로 확인한다
 
-이 검증은 핀 번호·I/O 표준·뱅크 전압이 디바이스 규칙에 맞는지를 확인한 것이다. 매뉴얼 표가 실제 보드 배선과 같은지는 P0.5(LED·버튼), P0.6(MIG), P0.7(PCIe)에서 보드로 확인한다.
+이 검증은 핀 번호·I/O 표준·뱅크 전압이 디바이스 규칙에 맞는지를 확인한 것이다. 매뉴얼 표가 실제 보드 배선과 같은지는 P1.5(LED·버튼), P1.6(MIG), P1.7(PCIe)에서 보드로 확인한다.
 
 ### 매뉴얼로 확정하지 못한 항목
 
@@ -128,10 +128,10 @@ vivado -mode batch -source hardware/vivado/create_project.tcl \
 | PCIe PERST# 핀 | **확정: L16**(2026-09-23 보드 시험, §6.3). 매뉴얼에는 핀 번호가 없다 | 완료 |
 | 팬 제어(FAN_PWM) 핀 | 핀 번호 미확인. 실물 보드에 팬이 없고 작은 방열판만 있어(사용자 확인) 당장 필요 없다 | 보류 |
 | USB-UART 방향 | `UART1_RXD`(L14)/`UART1_TXD`(L15)가 FPGA 기준 이름인지 불명확 | UART를 처음 쓸 때 루프백으로 확인 |
-| 보드 모델 표기 | 저장소 매뉴얼은 AX7A200 Rev 1.0(2019)이다. 실물 AX7A200B와 핀이 다르면 보드 시험에서 드러난다 | P0.5~P0.7 |
+| 보드 모델 표기 | 저장소 매뉴얼은 AX7A200 Rev 1.0(2019)이다. 실물 AX7A200B와 핀이 다르면 보드 시험에서 드러난다 | P1.5~P1.7 |
 
 
-## 6. P0.5~P0.7 보드 시험 (2026-09-23)
+## 6. P1.5~P1.7 보드 시험 (2026-09-23)
 
 모든 시험은 개발 서버에서 빌드하고 `.bit`·`.ltx`·`.mcs`를 `scp`로 Host `~/fpga_work/`에 보낸 뒤, Host의 로컬 JTAG(Vivado Hardware Manager)로 수행했다. 스크립트는 `hardware/board_test/host/`에 있다.
 
@@ -143,7 +143,7 @@ vivado -mode batch -source hardware/vivado/create_project.tcl \
 | `perst_latch.tcl` | PERST# 후보 핀 래치 초기화·읽기 |
 | `xdma_roundtrip.sh` | `lspci` 링크 확인과 H2C→C2H 데이터 왕복 비교 |
 
-### 6.1 P0.5 LED 설계 — JTAG로 확인
+### 6.1 P1.5 LED 설계 — JTAG로 확인
 
 보드를 직접 볼 수 없어 LED 점멸 대신 JTAG로 확인했다. `blink_top`에 VIO를 넣어 읽었다.
 
@@ -152,7 +152,7 @@ vivado -mode batch -source hardware/vivado/create_project.tcl \
 - LED 구동값이 `0xE → 0x7`로 바뀌어 순환 로직 동작. **물리 LED·버튼 배선은 확인하지 못했다**
 - xsim `PASS`, Verilator lint 경고 0. 빌드: `hardware/board_test/p05_blink/build_p05.tcl`
 
-### 6.2 P0.6 MIG DDR3
+### 6.2 P1.6 MIG DDR3
 
 | 항목 | 값 |
 |---|---|
@@ -160,9 +160,9 @@ vivado -mode batch -source hardware/vivado/create_project.tcl \
 | 핀 | MIG가 만든 XDC의 71개 핀이 `ax7a200b_ddr3.xdc`와 모두 일치 |
 | 빌드 | Critical Warning 0, WNS +0.963 ns / WHS +0.052 ns |
 | 보드 결과 | `init_calib_complete = 1`, 360초 동안 `tg_compare_error = 0`, `run_sec`이 실제 시간과 일치(UI 클럭 100 MHz 확인) |
-| 한계 | 예제 트래픽 생성기의 기본 검사 범위는 앞쪽 16 MiB(`END_ADDRESS=0x00FFFFFF`)다. 1 GiB 전 범위와 대역폭은 P2.1에서 측정한다 |
+| 한계 | 예제 트래픽 생성기의 기본 검사 범위는 앞쪽 16 MiB(`END_ADDRESS=0x00FFFFFF`)다. 1 GiB 전 범위와 대역폭은 P3.1에서 측정한다 |
 
-### 6.3 P0.7 PCIe Gen2 ×2 XDMA
+### 6.3 P1.7 PCIe Gen2 ×2 XDMA
 
 설계는 `hardware/board_test/p07_xdma/`의 블록 디자인(XDMA + AXI BRAM 64 KiB)이며 탑은 `p07_top.v`다.
 

@@ -1,10 +1,10 @@
 # software/ 구성
 
-갱신일: 2026-09-25
+갱신일: 2026-10-07
 
 | 폴더 | 내용 |
 |---|---|
-| `model_develop/` | 모델·학습 코드. `snn_model.py`(PLIF-T `40→384→256→64→2`), `dcase_data.py`(파일 목록·mel 추출·캐시), `train.py`(장비 1대 학습), `train_all.py`(40대 순차 학습), `snn_numpy.py`(PyTorch 없는 FP32 순전파), `snn_int8.py`(INT8 양자화 규칙·정수 순전파, P1.5. P1.7 골든 참조의 기준) |
+| `model_develop/` | 모델·학습 코드. `snn_model.py`(PLIF-T `40→384→256→64→2`), `dcase_data.py`(파일 목록·mel 추출·캐시), `train.py`/`train_all.py`(학습), `snn_numpy.py`(FP32 참조), `snn_int8.py`(INT8 골든), `model_format.py`(DDR3 형식), `export_models.py`(P2.6 생성), `make_golden_vectors.py`(P2.7 생성), `verify_p1_artifacts.py`(전수 검증) |
 | `model_develop/references/` | 선행 SpikeSense-Edge 코드 원본. 수정하지 않고 참고용으로만 둔다 |
 | `analysis_develop/` | 분석·그래프 코드. `analyze_runs.py`(학습 기록 → 요약표·곡선), `exp_lowscore.py`(학습 방식 비교 실험), `check_numpy_fp.py`(선행 NumPy 재현·NumPy↔PyTorch FP 일치 검증, 결과 `numpy_fp/`), `compare_quant.py`(INT8 ↔ FP32 40대 정확도 비교), `quant_variants.py`(양자화 후보 비교). 두 결과는 `quant_int8/` |
 | `analysis_data/` | 분석 산출물. `all40/`(40대 결과표·학습 기록·보고서), `figures/`(논문용 그림) |

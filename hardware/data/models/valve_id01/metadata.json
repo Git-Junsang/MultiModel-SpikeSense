@@ -1,0 +1,31 @@
+{
+  "format_version": 1,
+  "model_id": 21,
+  "unit": "valve_id01",
+  "checkpoint": "software/model_weights/valve_id01/last.pth",
+  "layer_sizes": [
+    40,
+    384,
+    256,
+    64,
+    2
+  ],
+  "weight_scales": [
+    0.011046950272687777,
+    0.009616935347008892,
+    0.012171540673323504,
+    0.021524125196802333
+  ],
+  "weights_bytes": 130176,
+  "params_bytes": 1412,
+  "slot_bytes": 135168,
+  "slot_offset": 2838528,
+  "slot_offset_hex": "0x002B5000",
+  "ddr_address": 2838528,
+  "ddr_address_hex": "0x002B5000",
+  "sha256": {
+    "weights.bin": "31c246e0069a4d9046176d089413da6b54cbdad34e31228186b5aff93191495a",
+    "params.bin": "25f636b9e36fc34431f916872078ec7c088a7158ae4329b98187001e8e57edb1",
+    "model.slot.bin": "dd05adefd787e597ed812919c39242314a9f30a78107c176822ed42098d458ab"
+  }
+}

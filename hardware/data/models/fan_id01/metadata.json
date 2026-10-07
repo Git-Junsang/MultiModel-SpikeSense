@@ -1,0 +1,31 @@
+{
+  "format_version": 1,
+  "model_id": 0,
+  "unit": "fan_id01",
+  "checkpoint": "software/model_weights/fan_id01/last.pth",
+  "layer_sizes": [
+    40,
+    384,
+    256,
+    64,
+    2
+  ],
+  "weight_scales": [
+    0.012051648042333407,
+    0.010258007237291712,
+    0.012561195478664609,
+    0.021480000863863726
+  ],
+  "weights_bytes": 130176,
+  "params_bytes": 1412,
+  "slot_bytes": 135168,
+  "slot_offset": 0,
+  "slot_offset_hex": "0x00000000",
+  "ddr_address": 0,
+  "ddr_address_hex": "0x00000000",
+  "sha256": {
+    "weights.bin": "acdf46bfcacf3bc25a74e29156b5a61c54eb9cff24053ce21d6a33ad1550d058",
+    "params.bin": "d4366a995161b1853787119fca985d5e22f1009d53f72d23bbd2619150321148",
+    "model.slot.bin": "db2ce5c7081ac41213777ae195254247049bcd8dec02a3952219b10c6f397973"
+  }
+}

@@ -53,11 +53,15 @@ def quantize(layers):
     return q
 
 
-def forward(q, x_q, stats=None):
+def forward(q, x_q, stats=None, trace=None):
     """x_q: int [B, T, 40] (0~127) → 출력 막전위 int64 [B, T, 2].
 
     stats에 dict를 넘기면 층별 누산 |최대|(acc), 포화 전 막전위 |최대|(mem),
     포화 횟수(sat), 층별 스파이크 기록(spk, int8 [B, T, N])을 채운다.
+
+    trace에 dict를 넘기면 RTL 대조용 층별 레코드를 [B,T,N]으로 채운다.
+    ``cur``는 L1 시프트 후 전류, ``mem_pre``는 포화 후·발화 전,
+    ``spk``는 발화, ``mem``은 soft reset 후 저장 막전위다.
     """
     x_q = np.asarray(x_q)
     B, T, _ = x_q.shape
@@ -70,6 +74,14 @@ def forward(q, x_q, stats=None):
         n = len(q)
         stats.update(acc=[0] * n, mem=[0] * n, sat=[0] * n,
                      spk=[np.zeros((B, T, l["W"].shape[0]), np.int8) for l in q])
+    if trace is not None:
+        trace.clear()
+        trace.update(
+            cur=[np.zeros((B, T, l["W"].shape[0]), np.int32) for l in q],
+            mem_pre=[np.zeros((B, T, l["W"].shape[0]), np.int16) for l in q],
+            spk=[np.zeros((B, T, l["W"].shape[0]), np.uint8) for l in q],
+            mem=[np.zeros((B, T, l["W"].shape[0]), np.int16) for l in q],
+        )
 
     for t in range(T):
         h = x_q[:, t, :].astype(np.float64)
@@ -86,6 +98,11 @@ def forward(q, x_q, stats=None):
             mems[i] = mem - spk * vth[i]
             if stats is not None:
                 stats["spk"][i][:, t] = spk
+            if trace is not None:
+                trace["cur"][i][:, t] = cur
+                trace["mem_pre"][i][:, t] = mem
+                trace["spk"][i][:, t] = spk
+                trace["mem"][i][:, t] = mems[i]
             h = spk.astype(np.float64)
         out[:, t] = mems[-1]
     return out
