@@ -1,114 +1,109 @@
-# 할 일 리스트 — Phase·Task
+# 작업 목록
 
-작성일: 2026-09-22 | 개정: r16 (2026-10-12, P3.8 최종 정리: 비교 대상 7개, 구현 SlackBatch. 점수 방식 개선·문헌 기반 후보 비교 포함. r13 2026-10-11, P3.6~P3.8 완료: XL 시나리오별 최대 트랙, 합성 목표 1,024트랙, 3축 24조합 측정)
+표기: `[x]` 완료, `[ ]` 미완료. 상세 결과는 보고서와 설계 문서에 둔다.
 
-## 머리말
+## 1. 개발 환경과 보드
 
-- **기준 문서**: [2026-09-17 중간보고](<../presentation/다중 모델, 다중 트랙 실시간 SNN 추론 가속기_중간보고_26.09.17.pptx>) 슬라이드 16(연구 진행 계획), [PROPOSAL.md](PROPOSAL.md) §6(연구 진행 계획)·§9(미정 사항)
-- **현재 상태** (2026-10-11): Phase 1·2 완료, Phase 3은 P3.1~P3.8 완료, **P3.9(사양 동결)만 남음**. P3.6~P3.8 종합: [P3.6~3.8 리포트](<../reports/P3.6~3.8 Research Report.md>) §4.3, 세부 [MODEL_SIZE_PLAN.md](MODEL_SIZE_PLAN.md) §5. 확정안은 모델 XL `40→768→512→128→2` INT8 + 소리 겹침 증강, 256레인 · 막전위 DDR3, **합성 목표 1,024트랙**(시나리오별 보장 최대 U 1,328 · K 1,312 · S 1,232 · I 5,328 · SK 1,232 · R 1,632, 동시 도착이 상한). 1,024트랙에서 3축 24조합 중 위반 0은 8개(전체 캐시의 묶는 설계 4 + 부분 상주·고정 혼합의 한 줄씩 4), FCFS·EDF는 전부 위반 100 %. 목표(512 → 1,024트랙)·모델(L → XL) 변경은 PROPOSAL 반영 전 지도교수 확인이 필요하다. 이전 상태(2026-10-10): P3.5 시뮬레이터로 24조합을 실행한 결과, 실측 조건(L, 512트랙)에서는 스케줄러·캐시가 없어도 마감을 지켜 결정이 구별되지 않았다([SIM_PLAN.md](SIM_PLAN.md) §6). P3.1~P3.4 결과([P3.1~3.4 리포트](<../reports/P3.1~3.4 Research Report.md>)). DDR3 순차 읽기 실측 3.015 GB/s(2.0 GB/s 가정보다 높음), BRAM 타일 기준 가중치 가용분 627.75 KiB(제안서 709.375 KiB). 막전위 온칩 시 제안서 배분이면 전체 모델 캐시 4벌, 슬라이스 이중 버퍼 + β·vth 엔트리별 + 큐·메타 분산 RAM 구성이면 5벌 — 5벌 기준안은 구성 D로 확정, PROPOSAL rev.5에 반영. 이전 상태(2026-10-07): Phase 1·2 완료. P1.5~P1.7 보드 확인 완료(2026-09-23): LED 설계·DDR3 MIG·PCIe Gen2 ×2 XDMA DMA 왕복. PCIe PERST#는 L16으로 확정했다. P2.4: 2출력(`40→384→256→64→2`) 40대 학습, 파일 단위 ROC-AUC 평균 0.9563. P2.5: 선행 방식 INT8(층별 대칭, β Q0.8) + 16 bit 막전위 포화 채택, AUC 평균 0.9554. P2.6~P2.7: 40모델 BIN·HEX·DDR3 이미지와 실데이터 골든 80개·포화 stress 2개 생성, 전수 재계산 일치. RTL·호스트 코드는 아직 없다.
-- **진행 방식**: 트랙을 나누지 않고 ID 순서대로 진행한다. **Phase 1(FPGA·서버 점검, 개발 환경)이 1순위**다. 날짜와 소요 기간은 정하지 않는다.
-- **표기**: ID `Pp.n`에서 p는 Phase(1부터 센다), n은 순서다. Phase 2~6은 중간보고의 1~5단계(모델 준비~평가·정리)에 대응하고, Phase 1(개발 환경)은 중간보고에 따로 없는 준비 단계다. 보드 시험 폴더(`p05_blink` 등)와 스크립트 이름은 변경 전 번호를 유지한다. `선행`에 적힌 task가 끝나야 시작한다. 완료한 task는 `[x]`로 바꾸고 산출물 위치를 적는다.
-- **수치 구분**: 2.0 GB/s, 32레인 @ 100 MHz, 709.375 KiB 가용분은 가정·계산값이다. 실측으로 확인하기 전에는 결과로 쓰지 않는다.
+| 상태 | ID | 작업 | 결과 |
+|---|---|---|---|
+| [x] | P1.1 | 개발·학습 서버 확인 | RTX 3090 Ti, PyTorch CUDA 확인 |
+| [x] | P1.2 | Vivado·xsim·Verilator 확인 | synthesis, simulation, lint 통과 |
+| [x] | P1.3 | JTAG 연결 | `xc7a200t_0` 인식 |
+| [x] | P1.4 | XDC와 build script | 87개 port pin 일치 |
+| [x] | P1.5 | LED·clock board test | VIO 계산값 일치, 약 200 MHz |
+| [x] | P1.6 | MIG DDR3 test | calibration 완료, 360초 error 0 |
+| [x] | P1.7 | PCIe XDMA test | Gen2 ×2, 64 KiB 왕복 10/10 |
+| [x] | P1.8 | 저장소 구조와 NumPy reference | 선행 golden 일치, 새 FP32 AUC 일치 |
 
----
+보고서: [P1.1~P1.4](<../reports/P1.1~1.4 Research Report.md>), [P1.5~P1.7](<../reports/P1.5~1.7 Research Report.md>), [P1.8](<../reports/P1.8 Research Report.md>)
+환경: [ENVIRONMENT.md](ENVIRONMENT.md)
 
-## Phase 1 — FPGA·서버 점검, 개발 환경 (1순위)
+## 2. 모델
 
-|  | ID | 작업 | 완료 조건(산출물) | 선행 |
-| --- | ---- | ------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- | ---------- |
-| [x] | P1.1 | 서버 점검: GPU·드라이버·CUDA·PyTorch 버전, 디스크 여유·NAS 경로, `python3` 패키지 | 환경 기록(버전표). 학습에 쓸 GPU 확정 → [ENVIRONMENT.md](ENVIRONMENT.md) §2. 학습 GPU: 개발 서버 RTX 3090 Ti | — |
-| [x] | P1.2 | 툴체인 점검: Vivado 2026.1(`/tools/Xilinx/2026.1`) 라이선스와 XC7A200T-2FBG484I 파트 지원, `xvlog`·`xelab`·`xsim`, Verilator 실행 | 빈 설계 합성 성공, 최소 testbench xsim 실행, Verilator lint 실행 → [ENVIRONMENT.md](ENVIRONMENT.md) §3 | —         |
-| [x] | P1.3 | 보드 연결 환경: 보드를 꽂을 Host PC(PCIe 슬롯·OS) 확정, JTAG 케이블·드라이버 설치, Hardware Manager 인식                                  | Hardware Manager에서 XC7A200T 인식 → [ENVIRONMENT.md](ENVIRONMENT.md) §4. Host `sdsl-llm`(Ubuntu 24.04), PCIe 슬롯 장착·슬롯 전원. Host Vivado BASIC 라이선스 설치, 로컬 JTAG 인식 | P1.2       |
-| [x] | P1.4 | [보드 매뉴얼](../manual/AX7A200_User_Manual.pdf) 기반 기본 XDC(시스템 클럭·LED·키·DDR3·PCIe 핀)와 Vivado 프로젝트 생성 스크립트          | 저장소의 XDC와 Tcl 스크립트, 스크립트로 프로젝트 재생성 가능 → `hardware/constraints/ax7a200b_*.xdc`, `hardware/vivado/create_project.tcl`, [ENVIRONMENT.md](ENVIRONMENT.md) §5. PCIe PERST#·팬 핀은 미확인 | P1.2       |
-| [x] | P1.5 | LED 점멸 설계로 bitstream 생성·다운로드                                                                                                    | 보드에서 동작 확인(2026-09-23). LED는 볼 수 없어 JTAG(VIO)로 확인: 연산 결과 `0x13E5E51C`(=333,833,500) 일치, 사이클 카운터로 약 200 MHz, LED 구동값 순환. 물리 LED 배선은 미확인 → `hardware/board_test/p05_blink/`, [ENVIRONMENT.md](ENVIRONMENT.md) §6 | P1.3, P1.4 |
-| [x] | P1.6 | MIG DDR3 예제 설계 생성, 보드에서 메모리 테스트                                                                                             | 보드 확인(2026-09-23): `init_calib_complete=1`, 360초 동안 `tg_compare_error=0`. 검사 범위는 예제 기본값인 앞쪽 16 MiB → `hardware/board_test/p06_mig/`(prj·빌드 스크립트·탑), [ENVIRONMENT.md](ENVIRONMENT.md) §6 | P1.5       |
-| [x] | P1.7 | PCIe Gen2 ×2 XDMA 예제로 Host 링크 확인과 DMA 왕복                                                                                         | 보드 확인(2026-09-23): `lspci` `10ee:7022`, LnkSta **5 GT/s ×2**, 64 KiB DMA 왕복 10/10 일치. PERST#=L16 확정 → `hardware/board_test/p07_xdma/`, `hardware/board_test/host/`, [ENVIRONMENT.md](ENVIRONMENT.md) §6 | P1.5       |
-| [x] | P1.8 | 저장소 디렉터리 골격(`software/`, `hardware/`)을 정하고 선행 `software/test_model_numpy.py` 재현 | [P1.8 리포트](<../reports/P1.8 Research Report.md>). 골격 확정: `software/`(model_develop·analysis_develop·analysis_result·model_weights·data, [README](../../software/README.md)), `hardware/`(src·testbench·sim·constraints·vivado·board_test, [README](../../hardware/README.md)). 시뮬레이션 폴더는 루트 `sim/` 대신 `hardware/sim/`. 선행 INT8 NumPy 순전파를 선행 골든 벡터와 비트 일치로 재현. 새 모델 FP32 NumPy 순전파(`software/model_develop/snn_numpy.py`)를 40대 test 세트에서 PyTorch와 비교: 판정 불일치 129,792개 중 1개, AUC 40대 소수 4자리 일치, 스파이크 차이 200개/28.4억은 모두 임계값 근처 FP32 반올림 → `software/analysis_develop/check_numpy_fp.py`, 결과 `software/analysis_develop/numpy_fp/` | P1.1       |
+| 상태 | ID | 작업 | 결과 |
+|---|---|---|---|
+| [x] | P2.1 | dataset과 label 결정 | DCASE 2020 Task 2, 정상/이상 2출력 |
+| [x] | P2.2 | 40모델 구성 | 41대 중 40대, 지도학습 채택 |
+| [x] | P2.3 | `40→384→256→64→2` 구현 | 4 weight layer, 706뉴런 |
+| [x] | P2.4 | 모델 40개 학습 | 평균 ROC-AUC 0.9563, P2.3~P2.4 보고서 참고 |
+| [x] | P2.5 | INT8 방식 결정 | 평균 AUC 0.9554, 16 bit 막전위 saturation 적용 |
+| [x] | P2.6 | weight export | 모델당 130,176 B, 132 KiB slot |
+| [x] | P2.7 | INT8 golden vector | 실데이터 80개 + saturation test 2개 |
 
-**완료 판정**: 보드(JTAG)·DDR3·PCIe·학습 서버·시뮬레이터가 모두 동작한다.
+보고서: [P2.1~P2.2](<../reports/P2.1~2.2 Research Report.md>), [P2.3~P2.4](<../reports/P2.3~2.4 Research Report.md>), [P2.5](<../reports/P2.5 Research Report.md>), [P2.6~P2.7](<../reports/P2.6~2.7 Research Report.md>)
 
-## Phase 2 — 모델 준비
+## 3. 설계 검증
 
-|     | ID   | 작업                                                                                            | 완료 조건(산출물)                              | 선행       |
-| --- | ---- | ----------------------------------------------------------------------------------------------- | ---------------------------------------------- | ---------- |
-| [x] | P2.1 | 데이터 확보 방안 결정, 출력 라벨 정의 | [P2.1~2.2 리포트](<../reports/P2.1~2.2 Research Report.md>). **DCASE 2020 Task 2 확정**(개발·추가 학습·평가 세트 + `eval_data_list.csv`, wav 54,254개, 17 GB) → `software/data/dataset_dcase/`. 기계 ID 41개 확인. 출력은 2클래스(정상/이상) | P1.8       |
-| [x] | P2.2 | 기계 ID 41개 중 40개 선정, 트랙↔모델 매핑 초안, 이상 샘플 학습 방식 결정                                                  | 모델 40개 구성표, 매핑 초안. 진행: 40대 선정(fan id_00 제외) → `software/model_develop/dcase_data.py`. 가짜 이상(다른 ID 정상)은 실제 이상 탐지에 실패해 폐기하고 지도학습을 채택했다. 매핑 초안 3안(U 균등·S 편중·D 희소) → [P2.1~2.2 리포트](<../reports/P2.1~2.2 Research Report.md>) §5.3 | P2.1       |
-| [x] | P2.3 | `40→384→256→64→2` PLIF-T 모델 구현(선행 `snn_model.py` 확장). 가중치 층 4개, 뉴런 706개 | [P2.3~2.4 리포트](<../reports/P2.3~2.4 Research Report.md>). 모델 코드 → `software/model_develop/snn_model.py`. 가중치 130,176·뉴런 706·PLIF 파라미터 1,412 확인. 선행 구조(`40→128→32→2`) 설정 시 선행 모델과 순전파 출력 3종·역전파 기울기가 비트 단위 일치(`verify_reference.py`). 뉴런 갱신 규칙은 `plift_core.v`와 동일하게 유지 | P1.8       |
-| [x] | P2.4 | 개인 서버에서 40개 모델 학습                                                                    | **40대 학습 완료**(RTX 3090 Ti 독점, 85.2분, 장비당 128초). 파일 단위 ROC-AUC 평균 0.9563, 0.9 이상 35대, 0.8 미만 0대, 최저 0.8175(ToyCar_id05). 41대 중 제외 장비를 slider_id06(AUC 0.998) → fan_id00(0.738)으로 교체했다. 평가 결과를 보고 고른 교체이므로 41대 전부 기준 평균 0.9510도 함께 기록한다. 배치 512·에포크 60·코사인의 근거와 학습 방식·결과 → `software/analysis_result/REPORT.md`, 표 `results.csv`, 가중치 `software/model_weights/<장비>/last.pth` | P2.2, P2.3 |
-| [x] | P2.5 | INT8 양자화와 FP 대비 정확도 비교(선행`compare_quant.py` 참고)                                | [P2.5 리포트](<../reports/P2.5 Research Report.md>). **선행 방식 채택**(가중치 층별 대칭 INT8, β Q0.8, 임계값 uint8, 누설 내림) + **16 bit 막전위 포화 가산** 추가. 후보 7개(뉴런별 스케일·β Q0.12·누설 반올림) 간 평균 AUC 차이 0.0006 이내라 하드웨어가 단순한 쪽을 골랐다. 40대 파일 AUC 평균 0.9563 → 0.9554(−0.0009, 장비별 −0.0116~+0.0090), 판정 일치 96.5%, 16 bit 넘침 0회(L3 최대 17,093 = 52.2%). 선행 INT8 가중치로 선행 골든과 비트 일치. RTL에 넘길 폭: 층 1 누산 21 bit, 층 2 전류 17 bit. 모델당 β·임계값 1,412 B 추가(P2.6에서 저장 위치 결정) → `software/model_develop/snn_int8.py`, `software/analysis_develop/{compare_quant,quant_variants}.py`, 결과 `software/analysis_develop/quant_int8/` | P2.4       |
-| [x] | P2.6 | 가중치 HEX/바이너리 내보내기(선행`export_weights.py` 확장), DDR3 적재 레이아웃 정의           | [P2.6~2.7 리포트](<../reports/P2.6~2.7 Research Report.md>). 40모델 각 130,176 B `weights.bin`/HEX, β·임계값 1,412 B, 132 KiB 슬롯과 5,406,720 B DDR3 이미지 생성 → `hardware/data/models/`. 주소·파일 형식 → [MODEL_MEMORY_LAYOUT.md](MODEL_MEMORY_LAYOUT.md) | P2.5       |
-| [x] | P2.7 | INT8 비트 정확 NumPy 골든 참조 구현, 참조 입력·막전위·출력 벡터 생성                          | [P2.6~2.7 리포트](<../reports/P2.6~2.7 Research Report.md>). `snn_int8.forward` 층별 trace, 정상·이상 80개 + 양·음 포화 stress 2개 → `hardware/data/golden/`. 40모델·82벡터 전수 재계산 PASS → `verify_p1_artifacts.py` | P2.6       |
+| 상태 | ID | 작업 | 결과 |
+|---|---|---|---|
+| [x] | P3.1 | DDR3 bandwidth·latency 실측 | read 3.015 GB/s, model 43.43 µs |
+| [x] | P3.2 | IP resource 실측 | XDMA 20.5 BRAM tile, MIG 0 |
+| [x] | P3.3 | PCIe latency·jitter 실측 | 64 B H2C p50 27.2 µs |
+| [x] | P3.4 | 32 lane BRAM 구성 | model entry 28.5 tile, 막전위 176.5 tile |
+| [x] | P3.5 | architecture simulator | self-test 통과, 24조합 비교 |
+| [x] | P3.6 | 모델 크기·quantization 비교 | 작은 모델은 정확도 하락, XL은 평균 +0.005 |
+| [x] | P3.7 | 요청 시나리오 6개 | U, K, S, I, SK, R 반영 |
+| [x] | P3.8 | cache·scheduler·연산 비교 | SlackBatch 제안, P3.6~P3.8 보고서 참고 |
+| [ ] | P3.9 | architecture spec 동결 | interface, register map, packet, 최종 목표 확정 |
 
-**완료 판정**: 40개 INT8 모델의 가중치 파일과 골든 참조 벡터가 준비되어 있다.
+P3.8 제안안:
 
-## Phase 3 — 설계 검증
+- XL INT8 + overlap augmentation
+- 256 lane, 막전위 DDR3
+- synthesis 목표 1,024트랙
+- cache entry 2개
+- SlackBatch 구현, 6개 비교 정책 runtime 선택
 
-|     | ID   | 작업                                                                                                                                | 완료 조건(산출물)                                      | 선행       |
-| --- | ---- | ----------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ | ---------- |
-| [x] | P3.1 | MIG + 트래픽 생성기 + 사이클 카운터로 DDR3 실효 대역폭·지연 측정. 패턴: 순차, 슬라이스 크기별, 모델 전환(랜덤 주소)                | 패턴별 GB/s·지연 측정표(2.0 GB/s 가정과 비교) → [리포트](<../reports/P3.1~3.4 Research Report.md>) §3. 순차 읽기 **3.015 GB/s**·쓰기 2.812 GB/s(MIG ROW_BANK_COLUMN, P1.6 매핑은 3.7 % 낮음), 1 GiB 전 범위 검증 오류 0, 모델 가중치 130,176 B 평균 43.43 µs, 슬라이스 `0.244 µs + S / 3.015 GB/s`, 모델 전환 추가 비용 없음, 단일 읽기 260~530 ns. 설계 `hardware/board_test/p3_meas/`, 원자료·요약 `software/analysis_develop/p3_meas/` | P1.6       |
-| [x] | P3.2 | MIG·XDMA·버퍼 합성 리포트로 BRAM·LUT·FF 점유 실측, 가중치 가용 BRAM 재계산                                                      | 자원 리포트, 709.375 KiB 추정의 갱신값 → [리포트](<../reports/P3.1~3.4 Research Report.md>) §6. XDMA 20.5 타일·LUT 11,828, MIG 0 타일·LUT 6,499. 제안서 배분 기준 가용분 **627.75 KiB**(β·vth·큐·메타 포함 시 526.5 KiB). 메모리 골격 배치·배선 확인(fit): 엔트리 4벌 구성 344 타일(94.2 %) 100 MHz 통과 | P1.6, P1.7 |
-| [x] | P3.3 | PCIe Host↔FPGA 지연·지터 측정                                                                                                     | 지연 분포(평균·p99·최대) → [리포트](<../reports/P3.1~3.4 Research Report.md>) §4. MMIO 읽기 p50 1.54 µs, 64 B DMA p50 27.2 µs(H2C)·25.1 µs(C2H), 1 ms 간격 시 p50 98 µs, 관측 최대 147~163 µs, H2C 758 MB/s, 모델 이미지 5,406,720 B 적재 약 7.1 ms·되읽기 일치, FPGA 시계 +3.82 ppm. 도구 `hardware/board_test/host/{pcie_lat.c,p3_pcie_bench.sh}` | P1.7       |
-| [x] | P3.4 | 32레인 공급에 필요한 BRAM 포트·폭·뱅크 구성 검토                                                                                  | 구성안과 BRAM 개수 계산 → [ONCHIP_MEMORY.md](ONCHIP_MEMORY.md), `software/analysis_develop/bram_plan.py`. 가중치 SDP 256 bit 읽기·쓰기, 엔트리 28.5 타일(넓은 word는 패리티 비트 사용), 막전위 층별 16 bit 176.5 타일. 막전위 온칩 시 제안서 배분 4벌, 구성 D(슬라이스 이중 버퍼 + β·vth 엔트리별 + 큐·메타 분산 RAM) 5벌 + 잔여 15 타일 | P3.2       |
-| [x] | P3.5 | 시뮬레이션 환경 1개: 무작위 모델 요청 도착(트랙별 위상, 실측 PCIe 지연 표본), 실측 비용 모델(DDR3 `0.244 µs + S/3.015 GB/s`, 연산 4,068사이클 + 10 %), 지표 4개 → [SIM_PLAN.md](SIM_PLAN.md) §1 | 시뮬레이터 코드, 손계산 대조 통과 → `software/sim_develop/`(공통 엔진 + 부품 9개, 24조합 × 시드 5 = 120회 약 10 s). 손계산 대조 6건 일치(SIM_PLAN §1.5). 첫 실행(N=512·640): 예산 안 20조합 위반 0, 평균 묶음 ≤ 1.1, DDR3 가동률 ≤ 0.76 — DDR3가 병목이 아님 | P3.1, P3.3 |
-| [x] | P3.6 | **모델 크기·양자화 검증**: 현재 `40→384→256→64→2`가 필요한지 확인. 작은 구조 4개(M `256-128-64`, S `128-64-32`, P `128-32`(선행), XS `64-32`)를 같은 설정으로 40대 재학습, 가중치 FP32·INT8·INT6·INT4 비교 → [MODEL_SIZE_PLAN.md](MODEL_SIZE_PLAN.md) §1 | 판정(평균 AUC ≥ 0.9504, 0.9 이상 35대 이상) 통과 중 40모델 합계 최소 = 효율 모델. 표 `software/analysis_develop/size_sweep/summary.md`. 모델이 바뀌면 P2.6~P2.7 산출물(HEX·DDR3 이미지·골든)을 다시 만든다. 결과(160대 학습): 작은 구조 4개 모두 L보다 AUC 0.007~0.029 낮음(p ≤ 0.015, 선행 구조 P −0.013) → 현재 크기에 정확도 근거 있음. 통과 중 최소 = **L INT6**(3.91 MB, −0.003). 남은 일: INT6 정수 파이프라인 확인 또는 INT8 유지 결정. 추가(2026-10-10): XL `40→768→512→128→2` 학습 결과 평균 +0.005(유의하지 않음). 장비 종류별로는 밸브만 크기에 따라 계속 좋아지고(XL +0.035, 7/7), 나머지 33대는 M에서 포화 → 종류별 크기 혼합 검토(MODEL_SIZE_PLAN §1.5) 완료(2026-10-11): **XL INT8 채택**. 깨끗한 소리에서 L 대비 +0.005(유의하지 않음)지만 밸브 7/7 향상, 겹침이 심할수록 이득이 커짐(−6 dB +0.010). INT6은 채택하지 않음 → [P3.6~3.8 리포트](<../reports/P3.6~3.8 Research Report.md>) §2·§3·§5 | P3.5 |
-| [x] | P3.7 | **요청 시나리오 정의·시뮬레이터 반영**: U 균등, K 편중, S 동시 도착, I 띄엄띄엄, S+K. 비교 기준 구조(도착 순서 + 이중 버퍼) → MODEL_SIZE_PLAN §2.1 | 시나리오 설정이 들어간 시뮬레이터, 기준 구조의 시나리오별 위반율 완료(2026-10-11): 시나리오 6개(U·K·S·I·SK + R 무작위 혼잡도)를 `sim_core.SCENARIOS`에 반영. 기준 구조(도착 순서)는 L 512트랙에서 위반 0, XL에서는 약 176트랙을 넘으면 위반(1,024트랙 100 %) → MODEL_SIZE_PLAN §2.1·§4.2·§5 | P3.6 |
-| [x] | P3.8 | **캐시·스케줄러·연산 방식 결정**: P3.6 효율 모델로 모든 시나리오 위반 0을 만족하는 조합 탐색(저장 정책·캐시 벌 수, 스케줄러, 연산 방식) → MODEL_SIZE_PLAN §2.2, [SIM_PLAN.md](SIM_PLAN.md) | 모든 시나리오 위반 0 중 BRAM 최소 조합, 기준 구조 대비 효과(무엇이 있어야 0이 되는가). 진행: 지표를 "모든 시나리오 위반 0인 최대 트랙 수"로 바꿔 144개 설계 탐색(`dse.py`, MODEL_SIZE_PLAN §3.4). 64레인 막전위 온칩 928트랙(D 스트림·한 줄씩·그룹핑), 막전위 DDR3 1,408트랙. → 최대 트랙 실험(MODEL_SIZE_PLAN §4, `dse.py --rev 2`): 호스트 1 ms 묶음 입출력·막전위 쓰기 실측·한 줄씩 스파이크 버퍼를 반영하고 레인 256·EDF·무작위 혼잡도 시나리오 R을 추가해 256개 설계 탐색 + 시드 20 확인 + 축별 기여 + 민감도. 막전위 온칩 최대 **64레인 944**(BRAM 한계, 여유 8.6 ms, 세 축 모두 영향, 한 축씩 고르면 최적 미달), 막전위 DDR3 보장값 1,312 / 2,336 / 3,696(64·128·256레인, 연산 한계의 92 %, 여유 0.12 ms, 스케줄러만 영향). 목표 트랙 수 변경은 결정 필요 종합(2026-10-11): [P3.6~3.8 리포트](<../reports/P3.6~3.8 Research Report.md>) — 확정안(제안) XL + 소리 겹침 증강, 256레인 · 막전위 DDR3, 1,000트랙(보장 상한 1,232). 정책 비교: FCFS·EDF 위반 100 %, 전체 캐시는 지연 짧음(8 ms)·스트림은 DDR3 전송·에너지 적음. 목표·모델 변경은 지도교수 확인 필요 완료(2026-10-11): XL · 256레인 · 막전위 DDR3에서 시나리오별 보장 최대 U 1,328 · K 1,312 · S 1,232 · I 5,328 · SK 1,232 · R 1,632 → **합성 목표 1,024트랙**(상한 1,232의 83 %, 민감도 5조건 위반 0). 1,024트랙 3축 24조합 측정(위반율·평균 처리 시간·오프칩 접근·사이클): 위반 0은 8개, FCFS·EDF 전부 100 %. 부분 상주·고정 혼합은 XL 예산에서 상주분이 모델의 4 %라 스트림과 거의 같음. 권고: 엔트리 2벌(전체 캐시) · 그룹핑, 같은 비트스트림에서 스트림 런타임 전환 → `software/sim_develop/target_exp.py`, 결과 `sim_result/p38_*`, MODEL_SIZE_PLAN §5, 리포트 §4.3. 점수 방식 개선(2026-10-12): 초안의 묶음 상한·고정 긴급 기준을 마감 가드로 바꾼 점수2는 그룹핑과 같은 위반율·최대 트랙, 마감 여유 안에서 기다리는 점수3은 같은 위반율에서 오프칩 전송 −45~56 %(지연 +26~41 %, 가드 여유를 실제 결과 회수 경로로 맞춰야 함) → MODEL_SIZE_PLAN §5.10, `sim_result/p38s_*`. 문헌 기반 후보 비교(2026-10-12): Dysta식(B03)·지연 그룹핑(LazyBatching류)·시간제한 묶음·강건 변형 중 **지연 그룹핑**이 위반 0·외란 강건을 유지하며 오프칩 전송 −52~61 %, 정렬 없는 간이 가드는 −38~49 %에 최대 응답이 그룹핑과 같음. 권고를 그룹핑 + 지연 그룹핑(간이·누적합) 런타임 선택으로 갱신 → MODEL_SIZE_PLAN §5.11, `sim_result/p38t*`. **최종 정리(2026-10-12)**: 비교 대상 7개(기존 FCFS·EDF·Grouping, 선행연구 Dysta·Timeout, 제안 SlackBatch-Lite·SlackBatch), **구현은 SlackBatch**(위반 0·외란 강건, 오프칩 전송 −61 %, 동적 에너지 −58 %) → MODEL_SIZE_PLAN §5.12, `sim_result/p38f_*`, 그림 `fig18·19` | P3.7 |
-| [ ] | P3.9 | 아키텍처 사양 동결: 모듈 인터페이스, 레지스터맵, 패킷 형식(`track_id` 9 bit 이상, `model_id` 6 bit 이상, 시각 정보). 입력(P3.8): 합성 목표 1,024트랙(`track_id` 10 bit), 스케줄러 SlackBatch + 비교용 런타임 전환(FCFS·EDF·Grouping·Dysta·Timeout·SlackBatch-Lite)             | 아키텍처 사양 문서                                     | P3.4, P3.8 |
+이 안은 simulation 결과다. 512→1,024트랙과 L→XL 변경은 `PROPOSAL.md`에 아직 반영하지 않았다.
 
-**완료 판정**: 실측 기반 비용 모델로 저장 정책·스케줄러를 비교했고 RTL 사양이 동결되었다. 실측 대역폭이 2.0 GB/s보다 낮으면 실측값으로 정책·배칭·중첩을 다시 평가한다. 목표(40모델·512트랙·32 ms)를 바꿔야 하면 근거와 대안을 먼저 사용자에게 설명한다.
+문서: [P3.1~P3.4 보고서](<../reports/P3.1~3.4 Research Report.md>), [SIM_PLAN.md](SIM_PLAN.md), [MODEL_SIZE_PLAN.md](MODEL_SIZE_PLAN.md), [P3.6~P3.8 보고서](<../reports/P3.6~3.8 Research Report.md>)
 
-## Phase 4 — RTL 구현
+## 4. RTL
 
-|     | ID    | 작업                                                                                          | 완료 조건(산출물)                                                                                                     | 선행       |
-| --- | ----- | --------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- | ---------- |
-| [ ] | P4.1  | `compute_array`(32레인) 구현, 선행 `plift_core.v` 재사용                                  | 단일 트랙·단일 모델에서 P2.7 골든과 비트 일치(xsim)                                                                  | P2.7, P3.9 |
-| [ ] | P4.2  | `membrane_bank` 512트랙(`512 × 706 × 2 B = 706 KiB`), 선행 `membrane_mem_mult.v` 확장 | 트랙별 읽기·쓰기 단위 검증                                                                                           | P3.9       |
-| [ ] | P4.3  | `weight_store`/`model_cache`와 슬라이스 더블 버퍼                                         | 유효성 관리·교체 단위 검증                                                                                           | P3.9       |
-| [ ] | P4.4  | `model_prefetch`/DMA(MIG AXI 인터페이스)                                                    | 슬라이스 전송·완료 신호·역압 단위 검증                                                                              | P4.3       |
-| [ ] | P4.5  | `track_scheduler`, 정책을 런타임에 고르는 레지스터                                          | 4개 정책의 선택 순서가 SW 시뮬레이터와 일치                                                                           | P3.9       |
-| [ ] | P4.6  | 요청 큐, 타임스탬프, 계측 카운터(가중치 전송 바이트, 시작·대기·완료 시각)                   | 카운터 값 검증                                                                                                        | P4.5       |
-| [ ] | P4.7  | XDMA 통합과 Host 드라이버/라이브러리, 40개 모델 가중치 DDR3 적재                              | Host에서 가중치 적재·요청 전송·결과 회수 경로 동작(시뮬레이션)                                                      | P4.4, P4.6 |
-| [ ] | P4.8  | Host 전처리: 선행`rpi/capture_mel.py` 재사용, USB 마이크 → `track_id`·타임스탬프 부여   | 마이크 입력이 요청 패킷으로 변환됨                                                                                    | P3.9       |
-| [ ] | P4.9  | 512트랙 부하 생성·트레이스 재생기, SW 시뮬레이터 트레이스로 RTL 테스트벡터 생성              | 재현 가능한 트레이스 파일과 생성 스크립트                                                                             | P3.5       |
-| [ ] | P4.10 | 통합 xsim 검증 + Verilator lint                                                               | 트랙 인터리빙 시 상태 분리·순서 유지, 캐시 미스·부분 상주·DMA 대기, 마감 임박 시 배치 절단, 골든과 출력·상태 일치 | P4.1~P4.9  |
+P3.9에서 architecture를 동결한 뒤 시작한다.
 
-**완료 판정**: 통합 RTL이 골든 참조와 출력·막전위가 일치하고, 정책 전환과 계측이 시뮬레이션에서 동작한다.
+| 상태 | ID | 작업 | 완료 기준 |
+|---|---|---|---|
+| [ ] | P4.1 | `compute_array`, `plift_core` | INT8 golden과 bit 일치 |
+| [ ] | P4.2 | `membrane_bank` | track state 분리 |
+| [ ] | P4.3 | cache와 slice buffer | valid·교체 검증 |
+| [ ] | P4.4 | DMA·prefetch | 전송 완료와 backpressure 검증 |
+| [ ] | P4.5 | `track_scheduler` | SW 정책과 선택 순서 일치 |
+| [ ] | P4.6 | queue·timestamp·counter | 계측값 검증 |
+| [ ] | P4.7 | XDMA·Host 연동 | 모델 적재, 요청, 결과 회수 |
+| [ ] | P4.8 | USB mic preprocessing | `track_id`와 timestamp 생성 |
+| [ ] | P4.9 | load generator | 재현 가능한 trace |
+| [ ] | P4.10 | 통합 test | xsim, Verilator, state·output 일치 |
 
-## Phase 5 — 보드 통합
+## 5. 보드 통합
 
-|     | ID   | 작업                                                                            | 완료 조건(산출물)                    | 선행       |
-| --- | ---- | ------------------------------------------------------------------------------- | ------------------------------------ | ---------- |
-| [ ] | P5.1 | 합성·P&R, 100 MHz 타이밍 클로저                                                | 타이밍·자원 리포트                  | P4.10      |
-| [ ] | P5.2 | bitstream 생성, ILA 디버깅 포인트 삽입                                          | 보드 구동, ILA 파형 확인             | P5.1       |
-| [ ] | P5.3 | 단계적 보드 시험: 단일 요청 → 다중 트랙 → 512트랙 부하, 결과와 골든 자동 비교 | 단계별 시험 로그, 불일치 디버깅 기록 | P5.2       |
-| [ ] | P5.4 | USB 마이크 → Host 전처리 → 가속기 종단간 시험                                 | 종단간 동작 로그                     | P4.8, P5.3 |
+| 상태 | ID | 작업 | 완료 기준 |
+|---|---|---|---|
+| [ ] | P5.1 | synthesis·P&R | timing·resource report |
+| [ ] | P5.2 | bitstream·ILA | board 동작과 waveform |
+| [ ] | P5.3 | 단계별 board test | 단일 요청→다중 track→목표 부하 |
+| [ ] | P5.4 | end-to-end test | USB mic→Host→FPGA→결과 |
 
-**완료 판정**: 보드에서 정책 전환과 계측이 동작하고 결과가 골든과 일치한다.
+## 6. 평가와 논문
 
-## Phase 6 — 평가·정리
+| 상태 | ID | 작업 | 완료 기준 |
+|---|---|---|---|
+| [ ] | P6.1 | 비교 실험 | 같은 trace·mapping·clock·cache 조건 |
+| [ ] | P6.2 | 계측 수집 | miss rate, weight byte, p99, worst |
+| [ ] | P6.3 | simulation과 board 비교 | 오차 원인 분석 |
+| [ ] | P6.4 | USB mic demo | 통합 시연 |
+| [ ] | P6.5 | 논문 | 초안과 재현 자료 |
 
-|     | ID   | 작업                                                                                                                   | 완료 조건(산출물)                                           | 선행       |
-| --- | ---- | ---------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- | ---------- |
-| [ ] | P6.1 | 실험 매트릭스 정의와 실행: 스케줄러 4 × 저장 정책 3 × 부하·모델 편중·지터. 가능하면 동일 bitstream에서 런타임 전환 | 실험 조건표(트레이스·매핑·캐시 초기 상태·클럭·DDR 설정) | P5.3       |
-| [ ] | P6.2 | 원시 계측 수집, 지표 계산: 마감 위반율, 가중치 DRAM 전송 바이트, p99·최악 지연                                        | 원시 데이터와 지표 표                                       | P6.1       |
-| [ ] | P6.3 | SW 시뮬레이터 예측과 보드 실측 비교                                                                                    | 오차 분석                                                   | P6.2       |
-| [ ] | P6.4 | USB 마이크 데모(통합 시연이며 512트랙 성능의 근거로 쓰지 않음)                                                         | 데모 영상·절차                                             | P5.4       |
-| [ ] | P6.5 | 결과 분석, 논문 작성                                                                                                   | 논문 초안                                                   | P6.2, P6.3 |
+## 7. 선행 자산
 
----
+선행 저장소: `/mnt/nas/data/2026-CAU/서울대학교 학부인턴/Project/SpikeSense-Edge`
 
-## 선행 자산 재사용
+| 자산 | 사용 위치 |
+|---|---|
+| 모델·학습·quantization·export code | P1.8, P2 |
+| `plift_core.v`, `mac_unit.v` | P4.1 |
+| `membrane_mem_mult.v` | P4.2 |
+| `anomaly_judge_mult.v`, `control_fsm_mult.v` | P4 참고 |
+| `capture_mel.py` | P4.8 |
 
-선행 저장소: `/mnt/nas/data/2026-CAU/서울대학교 학부인턴/Project/SpikeSense-Edge` (사용 전 그 저장소의 `CLAUDE.md`를 읽는다. 동결된 `snn_top.v`·`dual_snn_top.v`는 수정하지 않는다.)
-
-| 자산                                                          | 쓰는 task                 |
-| ------------------------------------------------------------- | ------------------------- |
-| `software/test_model_numpy.py`                              | P1.8                      |
-| `software/snn_model.py`, `train.py`                       | P2.3, P2.4                |
-| `software/compare_quant.py`                                 | P2.5                      |
-| `software/export_weights.py`, `make_hw_test_vectors.py`   | P2.6, P2.7                |
-| `hardware/src/plift_core.v`, `mac_unit.v`                 | P4.1                      |
-| `hardware/src/membrane_mem_mult.v`                          | P4.2                      |
-| `hardware/src/anomaly_judge_mult.v`, `control_fsm_mult.v` | P4.1, P4.5 (참고)         |
-| `hardware/fpga/*.tcl`                                       | P1.4 (스크립트 구조 참고) |
-| `rpi/capture_mel.py`                                        | P4.8                      |
+선행 저장소의 지침을 먼저 읽는다. 동결된 `snn_top.v`, `dual_snn_top.v`는 수정하지 않는다.
