@@ -1,0 +1,67 @@
+====================================================================== 
+전체 40대 학습 | clip_loss=True hop=16 | 채택=마지막 에포크 | layers=40,768,512,128,2
+끝난 장비 19대 건너뜀, 이 프로세스 5대 → results_r3_s0of5.csv
+
+--- [1/5] fan_id06
+[fan_id06] method=supervised bs=512 epochs=60 sched=cosine clip_loss hop=16 aug(p=0.5, K=4)
+  train 정상 14814 seg, 다른 ID 풀 2916 seg, val 1840 seg, test 2810 seg
+  파일 단위 손실: 정상 823파일, 이상 162파일
+  ep   1 | train 0.9410/0.580 | val 0.1403/0.680 auc 0.835 | test AUC 0.871 pAUC 0.608 | 2.9s
+  ep  10 | train 0.1065/0.838 | val 0.0447/0.954 auc 0.995 | test AUC 0.986 pAUC 0.984 | 3.1s
+  ep  20 | train 0.0685/0.908 | val 0.0462/0.968 auc 0.988 | test AUC 0.990 pAUC 0.990 | 5.3s
+  ep  30 | train 0.0439/0.939 | val 0.0199/0.978 auc 0.999 | test AUC 0.999 pAUC 0.993 | 6.4s
+  ep  40 | train 0.0322/0.953 | val 0.0059/0.996 auc 1.000 | test AUC 0.999 pAUC 0.994 | 6.4s
+  ep  50 | train 0.0250/0.966 | val 0.0241/0.981 auc 0.999 | test AUC 0.998 pAUC 0.994 | 6.4s
+  ep  60 | train 0.0172/0.975 | val 0.0068/0.994 auc 1.000 | test AUC 0.999 pAUC 0.996 | 6.4s
+  완료 → /mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/software/analysis_data/size_sweep/XL_aug/fan_id06
+
+unit                  val_loss     val_auc    test_auc   test_pauc test_f1_bal test_acc_bal test_seg_f1 test_seg_acc test_auc_bestval
+fan_id06                0.0068      0.9996      0.9992      0.9956      0.9759      0.9760      0.9814      0.9762      0.9988
+평균                      0.0068      0.9996      0.9992      0.9956      0.9759      0.9760      0.9814      0.9762      0.9988
+
+--- [2/5] slider_id04
+[slider_id04] method=supervised bs=512 epochs=60 sched=cosine clip_loss hop=16 aug(p=0.5, K=4)
+  train 정상 7038 seg, 다른 ID 풀 1440 seg, val 860 seg, test 1890 seg
+  파일 단위 손실: 정상 391파일, 이상 80파일
+  ep   1 | train 1.8998/0.490 | val 0.1752/0.453 auc 0.458 | test AUC 0.381 pAUC 0.491 | 3.1s
+  ep  10 | train 0.0582/0.963 | val 0.0335/0.940 auc 0.997 | test AUC 1.000 pAUC 1.000 | 2.6s
+  ep  20 | train 0.0116/0.991 | val 0.1546/0.909 auc 0.966 | test AUC 1.000 pAUC 0.999 | 3.1s
+  ep  30 | train 0.0187/0.976 | val 0.1198/0.953 auc 0.930 | test AUC 1.000 pAUC 1.000 | 3.1s
+  ep  40 | train 0.0015/0.997 | val 0.1495/0.950 auc 0.957 | test AUC 1.000 pAUC 1.000 | 3.3s
+  ep  50 | train 0.0008/1.000 | val 0.1330/0.952 auc 0.968 | test AUC 1.000 pAUC 1.000 | 3.3s
+  ep  60 | train 0.0010/0.999 | val 0.0875/0.963 auc 0.992 | test AUC 1.000 pAUC 1.000 | 3.3s
+  완료 → /mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/software/analysis_data/size_sweep/XL_aug/slider_id04
+
+unit                  val_loss     val_auc    test_auc   test_pauc test_f1_bal test_acc_bal test_seg_f1 test_seg_acc test_auc_bestval
+fan_id06                0.0068      0.9996      0.9992      0.9956      0.9759      0.9760      0.9814      0.9762      0.9988
+slider_id04             0.0875      0.9923      1.0000      1.0000      0.9712      0.9713      0.9706      0.9725      1.0000
+평균                      0.0471      0.9960      0.9996      0.9978      0.9735      0.9737      0.9760      0.9744      0.9994
+
+--- [3/5] valve_id04
+[valve_id04] method=supervised bs=512 epochs=60 sched=cosine clip_loss hop=16 aug(p=0.5, K=4)
+  train 정상 14580 seg, 다른 ID 풀 972 seg, val 1800 seg, test 1600 seg
+  파일 단위 손실: 정상 810파일, 이상 54파일
+  ep   1 | train 0.7913/0.519 | val 0.1722/0.534 auc 0.555 | test AUC 0.518 pAUC 0.515 | 6.8s
+  ep  10 | train 0.1946/0.488 | val 0.2020/0.500 auc 0.448 | test AUC 0.510 pAUC 0.505 | 6.4s
+  ep  20 | train 0.1908/0.493 | val 0.2091/0.486 auc 0.496 | test AUC 0.569 pAUC 0.477 | 6.3s
+  ep  30 | train 0.1753/0.546 | val 0.1780/0.519 auc 0.512 | test AUC 0.791 pAUC 0.625 | 6.3s
+  ep  40 | train 0.0669/0.919 | val 0.1668/0.822 auc 0.847 | test AUC 1.000 pAUC 1.000 | 6.3s
+  ep  50 | train 0.0386/0.949 | val 0.1695/0.829 auc 0.857 | test AUC 1.000 pAUC 0.998 | 6.3s
+  ep  60 | train 0.0271/0.965 | val 0.1903/0.827 auc 0.870 | test AUC 0.999 pAUC 0.997 | 6.3s
+  완료 → /mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/software/analysis_data/size_sweep/XL_aug/valve_id04
+
+unit                  val_loss     val_auc    test_auc   test_pauc test_f1_bal test_acc_bal test_seg_f1 test_seg_acc test_auc_bestval
+fan_id06                0.0068      0.9996      0.9992      0.9956      0.9759      0.9760      0.9814      0.9762      0.9988
+slider_id04             0.0875      0.9923      1.0000      1.0000      0.9712      0.9713      0.9706      0.9725      1.0000
+valve_id04              0.1903      0.8699      0.9995      0.9974      0.8432      0.8175      0.7720      0.7825      0.9902
+평균                      0.0949      0.9539      0.9996      0.9977      0.9301      0.9216      0.9080      0.9104      0.9963
+
+--- [4/5] ToyCar_id06
+[ToyCar_id06] method=supervised bs=512 epochs=60 sched=cosine clip_loss hop=16 aug(p=0.5, K=4)
+  train 정상 18000 seg, 다른 ID 풀 2380 seg, val 2200 seg, test 4213 seg
+  파일 단위 손실: 정상 900파일, 이상 119파일
+  ep   1 | train 0.7212/0.489 | val 0.1856/0.495 auc 0.526 | test AUC 0.533 pAUC 0.513 | 7.9s
+  ep  10 | train 0.1899/0.512 | val 0.1808/0.528 auc 0.562 | test AUC 0.638 pAUC 0.564 | 7.9s
+  ep  20 | train 0.2174/0.511 | val 0.2633/0.500 auc 0.500 | test AUC 0.500 pAUC 0.500 | 8.2s
+  ep  30 | train 0.1787/0.531 | val 0.1800/0.528 auc 0.564 | test AUC 0.678 pAUC 0.572 | 8.3s
+  ep  40 | train 0.1619/0.661 | val 0.1394/0.740 auc 0.796 | test AUC 0.907 pAUC 0.736 | 8.2s

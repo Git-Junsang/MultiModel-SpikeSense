@@ -161,7 +161,7 @@ def main():
         fp.write("\n".join(lines) + "\n")
 
     ref = {}
-    with open(os.path.join(SOFTWARE, "analysis_data", "all40", "results.csv")) as fp:
+    with open(os.path.join(SOFTWARE, "analysis_result", "all40", "results.csv")) as fp:
         for r in csv.DictReader(fp):
             ref[r["unit"]] = float(r["test_auc"])
 

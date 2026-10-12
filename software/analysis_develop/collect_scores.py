@@ -1,7 +1,7 @@
 """논문 그림의 원자료를 모은다(GPU 필요).
 
 평가 분할은 train.prepare와 동일하다(학습에 쓴 이상 파일 절반 제외). 따라서 여기서
-계산한 AUC는 analysis_data/all40/results.csv의 test_auc와 같아야 한다.
+계산한 AUC는 analysis_result/all40/results.csv의 test_auc와 같아야 한다.
 
 학습된 40대 모델로 test 세그먼트를 추론해
   1) 파일 단위 이상 점수·정답  → figures/scores.npz
@@ -23,7 +23,7 @@ import dcase_data as dd
 import snn_model as sm
 import train as tr
 
-OUT = os.path.join(SW, "analysis_data", "figures")
+OUT = os.path.join(SW, "analysis_result", "figures")
 DEV = "cuda" if torch.cuda.is_available() else "cpu"
 
 

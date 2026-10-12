@@ -1,0 +1,16 @@
+== p3_brc
+All user specified timing constraints are met.
+  clk_pll_i WNS=0.288 ns WHS=0.036 ns
+  userclk1 WNS=0.469 ns WHS=0.036 ns
+== p3_rbc
+All user specified timing constraints are met.
+  clk_pll_i WNS=0.115 ns WHS=0.031 ns
+  userclk1 WNS=0.529 ns WHS=0.036 ns
+== p3_fit4111
+All user specified timing constraints are met.
+  clk_pll_i WNS=0.093 ns WHS=0.036 ns
+  userclk1 WNS=0.532 ns WHS=0.028 ns
+== p3_fit5100
+All user specified timing constraints are met.
+  clk_pll_i WNS=0.073 ns WHS=0.036 ns
+  userclk1 WNS=0.248 ns WHS=0.035 ns

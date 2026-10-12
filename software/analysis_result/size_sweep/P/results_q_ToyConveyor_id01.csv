@@ -1,0 +1,2 @@
+unit,epochs,sec,val_loss,val_auc,test_auc,test_pauc,test_f1_bal,test_acc_bal,test_seg_f1,test_seg_acc,test_auc_bestval
+ToyConveyor_id01,60,181.7,0.2187,0.8857,0.9586,0.8919,0.772,0.7768,0.5925,0.792,0.9197

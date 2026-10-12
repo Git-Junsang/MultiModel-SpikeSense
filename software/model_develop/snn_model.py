@@ -103,6 +103,13 @@ INIT_BETAS = (
 )
 
 
+def default_betas(layer_sizes):
+    """층 수에 맞춘 초기 beta 그룹: 은닉층 1은 INIT_BETAS[0], 나머지 은닉층은 INIT_BETAS[1],
+    출력층은 0.85. 기본 구조에서는 INIT_BETAS와 같고, `40→128→32→2`에서는 선행 모델과 같다(P3.6)."""
+    n_hidden = len(layer_sizes) - 2
+    return (INIT_BETAS[0],) + (INIT_BETAS[1],) * (n_hidden - 1) + (INIT_BETAS[-1],)
+
+
 class AnomalySNN(nn.Module):
     """`40→384→256→64→2` PLIF-T SNN.
 

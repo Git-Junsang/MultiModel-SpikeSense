@@ -234,6 +234,7 @@ SNN 가속기 분야에서 **메모리 최적화는 이미 밀집 지역**이다
 - [ ] `multi-tenant SNN`, `deadline-aware SNN accelerator`, `model caching FPGA` 키워드 Google Scholar 재검색
 - [ ] 산업 예지보전에서 **설비별 개인화 모델**이 실제 사용되는지 근거 문헌 확보 (제안서 §1.3 뒷받침)
 - [ ] 8클래스 결함 라벨 음향 데이터셋 조사 (MIMII/DCASE는 이진 중심)
+- [ ] 지연 배칭·동적 배칭 원문 확보: LazyBatching(Choi 외), NVIDIA Triton 동적 배칭(대기 상한), Clipper 적응형 배칭. P3.8 지연 그룹핑·시간제한 묶음(MODEL_SIZE_PLAN §5.11)의 선행 경계 확인용
 
 ---
 

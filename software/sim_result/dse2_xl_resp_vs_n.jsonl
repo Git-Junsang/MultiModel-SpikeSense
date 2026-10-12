@@ -1,0 +1,168 @@
+{"design": [128, "onchip", 0, 0, 0], "n": 128, "ok": true, "worst_ms": 21.86383398605196, "miss_rate": 0.0}
+{"design": [128, "onchip", 0, 0, 0], "n": 144, "ok": true, "worst_ms": 24.863676986051956, "miss_rate": 0.0}
+{"design": [128, "onchip", 0, 0, 0], "n": 160, "ok": true, "worst_ms": 27.86280398605205, "miss_rate": 0.0}
+{"design": [128, "onchip", 0, 0, 0], "n": 176, "ok": false}
+{"design": [128, "onchip", 0, 0, 0], "n": 192, "ok": false}
+{"design": [128, "onchip", 0, 0, 0], "n": 208, "ok": false}
+{"design": [128, "onchip", 0, 0, 0], "n": 224, "ok": false}
+{"design": [128, "onchip", 0, 0, 0], "n": 240, "ok": false}
+{"design": [128, "onchip", 0, 0, 0], "n": 256, "ok": false}
+{"design": [128, "onchip", 0, 0, 0], "n": 272, "ok": false}
+{"design": [128, "onchip", 0, 0, 0], "n": 288, "ok": false}
+{"design": [128, "onchip", 0, 0, 0], "n": 304, "ok": false}
+{"design": [128, "onchip", 0, 0, 0], "n": 320, "ok": false}
+{"design": [128, "onchip", 0, 0, 0], "n": 336, "ok": false}
+{"design": [128, "onchip", 0, 0, 0], "n": 352, "ok": false}
+{"design": [128, "onchip", 0, 0, 0], "n": 368, "ok": false}
+{"design": [128, "onchip", 0, 0, 0], "n": 384, "ok": false}
+{"design": [128, "onchip", 0, 0, 0], "n": 400, "ok": false}
+{"design": [128, "onchip", 0, 0, 0], "n": 416, "ok": false}
+{"design": [128, "onchip", 0, 0, 0], "n": 432, "ok": false}
+{"design": [128, "onchip", 0, 0, 0], "n": 448, "ok": false}
+{"design": [128, "onchip", 0, 0, 0], "n": 464, "ok": false}
+{"design": [128, "onchip", 0, 0, 0], "n": 480, "ok": false}
+{"design": [128, "onchip", 0, 0, 0], "n": 496, "ok": false}
+{"design": [128, "onchip", 0, 0, 0], "n": 512, "ok": false}
+{"design": [128, "onchip", 0, 0, 0], "n": 528, "ok": false}
+{"design": [128, "onchip", 0, 0, 0], "n": 544, "ok": false}
+{"design": [128, "onchip", 0, 0, 0], "n": 560, "ok": false}
+{"design": [128, "onchip", 0, 0, 0], "n": 576, "ok": false}
+{"design": [128, "onchip", 0, 0, 0], "n": 592, "ok": false}
+{"design": [128, "onchip", 0, 0, 0], "n": 608, "ok": false}
+{"design": [128, "onchip", 0, 0, 0], "n": 624, "ok": false}
+{"design": [128, "onchip", 0, 0, 0], "n": 640, "ok": false}
+{"design": [128, "onchip", 0, 0, 0], "n": 656, "ok": false}
+{"design": [128, "onchip", 0, 0, 0], "n": 672, "ok": false}
+{"design": [128, "onchip", 0, 0, 0], "n": 688, "ok": false}
+{"design": [128, "onchip", 0, 0, 0], "n": 704, "ok": false}
+{"design": [128, "onchip", 0, 0, 0], "n": 720, "ok": false}
+{"design": [128, "onchip", 0, 0, 0], "n": 736, "ok": false}
+{"design": [128, "onchip", 0, 0, 0], "n": 752, "ok": false}
+{"design": [128, "onchip", 0, 0, 0], "n": 768, "ok": false}
+{"design": [128, "onchip", 0, 0, 0], "n": 784, "ok": false}
+{"design": [128, "onchip", 0, 2, 1], "n": 128, "ok": true, "worst_ms": 8.868615986051969, "miss_rate": 0.0}
+{"design": [128, "onchip", 0, 2, 1], "n": 144, "ok": true, "worst_ms": 9.731179233121686, "miss_rate": 0.0}
+{"design": [128, "onchip", 0, 2, 1], "n": 160, "ok": true, "worst_ms": 9.863493986051996, "miss_rate": 0.0}
+{"design": [128, "onchip", 0, 2, 1], "n": 176, "ok": false}
+{"design": [128, "onchip", 0, 2, 1], "n": 192, "ok": false}
+{"design": [128, "onchip", 0, 2, 1], "n": 208, "ok": false}
+{"design": [128, "onchip", 0, 2, 1], "n": 224, "ok": false}
+{"design": [128, "onchip", 0, 2, 1], "n": 240, "ok": false}
+{"design": [128, "onchip", 0, 2, 1], "n": 256, "ok": false}
+{"design": [128, "onchip", 0, 2, 1], "n": 272, "ok": false}
+{"design": [128, "onchip", 0, 2, 1], "n": 288, "ok": false}
+{"design": [128, "onchip", 0, 2, 1], "n": 304, "ok": false}
+{"design": [128, "onchip", 0, 2, 1], "n": 320, "ok": false}
+{"design": [128, "onchip", 0, 2, 1], "n": 336, "ok": false}
+{"design": [128, "onchip", 0, 2, 1], "n": 352, "ok": false}
+{"design": [128, "onchip", 0, 2, 1], "n": 368, "ok": false}
+{"design": [128, "onchip", 0, 2, 1], "n": 384, "ok": false}
+{"design": [128, "onchip", 0, 2, 1], "n": 400, "ok": false}
+{"design": [128, "onchip", 0, 2, 1], "n": 416, "ok": false}
+{"design": [128, "onchip", 0, 2, 1], "n": 432, "ok": false}
+{"design": [128, "onchip", 0, 2, 1], "n": 448, "ok": false}
+{"design": [128, "onchip", 0, 2, 1], "n": 464, "ok": false}
+{"design": [128, "onchip", 0, 2, 1], "n": 480, "ok": false}
+{"design": [128, "onchip", 0, 2, 1], "n": 496, "ok": false}
+{"design": [128, "onchip", 0, 2, 1], "n": 512, "ok": false}
+{"design": [128, "onchip", 0, 2, 1], "n": 528, "ok": false}
+{"design": [128, "onchip", 0, 2, 1], "n": 544, "ok": false}
+{"design": [128, "onchip", 0, 2, 1], "n": 560, "ok": false}
+{"design": [128, "onchip", 0, 2, 1], "n": 576, "ok": false}
+{"design": [128, "onchip", 0, 2, 1], "n": 592, "ok": false}
+{"design": [128, "onchip", 0, 2, 1], "n": 608, "ok": false}
+{"design": [128, "onchip", 0, 2, 1], "n": 624, "ok": false}
+{"design": [128, "onchip", 0, 2, 1], "n": 640, "ok": false}
+{"design": [128, "onchip", 0, 2, 1], "n": 656, "ok": false}
+{"design": [128, "onchip", 0, 2, 1], "n": 672, "ok": false}
+{"design": [128, "onchip", 0, 2, 1], "n": 688, "ok": false}
+{"design": [128, "onchip", 0, 2, 1], "n": 704, "ok": false}
+{"design": [128, "onchip", 0, 2, 1], "n": 720, "ok": false}
+{"design": [128, "onchip", 0, 2, 1], "n": 736, "ok": false}
+{"design": [128, "onchip", 0, 2, 1], "n": 752, "ok": false}
+{"design": [128, "onchip", 0, 2, 1], "n": 768, "ok": false}
+{"design": [128, "onchip", 0, 2, 1], "n": 784, "ok": false}
+{"design": [128, "onchip", 3, 2, 1], "n": 128, "ok": true, "worst_ms": 9.863493986051996, "miss_rate": 0.0}
+{"design": [128, "onchip", 3, 2, 1], "n": 144, "ok": true, "worst_ms": 10.730318233121652, "miss_rate": 0.0}
+{"design": [128, "onchip", 3, 2, 1], "n": 160, "ok": true, "worst_ms": 10.863036986052059, "miss_rate": 0.0}
+{"design": [128, "onchip", 3, 2, 1], "n": 176, "ok": true, "worst_ms": 11.742810233121737, "miss_rate": 0.0}
+{"design": [128, "onchip", 3, 2, 1], "n": 192, "ok": true, "worst_ms": 11.86267698605219, "miss_rate": 0.0}
+{"design": [128, "onchip", 3, 2, 1], "n": 208, "ok": true, "worst_ms": 12.838978274513735, "miss_rate": 0.0}
+{"design": [128, "onchip", 3, 2, 1], "n": 224, "ok": true, "worst_ms": 13.732788233121624, "miss_rate": 0.0}
+{"design": [128, "onchip", 3, 2, 1], "n": 240, "ok": true, "worst_ms": 14.761584233121713, "miss_rate": 0.0}
+{"design": [128, "onchip", 3, 2, 1], "n": 256, "ok": true, "worst_ms": 14.839681274513714, "miss_rate": 0.0}
+{"design": [128, "onchip", 3, 2, 1], "n": 272, "ok": true, "worst_ms": 15.733600233121543, "miss_rate": 0.0}
+{"design": [128, "onchip", 3, 2, 1], "n": 288, "ok": true, "worst_ms": 15.838509274513694, "miss_rate": 0.0}
+{"design": [128, "onchip", 3, 2, 1], "n": 304, "ok": true, "worst_ms": 16.761584233121482, "miss_rate": 0.0}
+{"design": [128, "onchip", 3, 2, 1], "n": 320, "ok": true, "worst_ms": 16.863099986051907, "miss_rate": 0.0}
+{"design": [128, "onchip", 3, 2, 1], "n": 336, "ok": true, "worst_ms": 17.863872986051952, "miss_rate": 0.0}
+{"design": [128, "onchip", 3, 2, 1], "n": 352, "ok": true, "worst_ms": 18.742810233121737, "miss_rate": 0.0}
+{"design": [128, "onchip", 3, 2, 1], "n": 368, "ok": true, "worst_ms": 19.52448915251647, "miss_rate": 0.0}
+{"design": [128, "onchip", 3, 2, 1], "n": 384, "ok": true, "worst_ms": 19.86471598605206, "miss_rate": 0.0}
+{"design": [128, "onchip", 3, 2, 1], "n": 400, "ok": true, "worst_ms": 20.741829233121592, "miss_rate": 0.0}
+{"design": [128, "onchip", 3, 2, 1], "n": 416, "ok": true, "worst_ms": 20.864702986051793, "miss_rate": 0.0}
+{"design": [128, "onchip", 3, 2, 1], "n": 432, "ok": true, "worst_ms": 21.86383398605196, "miss_rate": 0.0}
+{"design": [128, "onchip", 3, 2, 1], "n": 448, "ok": true, "worst_ms": 22.525227152516134, "miss_rate": 0.0}
+{"design": [128, "onchip", 3, 2, 1], "n": 464, "ok": false}
+{"design": [128, "onchip", 3, 2, 1], "n": 480, "ok": false}
+{"design": [128, "onchip", 3, 2, 1], "n": 496, "ok": false}
+{"design": [128, "onchip", 3, 2, 1], "n": 512, "ok": false}
+{"design": [128, "onchip", 3, 2, 1], "n": 528, "ok": false}
+{"design": [128, "onchip", 3, 2, 1], "n": 544, "ok": false}
+{"design": [128, "onchip", 3, 2, 1], "n": 560, "ok": false}
+{"design": [128, "onchip", 3, 2, 1], "n": 576, "ok": false}
+{"design": [128, "onchip", 3, 2, 1], "n": 592, "ok": false}
+{"design": [128, "onchip", 3, 2, 1], "n": 608, "ok": false}
+{"design": [128, "onchip", 3, 2, 1], "n": 624, "ok": false}
+{"design": [128, "onchip", 3, 2, 1], "n": 640, "ok": false}
+{"design": [128, "onchip", 3, 2, 1], "n": 656, "ok": false}
+{"design": [128, "onchip", 3, 2, 1], "n": 672, "ok": false}
+{"design": [128, "onchip", 3, 2, 1], "n": 688, "ok": false}
+{"design": [128, "onchip", 3, 2, 1], "n": 704, "ok": false}
+{"design": [128, "onchip", 3, 2, 1], "n": 720, "ok": false}
+{"design": [128, "onchip", 3, 2, 1], "n": 736, "ok": false}
+{"design": [128, "onchip", 3, 2, 1], "n": 752, "ok": false}
+{"design": [128, "onchip", 3, 2, 1], "n": 768, "ok": false}
+{"design": [128, "onchip", 3, 2, 1], "n": 784, "ok": false}
+{"design": [128, "ddr", 0, 2, 0], "n": 128, "ok": true, "worst_ms": 9.863493986051996, "miss_rate": 0.0}
+{"design": [128, "ddr", 0, 2, 0], "n": 144, "ok": true, "worst_ms": 9.863493986051996, "miss_rate": 0.0}
+{"design": [128, "ddr", 0, 2, 0], "n": 160, "ok": true, "worst_ms": 10.730318233121652, "miss_rate": 0.0}
+{"design": [128, "ddr", 0, 2, 0], "n": 176, "ok": true, "worst_ms": 10.863036986052059, "miss_rate": 0.0}
+{"design": [128, "ddr", 0, 2, 0], "n": 192, "ok": true, "worst_ms": 11.742810233121737, "miss_rate": 0.0}
+{"design": [128, "ddr", 0, 2, 0], "n": 208, "ok": true, "worst_ms": 11.86267698605219, "miss_rate": 0.0}
+{"design": [128, "ddr", 0, 2, 0], "n": 224, "ok": true, "worst_ms": 12.838978274513735, "miss_rate": 0.0}
+{"design": [128, "ddr", 0, 2, 0], "n": 240, "ok": true, "worst_ms": 13.732788233121624, "miss_rate": 0.0}
+{"design": [128, "ddr", 0, 2, 0], "n": 256, "ok": true, "worst_ms": 13.862646986052045, "miss_rate": 0.0}
+{"design": [128, "ddr", 0, 2, 0], "n": 272, "ok": true, "worst_ms": 14.761584233121713, "miss_rate": 0.0}
+{"design": [128, "ddr", 0, 2, 0], "n": 288, "ok": true, "worst_ms": 15.733600233121543, "miss_rate": 0.0}
+{"design": [128, "ddr", 0, 2, 0], "n": 304, "ok": true, "worst_ms": 15.733600233121543, "miss_rate": 0.0}
+{"design": [128, "ddr", 0, 2, 0], "n": 320, "ok": true, "worst_ms": 16.761584233121482, "miss_rate": 0.0}
+{"design": [128, "ddr", 0, 2, 0], "n": 336, "ok": true, "worst_ms": 16.863099986051907, "miss_rate": 0.0}
+{"design": [128, "ddr", 0, 2, 0], "n": 352, "ok": true, "worst_ms": 17.73033123312169, "miss_rate": 0.0}
+{"design": [128, "ddr", 0, 2, 0], "n": 368, "ok": true, "worst_ms": 18.52555815251637, "miss_rate": 0.0}
+{"design": [128, "ddr", 0, 2, 0], "n": 384, "ok": true, "worst_ms": 18.863872986051952, "miss_rate": 0.0}
+{"design": [128, "ddr", 0, 2, 0], "n": 400, "ok": true, "worst_ms": 19.732833233121667, "miss_rate": 0.0}
+{"design": [128, "ddr", 0, 2, 0], "n": 416, "ok": true, "worst_ms": 20.525148152516458, "miss_rate": 0.0}
+{"design": [128, "ddr", 0, 2, 0], "n": 432, "ok": true, "worst_ms": 20.864702986051793, "miss_rate": 0.0}
+{"design": [128, "ddr", 0, 2, 0], "n": 448, "ok": true, "worst_ms": 21.73537223312119, "miss_rate": 0.0}
+{"design": [128, "ddr", 0, 2, 0], "n": 464, "ok": true, "worst_ms": 21.86383398605196, "miss_rate": 0.0}
+{"design": [128, "ddr", 0, 2, 0], "n": 480, "ok": true, "worst_ms": 22.73069723312161, "miss_rate": 0.0}
+{"design": [128, "ddr", 0, 2, 0], "n": 496, "ok": true, "worst_ms": 23.52408615251654, "miss_rate": 0.0}
+{"design": [128, "ddr", 0, 2, 0], "n": 512, "ok": true, "worst_ms": 23.86430398605205, "miss_rate": 0.0}
+{"design": [128, "ddr", 0, 2, 0], "n": 528, "ok": true, "worst_ms": 24.732231233121595, "miss_rate": 0.0}
+{"design": [128, "ddr", 0, 2, 0], "n": 544, "ok": true, "worst_ms": 24.863676986051956, "miss_rate": 0.0}
+{"design": [128, "ddr", 0, 2, 0], "n": 560, "ok": true, "worst_ms": 25.894127986051956, "miss_rate": 0.0}
+{"design": [128, "ddr", 0, 2, 0], "n": 576, "ok": true, "worst_ms": 26.731288233121624, "miss_rate": 0.0}
+{"design": [128, "ddr", 0, 2, 0], "n": 592, "ok": true, "worst_ms": 26.86339198605204, "miss_rate": 0.0}
+{"design": [128, "ddr", 0, 2, 0], "n": 608, "ok": true, "worst_ms": 27.86280398605205, "miss_rate": 0.0}
+{"design": [128, "ddr", 0, 2, 0], "n": 624, "ok": true, "worst_ms": 28.73223123312171, "miss_rate": 0.0}
+{"design": [128, "ddr", 0, 2, 0], "n": 640, "ok": true, "worst_ms": 28.86288298605196, "miss_rate": 0.0}
+{"design": [128, "ddr", 0, 2, 0], "n": 656, "ok": true, "worst_ms": 29.863194986051997, "miss_rate": 0.0}
+{"design": [128, "ddr", 0, 2, 0], "n": 672, "ok": true, "worst_ms": 30.742810233121737, "miss_rate": 0.0}
+{"design": [128, "ddr", 0, 2, 0], "n": 688, "ok": true, "worst_ms": 30.86466198605206, "miss_rate": 0.0}
+{"design": [128, "ddr", 0, 2, 0], "n": 704, "ok": true, "worst_ms": 31.876715986052062, "miss_rate": 0.0}
+{"design": [128, "ddr", 0, 2, 0], "n": 720, "ok": true, "worst_ms": 32.35266296845593, "miss_rate": 0.00030970801120288634}
+{"design": [128, "ddr", 0, 2, 0], "n": 736, "ok": true, "worst_ms": 32.8626709860519, "miss_rate": 0.006392810938906562}
+{"design": [128, "ddr", 0, 2, 0], "n": 752, "ok": true, "worst_ms": 33.863101986052, "miss_rate": 0.014948902074167618}
+{"design": [128, "ddr", 0, 2, 0], "n": 768, "ok": true, "worst_ms": 91.12047642857348, "miss_rate": 0.3385397241780953}
+{"design": [128, "ddr", 0, 2, 0], "n": 784, "ok": true, "worst_ms": 204.34877296845568, "miss_rate": 0.6054359108481198}

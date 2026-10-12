@@ -1,0 +1,2 @@
+unit,epochs,sec,val_loss,val_auc,test_auc,test_pauc,test_f1_bal,test_acc_bal,test_seg_f1,test_seg_acc,test_auc_bestval
+slider_id04,60,57.5,0.1387,0.9774,0.9999,0.9994,0.913,0.9185,0.9114,0.9217,0.9976

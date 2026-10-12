@@ -1,0 +1,20 @@
+Vivado Simulator v2026.1
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+Copyright 2022-2026 Advanced Micro Devices, Inc. All Rights Reserved.
+Running: /tools/Xilinx/2026.1/Vivado/bin/unwrapped/lnx64.o/xelab --nolog -debug off tb_p3_core -s tb_p3_core 
+Multi-threading is on. Using 18 slave threads.
+WARNING: [XSIM 43-3431] One or more environment variables have been detected which affect the operation of the C compiler. These are typically not set in standard installations and are not tested by AMD, however they may be appropriate for your system, so the flow will attempt to continue.  If errors occur, try running xelab with the "-mt off -v 1" switches to see more information from the C compiler. The following environment variables have been detected:
+    LIBRARY_PATH
+Starting static elaboration
+Pass Through NonSizing Optimizer
+Completed static elaboration
+Starting simulation data flow analysis
+Completed simulation data flow analysis
+Time Resolution for simulation is 1ps
+Compiling module work.tgen_fifo(W=35)
+Compiling module work.tgen_fifo(W=33)
+Compiling module work.tgen_fifo
+Compiling module work.ddr_tgen_default
+Compiling module work.p3_core
+Compiling module work.tb_p3_core
+Built simulation snapshot tb_p3_core

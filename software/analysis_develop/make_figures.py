@@ -1,8 +1,8 @@
 """논문용 그림을 만든다(GPU 불필요).
 
-입력: analysis_data/results.csv, analysis_data/<장비>/history.csv,
-      analysis_data/figures/{scores.npz, membrane_headroom.csv}
-출력: analysis_data/figures/figN_*.pdf 와 같은 이름의 .png (300 dpi)
+입력: analysis_result/results.csv, analysis_result/<장비>/history.csv,
+      analysis_result/figures/{scores.npz, membrane_headroom.csv}
+출력: analysis_result/figures/figN_*.pdf 와 같은 이름의 .png (300 dpi)
 
 라벨은 영문으로 쓴다. 학회 제출 서식과 폰트 호환을 맞추기 위함이다.
 사용: python3 make_figures.py   (원자료가 없으면 먼저 collect_scores.py)
@@ -20,7 +20,7 @@ from matplotlib.lines import Line2D
 from sklearn.metrics import roc_curve
 
 SW = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DATA = os.path.join(SW, "analysis_data")
+DATA = os.path.join(SW, "analysis_result")
 OUT = os.path.join(DATA, "figures")
 
 TYPES = ["fan", "pump", "slider", "valve", "ToyCar", "ToyConveyor"]

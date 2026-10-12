@@ -1,0 +1,2 @@
+unit,epochs,sec,val_loss,val_auc,test_auc,test_pauc,test_f1_bal,test_acc_bal,test_seg_f1,test_seg_acc,test_auc_bestval
+fan_id03,60,214.5,0.0641,0.9813,0.9798,0.9418,0.8835,0.887,0.9028,0.881,0.9463

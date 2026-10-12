@@ -78,13 +78,23 @@ def list_files(machine, mid, split):
     return paths, labels
 
 
-def extract_mel(path):
-    """선행 extract_mel_spectrogram과 같은 처리. 반환 [frames, 40] float32, 범위 [0, 1]"""
+def read_wave(path):
+    """wav → 16 kHz 단일 채널 float64 (extract_mel과 같은 읽기)"""
     data, sr = sf.read(path)
     if data.ndim > 1:
         data = data[:, 0]
     if sr != SR:
         data = librosa.resample(data, orig_sr=sr, target_sr=SR)
+    return data
+
+
+def extract_mel(path):
+    """선행 extract_mel_spectrogram과 같은 처리. 반환 [frames, 40] float32, 범위 [0, 1]"""
+    return mel_from_wave(read_wave(path))
+
+
+def mel_from_wave(data):
+    """16 kHz 파형 → 정규화 mel. 겹침 증강(overlap_aug.py)도 섞은 파형을 이 함수로 처리한다"""
     data = data - np.mean(data)
     S = librosa.feature.melspectrogram(y=data, sr=SR, n_fft=N_FFT, hop_length=HOP, n_mels=N_MELS)
     log_S = librosa.power_to_db(S, ref=np.max)

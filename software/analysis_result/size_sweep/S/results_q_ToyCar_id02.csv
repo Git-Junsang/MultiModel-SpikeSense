@@ -1,0 +1,2 @@
+unit,epochs,sec,val_loss,val_auc,test_auc,test_pauc,test_f1_bal,test_acc_bal,test_seg_f1,test_seg_acc,test_auc_bestval
+ToyCar_id02,60,437.0,0.7402,0.8785,0.9748,0.9471,0.7728,0.7867,0.6821,0.8139,0.9558

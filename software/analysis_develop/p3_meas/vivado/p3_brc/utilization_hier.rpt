@@ -1,0 +1,65 @@
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2026 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2026.1 (lin64) Build 6511674 Tue Jun 16 11:01:26 MDT 2026
+| Date         : Fri Oct  9 20:07:46 2026
+| Host         : Dev-Ubuntu running 64-bit Ubuntu 24.04.4 LTS
+| Command      : report_utilization -hierarchical -hierarchical_depth 4 -file /root/mmss_build/p3_brc/reports/utilization_hier.rpt
+| Design       : p3_top
+| Device       : xc7a200tfbg484-2
+| Speed File   : -2
+| Design State : Routed
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Utilization Design Information
+
+Table of Contents
+-----------------
+1. Utilization by Hierarchy
+
+1. Utilization by Hierarchy
+---------------------------
+
++-----------------------------------------+----------------------------------------------+------------+------------+---------+------+-------+--------+--------+------------+
+|                 Instance                |                    Module                    | Total LUTs | Logic LUTs | LUTRAMs | SRLs |  FFs  | RAMB36 | RAMB18 | DSP Blocks |
++-----------------------------------------+----------------------------------------------+------------+------------+---------+------+-------+--------+--------+------------+
+| p3_top                                  |                                        (top) |      31707 |      25928 |    5393 |  386 | 40063 |     40 |      6 |          2 |
+|   (p3_top)                              |                                        (top) |          9 |          9 |       0 |    0 |    31 |      0 |      0 |          0 |
+|   dbg_hub                               |                                      dbg_hub |        473 |        449 |      24 |    0 |   753 |      0 |      0 |          0 |
+|     inst                                |                   dbg_hub_xsdbm_v3_0_6_xsdbm |        473 |        449 |      24 |    0 |   753 |      0 |      0 |          0 |
+|       BSCANID.u_xsdbm_id                |                dbg_hub_xsdbm_v3_0_6_xsdbm_id |        473 |        449 |      24 |    0 |   753 |      0 |      0 |          0 |
+|         SWITCH_N_EXT_BSCAN.bscan_switch |            dbg_hub_xsdbm_v3_0_6_bscan_switch |        124 |        124 |       0 |    0 |   125 |      0 |      0 |          0 |
+|         CORE_XSDB.UUT_MASTER            |               dbg_hub_xsdbm_v3_0_6_icon2xsdb |        297 |        273 |      24 |    0 |   566 |      0 |      0 |          0 |
+|   u_bd                                  |                                p3_bd_wrapper |      22912 |      18322 |    4479 |  111 | 30869 |     36 |      6 |          0 |
+|     (u_bd)                              |                                p3_bd_wrapper |        191 |        191 |       0 |    0 |     0 |      0 |      0 |          0 |
+|     p3_bd_i                             |                                        p3_bd |      22721 |      18131 |    4479 |  111 | 30869 |     36 |      6 |          0 |
+|       xdma_0                            |                               p3_bd_xdma_0_0 |      11828 |      10269 |    1545 |   14 | 13688 |     18 |      5 |          0 |
+|         inst                            |                      p3_bd_xdma_0_0_core_top |      11828 |      10269 |    1545 |   14 | 13688 |     18 |      5 |          0 |
+|       axi_bram_ctrl_0                   |                      p3_bd_axi_bram_ctrl_0_0 |        187 |        187 |       0 |    0 |   286 |      0 |      0 |          0 |
+|         U0                              |        p3_bd_axi_bram_ctrl_0_0_axi_bram_ctrl |        187 |        187 |       0 |    0 |   286 |      0 |      0 |          0 |
+|       jtag_axi_0                        |                           p3_bd_jtag_axi_0_0 |        686 |        501 |     176 |    9 |  1684 |      2 |      1 |          0 |
+|         inst                            | p3_bd_jtag_axi_0_0_jtag_axi_v1_2_24_jtag_axi |        686 |        501 |     176 |    9 |  1684 |      2 |      1 |          0 |
+|       smartconnect_0                    |                       p3_bd_smartconnect_0_0 |      10019 |       7174 |    2758 |   87 | 15206 |      0 |      0 |          0 |
+|         inst                            |               p3_bd_smartconnect_0_0_bd_0bfe |      10019 |       7174 |    2758 |   87 | 15206 |      0 |      0 |          0 |
+|   u_core                                |                                      p3_core |       1706 |       1636 |      70 |    0 |  2457 |      4 |      0 |          2 |
+|     (u_core)                            |                                      p3_core |         42 |         42 |       0 |    0 |   844 |      0 |      0 |          0 |
+|     u_tgen                              |                                     ddr_tgen |       1664 |       1594 |      70 |    0 |  1613 |      4 |      0 |          2 |
+|       (u_tgen)                          |                                     ddr_tgen |       1223 |       1223 |       0 |    0 |  1577 |      4 |      0 |          2 |
+|       u_rf                              |                                    tgen_fifo |        204 |        180 |      24 |    0 |    12 |      0 |      0 |          0 |
+|       u_wf                              |                    tgen_fifo__parameterized0 |        158 |        134 |      24 |    0 |    12 |      0 |      0 |          0 |
+|       u_xf                              |                    tgen_fifo__parameterized1 |         85 |         63 |      22 |    0 |    12 |      0 |      0 |          0 |
+|   u_mig                                 |                                     mig_ddr3 |       6499 |       5404 |     820 |  275 |  5649 |      0 |      0 |          0 |
+|     u_mig_ddr3_mig                      |                                 mig_ddr3_mig |       6499 |       5404 |     820 |  275 |  5649 |      0 |      0 |          0 |
+|       temp_mon_enabled.u_tempmon        |            mig_ddr3_mig_7series_v4_2_tempmon |         38 |         38 |       0 |    0 |   122 |      0 |      0 |          0 |
+|       u_memc_ui_top_axi                 |    mig_ddr3_mig_7series_v4_2_memc_ui_top_axi |       6456 |       5361 |     820 |  275 |  5477 |      0 |      0 |          0 |
+|         u_ui_top                        |             mig_ddr3_mig_7series_v4_2_ui_top |        630 |        254 |     376 |    0 |   969 |      0 |      0 |          0 |
+|         mem_intfc0                      |          mig_ddr3_mig_7series_v4_2_mem_intfc |       5011 |       4549 |     444 |   18 |  3724 |      0 |      0 |          0 |
+|         u_axi_mc                        |             mig_ddr3_mig_7series_v4_2_axi_mc |        818 |        561 |       0 |  257 |   782 |      0 |      0 |          0 |
+|   u_vio                                 |                                       vio_p3 |        110 |        110 |       0 |    0 |   304 |      0 |      0 |          0 |
+|     inst                                |                       vio_p3_vio_v3_0_28_vio |        110 |        110 |       0 |    0 |   304 |      0 |      0 |          0 |
+|       U_XSDB_SLAVE                      |                    vio_p3_xsdbs_v1_0_6_xsdbs |         77 |         77 |       0 |    0 |   161 |      0 |      0 |          0 |
+|       DECODER_INST                      |                   vio_p3_vio_v3_0_28_decoder |         28 |         28 |       0 |    0 |    50 |      0 |      0 |          0 |
+|       PROBE_IN_INST                     |              vio_p3_vio_v3_0_28_probe_in_one |          5 |          5 |       0 |    0 |    75 |      0 |      0 |          0 |
++-----------------------------------------+----------------------------------------------+------------+------------+---------+------+-------+--------+--------+------------+
+* Note: The sum of lower-level cells may be larger than their parent cells total, due to cross-hierarchy LUT combining
+
+

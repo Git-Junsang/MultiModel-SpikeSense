@@ -1,0 +1,2 @@
+unit,epochs,sec,val_loss,val_auc,test_auc,test_pauc,test_f1_bal,test_acc_bal,test_seg_f1,test_seg_acc,test_auc_bestval
+pump_id02,60,434.1,0.4423,0.9535,0.9877,0.9765,0.9152,0.9205,0.9082,0.9378,0.9741

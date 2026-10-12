@@ -1,0 +1,29 @@
+
+****** xsim v2026.1 (64-bit)
+  **** SW Build 6511674 on Tue Jun 16 11:01:26 MDT 2026
+  **** IP Build 6504888 on Tue Jun 09 09:05:25 MDT 2026
+  **** SharedData Build 6501428 on Mon Jun 08 17:34:18 MDT 2026
+  **** Start of session at: Fri Oct  9 19:58:22 2026
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+    ** Copyright 2022-2026 Advanced Micro Devices, Inc. All Rights Reserved.
+
+source xsim.dir/tb_p3_core/xsim_script.tcl
+# xsim {tb_p3_core} -autoloadwcfg -runall
+Time resolution is 1 ps
+run -all
+run w=1 v=0 am=0 pipe=0 xb=200 bmax=64 n=5 out=4 : cyc=1489 beats=1000 xfers=5 lat[min=273 max=314 avg=296.4] fst[min=273 max=314] err=0 proto=0 log=5 maxout=4
+run w=0 v=1 am=0 pipe=0 xb=200 bmax=64 n=5 out=4 : cyc=1288 beats=1000 xfers=5 lat[min=247 max=272 avg=256.2] fst[min=22 max=25] err=0 proto=0 log=5 maxout=4
+run w=0 v=1 am=0 pipe=1 xb=200 bmax=32 n=5 out=8 : cyc=1203 beats=1000 xfers=5 lat[min=246 max=483 avg=431.0] fst[min=23 max=245] err=1 proto=0 log=5 maxout=8
+run w=1 v=0 am=1 pipe=1 xb=96 bmax=128 n=60 out=8 : cyc=8319 beats=5760 xfers=60 lat[min=155 max=678 avg=624.9] fst[min=155 max=678] err=0 proto=0 log=60 maxout=8
+run w=0 v=1 am=1 pipe=1 xb=96 bmax=128 n=60 out=8 : cyc=6824 beats=5760 xfers=60 lat[min=137 max=559 avg=512.2] fst[min=22 max=445] err=0 proto=0 log=60 maxout=8
+run w=1 v=0 am=3 pipe=0 xb=4068 bmax=128 n=3 out=16 : cyc=17570 beats=12204 xfers=3 lat[min=5816 max=5876 avg=5855.0] fst[min=5816 max=5876] err=0 proto=0 log=3 maxout=16
+run w=0 v=1 am=3 pipe=0 xb=4068 bmax=128 n=3 out=16 : cyc=14433 beats=12204 xfers=3 lat[min=4777 max=4831 avg=4809.3] fst[min=22 max=22] err=0 proto=0 log=3 maxout=16
+run w=1 v=0 am=0 pipe=1 xb=2048 bmax=128 n=1 out=16 : cyc=2905 beats=2048 xfers=1 lat[min=2902 max=2902 avg=2902.0] fst[min=2902 max=2902] err=0 proto=0 log=1 maxout=16
+run w=0 v=1 am=2 pipe=0 xb=1 bmax=1 n=300 out=1 : cyc=7076 beats=300 xfers=300 lat[min=22 max=27 avg=22.6] fst[min=22 max=27] err=0 proto=0 log=300 maxout=1
+run w=0 v=0 am=0 pipe=1 xb=1 bmax=1 n=3000 out=16 : cyc=4828 beats=3000 xfers=3000 lat[min=22 max=28 avg=23.0] fst[min=22 max=28] err=0 proto=0 log=2048 maxout=16
+run w=0 v=0 am=0 pipe=1 xb=1 bmax=1 n=400 out=16 : cyc=662 beats=400 xfers=400 lat[min=22 max=28 avg=22.9] fst[min=22 max=28] err=0 proto=0 log=100 maxout=16
+PASS tb_p3_core
+$finish called at time : 731435 ns : File "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/board_test/p3_meas/tb_p3_core.sv" Line 332
+exit
+INFO: xsimkernel Simulation Memory Usage: 155172 KB (Peak: 211996 KB), Simulation CPU Usage: 730 ms
+INFO: [Common 17-206] Exiting xsim at Fri Oct  9 19:58:23 2026...

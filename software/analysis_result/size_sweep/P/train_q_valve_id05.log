@@ -1,0 +1,22 @@
+====================================================================== 
+전체 40대 학습 | clip_loss=True hop=16 | 채택=마지막 에포크 | layers=40,128,32,2
+끝난 장비 20대 건너뜀, 이 프로세스 1대 → results_q_valve_id05.csv
+
+--- [1/1] valve_id05
+[valve_id05] method=supervised bs=512 epochs=60 sched=cosine clip_loss hop=16
+  train 정상 14562 seg, 다른 ID 풀 3240 seg, val 1800 seg, test 3000 seg
+  파일 단위 손실: 정상 809파일, 이상 180파일
+  ep   1 | train 0.4016/0.536 | val 0.1764/0.603 auc 0.655 | test AUC 0.660 pAUC 0.550 | 5.6s
+  ep  10 | train 0.1512/0.691 | val 0.1595/0.639 auc 0.752 | test AUC 0.788 pAUC 0.537 | 2.5s
+  ep  20 | train 0.1300/0.756 | val 0.1678/0.673 auc 0.739 | test AUC 0.828 pAUC 0.547 | 2.4s
+  ep  30 | train 0.1124/0.789 | val 0.1585/0.726 auc 0.754 | test AUC 0.882 pAUC 0.628 | 3.1s
+  ep  40 | train 0.0994/0.824 | val 0.1868/0.745 auc 0.790 | test AUC 0.887 pAUC 0.728 | 2.5s
+  ep  50 | train 0.0947/0.843 | val 0.1901/0.734 auc 0.781 | test AUC 0.886 pAUC 0.723 | 2.8s
+  ep  60 | train 0.0904/0.847 | val 0.2013/0.727 auc 0.779 | test AUC 0.876 pAUC 0.701 | 2.8s
+  완료 → /mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/software/analysis_data/size_sweep/P/valve_id05
+
+unit                  val_loss     val_auc    test_auc   test_pauc test_f1_bal test_acc_bal test_seg_f1 test_seg_acc test_auc_bestval
+valve_id05              0.2013      0.7794      0.8759      0.7008      0.7242      0.7015      0.7923      0.7270      0.7523
+평균                      0.2013      0.7794      0.8759      0.7008      0.7242      0.7015      0.7923      0.7270      0.7523
+
+ALL DONE

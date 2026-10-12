@@ -1,0 +1,22 @@
+====================================================================== 
+전체 40대 학습 | clip_loss=True hop=16 | 채택=마지막 에포크 | layers=40,768,512,128,2
+끝난 장비 37대 건너뜀, 이 프로세스 1대 → results_r4_ToyCar_id07.csv
+
+--- [1/1] ToyCar_id07
+[ToyCar_id07] method=supervised bs=512 epochs=60 sched=cosine clip_loss hop=16 aug(p=0.5, K=4)
+  train 정상 18000 seg, 다른 ID 풀 2380 seg, val 2200 seg, test 4213 seg
+  파일 단위 손실: 정상 900파일, 이상 119파일
+  ep   1 | train 0.8685/0.512 | val 0.1733/0.524 auc 0.522 | test AUC 0.514 pAUC 0.530 | 3.8s
+  ep  10 | train 0.1799/0.501 | val 0.1817/0.504 auc 0.670 | test AUC 0.746 pAUC 0.654 | 4.7s
+  ep  20 | train 0.1643/0.663 | val 0.1754/0.680 auc 0.757 | test AUC 0.901 pAUC 0.801 | 4.8s
+  ep  30 | train 0.1242/0.744 | val 0.2425/0.746 auc 0.835 | test AUC 0.916 pAUC 0.877 | 4.8s
+  ep  40 | train 0.1173/0.764 | val 0.2444/0.766 auc 0.872 | test AUC 0.937 pAUC 0.896 | 4.8s
+  ep  50 | train 0.1007/0.787 | val 0.3202/0.761 auc 0.858 | test AUC 0.936 pAUC 0.914 | 3.2s
+  ep  60 | train 0.0942/0.792 | val 0.4746/0.768 auc 0.861 | test AUC 0.934 pAUC 0.917 | 3.2s
+  완료 → /mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/software/analysis_data/size_sweep/XL_aug/ToyCar_id07
+
+unit                  val_loss     val_auc    test_auc   test_pauc test_f1_bal test_acc_bal test_seg_f1 test_seg_acc test_auc_bestval
+ToyCar_id07             0.4746      0.8608      0.9339      0.9172      0.7697      0.7379      0.6641      0.6921      0.9366
+평균                      0.4746      0.8608      0.9339      0.9172      0.7697      0.7379      0.6641      0.6921      0.9366
+
+ALL DONE

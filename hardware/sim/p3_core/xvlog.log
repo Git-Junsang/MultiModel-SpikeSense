@@ -1,0 +1,7 @@
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/board_test/p3_meas/ddr_tgen.v" into library work
+INFO: [VRFC 10-311] analyzing module ddr_tgen
+INFO: [VRFC 10-311] analyzing module tgen_fifo
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/board_test/p3_meas/p3_core.v" into library work
+INFO: [VRFC 10-311] analyzing module p3_core
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/board_test/p3_meas/tb_p3_core.sv" into library work
+INFO: [VRFC 10-311] analyzing module tb_p3_core

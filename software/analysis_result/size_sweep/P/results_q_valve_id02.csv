@@ -1,0 +1,2 @@
+unit,epochs,sec,val_loss,val_auc,test_auc,test_pauc,test_f1_bal,test_acc_bal,test_seg_f1,test_seg_acc,test_auc_bestval
+valve_id02,60,206.6,0.238,0.85,0.8873,0.8684,0.6952,0.7325,0.663,0.7675,0.8263

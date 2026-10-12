@@ -11,7 +11,7 @@ SpecAugment 마스킹)을 따른다. 이상 샘플의 출처를 세 가지 중�
              전체로 평가한다. 정상만으로 학습하는 DCASE 원래 조건과 다르므로 공식
              순위표와 직접 비교하지 않는다. 선행 SpikeSense-Edge와 같은 지도학습 조건이며,
              other_id·mix로는 실제 이상을 탐지하지 못한 결과가 이 선택의 근거다
-             (analysis_data/REPORT.md).
+             (analysis_result/REPORT.md).
 
 모든 방법에서 학습 배치 전체(정상·이상)에 선행과 같은 시간·주파수 마스킹을 적용한다.
 출력층은 2뉴런이며 0 = 정상, 1 = 이상이다.
@@ -32,7 +32,7 @@ import torch.nn as nn
 from sklearn.metrics import roc_auc_score, f1_score
 
 import dcase_data as dd
-from snn_model import AnomalySNN
+from snn_model import AnomalySNN, LAYER_SIZES, default_betas
 
 N_CLASS = 2          # 출력 0 = 정상, 1 = 이상
 
@@ -113,8 +113,16 @@ def split_by_file_idx(d, val_files):
     return (d["seg"][~is_val], d["file_idx"][~is_val]), (d["seg"][is_val], d["file_idx"][is_val])
 
 
-def prepare(machine, mid, method, val_frac, seed, device, hop=None):
-    """hop을 주면 학습용 풀만 구간을 겹쳐 자른다. val·test는 항상 기본 분할이다."""
+def _aug_segments(mel, off, files, hop):
+    """증강 mel [K, ΣT, 40](파일마다 off 구간)에서 files 순서로 hop 간격 세그먼트를 잘라 [K, S, 31, 40] float16"""
+    return np.stack([np.concatenate([dd._segments(mel[k, off[f]:off[f + 1]].astype(np.float32), hop)
+                                     for f in files]).astype(np.float16) for k in range(mel.shape[0])])
+
+
+def prepare(machine, mid, method, val_frac, seed, device, hop=None, aug=None):
+    """hop을 주면 학습용 풀만 구간을 겹쳐 자른다. val·test는 항상 기본 분할이다.
+    aug(dataset_augmented 경로)를 주면 학습 풀과 같은 순서의 겹침 증강 세그먼트 train_pool_aug [K, S, 31, 40]를
+    함께 만든다(supervised만). val·test는 깨끗한 원본 그대로다."""
     rng = np.random.RandomState(seed)
     tgt = dd.load_unit(machine, mid, "train")
     val_files = rng.choice(np.unique(tgt["file_idx"]),
@@ -125,6 +133,15 @@ def prepare(machine, mid, method, val_frac, seed, device, hop=None):
         (tr_n, tr_nf), _ = split_by_file_idx(tgt_h, val_files)
     te = dd.load_unit(machine, mid, "test")
     te_seg, te_lab, te_file = te["seg"], te["label"].astype(int), te["file_idx"]
+    keep = np.ones(len(te_seg), bool)
+    h = hop or dd.SEG_FRAMES
+    aug_pool = None
+    if aug:
+        assert method == "supervised", "겹침 증강은 supervised 학습만 지원"
+        a = np.load(os.path.join(aug, f"{dd.unit_name(machine, mid)}_train.npz"))
+        vset = set(val_files.tolist())
+        aug_pool = [_aug_segments(a["mel"], a["off"], [f for f in np.unique(tgt["file_idx"]) if f not in vset], h)]
+        assert aug_pool[0].shape[1] == len(tr_n)
 
     if method == "supervised":
         # 이상 파일을 학습 50% / 평가 50%로 나누고, 학습 쪽의 10%는 val로 뗀다
@@ -136,6 +153,15 @@ def prepare(machine, mid, method, val_frac, seed, device, hop=None):
         src = dd.load_unit(machine, mid, "test", hop=hop) if hop else te
         fit_mask = np.isin(src["file_idx"], fit_files[n_val:])
         tr_o, tr_of = [src["seg"][fit_mask]], [src["file_idx"][fit_mask]]
+        if aug:
+            b = np.load(os.path.join(aug, f"{dd.unit_name(machine, mid)}_test.npz"))
+            pos = {int(f): j for j, f in enumerate(b["fit_files"])}         # 이상 파일만 담겨 있음
+            fo = np.concatenate([[0], np.cumsum(np.diff(b["fit_off"]))])
+            fsel = sorted(int(f) for f in fit_files[n_val:])
+            seg = [np.concatenate([dd._segments(b["fit"][k, fo[pos[f]]:fo[pos[f] + 1]].astype(np.float32), h)
+                                   for f in fsel]).astype(np.float16) for k in range(b["fit"].shape[0])]
+            aug_pool.append(np.stack(seg))
+            assert aug_pool[1].shape[1] == len(tr_o[0])
         va_o = [te_seg[np.isin(te_file, fit_files[:n_val])]]
         keep = (te_lab == 0) | np.isin(te_file, eval_anom)
         te_seg, te_lab = te_seg[keep], te_lab[keep]
@@ -159,6 +185,9 @@ def prepare(machine, mid, method, val_frac, seed, device, hop=None):
         "train_other_file": np.concatenate(tr_of),
         "test_seg": T(te_seg), "test_label": te_lab, "test_file": te_file,
         "bal_idx": balanced_idx(te_lab, rng),
+        "test_keep": keep,                     # 전체 test 세그먼트(기본 분할) 중 평가에 쓰는 것
+        **({"train_pool_aug": torch.tensor(np.concatenate(aug_pool, axis=1), dtype=torch.float16, device=device)}
+           if aug else {}),
     }
 
 
@@ -192,11 +221,20 @@ def clip_batches(groups, data, method, batch_size, gen):
         idx, cid, y = [], [], []
         for j, (segs, lab) in enumerate(chunk):
             idx.append(segs); cid.append(np.full(len(segs), j)); y.append(lab)
-        xs = [(data["train_normal"] if lab == 0 else data["train_other"])[torch.as_tensor(segs, device=dev)]
-              for segs, lab in chunk]
-        yield (torch.cat(xs),
-               torch.tensor(y, dtype=torch.long, device=dev),
-               torch.tensor(np.concatenate(cid), dtype=torch.long, device=dev))
+        # 정상·이상 풀을 이어 붙인 텐서에서 한 번에 모은다(파일마다 복사하던 것과 순서·값 동일)
+        off = len(data["train_normal"])
+        gidx = np.concatenate([segs if lab == 0 else segs + off for segs, lab in chunk])
+        gi = torch.as_tensor(gidx, device=dev)
+        cid_t = torch.tensor(np.concatenate(cid), dtype=torch.long, device=dev)
+        x = data["train_pool"][gi]
+        if "train_pool_aug" in data:
+            # 겹침 증강: 파일마다 확률 aug_p로 K가지 섞음 중 하나로 바꾼다(파일 안 세그먼트는 같은 섞음)
+            A = data["train_pool_aug"]
+            use = torch.rand(len(chunk), generator=gen, device=dev) < data["aug_p"]
+            kk = torch.randint(0, A.shape[0], (len(chunk),), generator=gen, device=dev)
+            m = use[cid_t]
+            x[m] = A[kk[cid_t][m], gi[m]].float()
+        yield x, torch.tensor(y, dtype=torch.long, device=dev), cid_t
 
 
 # ── 학습·평가 ──
@@ -254,11 +292,23 @@ def main(argv=None):
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--out_dir", default=None, help="학습 기록(history.csv, args.json) 위치")
     ap.add_argument("--weight_dir", default=None, help="체크포인트(best_val.pth, last.pth) 위치")
+    ap.add_argument("--layers", default=",".join(map(str, LAYER_SIZES)),
+                    help="층 크기(쉼표 구분). 기본 40,384,256,64,2. P3.6 모델 크기 검증용")
+    ap.add_argument("--aug", default=None, help="겹침 증강 데이터 경로(software/data/dataset_augmented). clip_loss 필요")
+    ap.add_argument("--aug_p", type=float, default=0.5, help="파일마다 섞은 버전으로 바꿀 확률")
+    ap.add_argument("--bands", default=None,
+                    help="mel 대역 lo:hi만 입력으로 쓴다(주파수 대역 고르기, 예: 13:40 = 중심 1 kHz 이상). 입력 층 크기 = hi − lo")
     args = ap.parse_args(argv)
+    if args.aug and not args.clip_loss:
+        ap.error("--aug는 --clip_loss와 함께 쓴다")
+    layer_sizes = tuple(int(v) for v in args.layers.split(","))
+    if args.bands:
+        b_lo, b_hi = (int(v) for v in args.bands.split(":"))
+        layer_sizes = (b_hi - b_lo,) + layer_sizes[1:]
 
     name = dd.unit_name(args.machine, args.mid)
     tag = f"{args.method}_bs{args.batch_size}_{args.sched}_e{args.epochs}"
-    out_dir = args.out_dir or os.path.join(dd.SOFTWARE_DIR, "analysis_data", "train_runs", name, tag)
+    out_dir = args.out_dir or os.path.join(dd.SOFTWARE_DIR, "analysis_result", "train_runs", name, tag)
     w_dir = args.weight_dir or os.path.join(dd.SOFTWARE_DIR, "model_weights", name)
     os.makedirs(out_dir, exist_ok=True)
     os.makedirs(w_dir, exist_ok=True)
@@ -270,7 +320,12 @@ def main(argv=None):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     gen = torch.Generator(device=device).manual_seed(args.seed)
 
-    data = prepare(args.machine, args.mid, args.method, args.val_frac, args.seed, device, args.hop)
+    data = prepare(args.machine, args.mid, args.method, args.val_frac, args.seed, device, args.hop, args.aug)
+    data["aug_p"] = args.aug_p
+    if args.bands:                             # 모든 입력(학습·증강·val·test)에서 같은 대역만 남긴다
+        for k in ("train_normal", "val_normal", "train_other", "val_other", "test_seg", "train_pool_aug"):
+            if k in data:
+                data[k] = data[k][..., b_lo:b_hi].contiguous()
     n_norm = len(data["train_normal"])
 
     # 고정 val 세트: val 정상 + 같은 수의 학습용 이상(고정 seed로 1회 생성)
@@ -280,12 +335,13 @@ def main(argv=None):
                        make_anomaly(args.method, data["val_normal"], data["val_other"], nv, vgen)])
     val_y = torch.cat([torch.zeros(nv), torch.ones(nv)]).long().to(device)
 
+    aug_note = f" aug(p={args.aug_p}, K={len(data['train_pool_aug'])})" if args.aug else ""
     print(f"[{name}] method={args.method} bs={args.batch_size} epochs={args.epochs} sched={args.sched}"
-          f"{' clip_loss' if args.clip_loss else ''}{f' hop={args.hop}' if args.hop else ''}")
+          f"{' clip_loss' if args.clip_loss else ''}{f' hop={args.hop}' if args.hop else ''}{aug_note}")
     print(f"  train 정상 {n_norm} seg, 다른 ID 풀 {len(data['train_other'])} seg, "
           f"val {len(val_x)} seg, test {len(data['test_seg'])} seg")
 
-    model = AnomalySNN().to(device)
+    model = AnomalySNN(layer_sizes, default_betas(layer_sizes)).to(device)
     loss_fn = FocalLoss(gamma=2.0)
     opt = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=1e-5)
     sched = (torch.optim.lr_scheduler.CosineAnnealingLR(opt, T_max=args.epochs)
@@ -302,6 +358,7 @@ def main(argv=None):
     clip_groups = None
     if args.clip_loss:
         clip_groups = (group_by_file(data["train_normal_file"]), group_by_file(data["train_other_file"]))
+        data["train_pool"] = torch.cat([data["train_normal"], data["train_other"]])
         print(f"  파일 단위 손실: 정상 {len(clip_groups[0])}파일, 이상 {len(clip_groups[1])}파일")
 
     best_val, best_metrics = float("inf"), None
@@ -325,17 +382,18 @@ def main(argv=None):
             _, mem, _ = model(x)
             logits = mem.mean(dim=1)[:, :N_CLASS]
             if clip_id is not None:
-                # 파일 안 세그먼트 출력을 평균 → 파일 하나가 표본 하나
-                logits = torch.zeros(int(clip_id.max()) + 1, N_CLASS, device=device).index_add_(
+                # 파일 안 세그먼트 출력을 평균 → 파일 하나가 표본 하나 (파일 수 = len(y), GPU 대기 없음)
+                logits = torch.zeros(len(y), N_CLASS, device=device).index_add_(
                     0, clip_id, logits) / torch.bincount(clip_id).unsqueeze(1)
             loss = loss_fn(logits, y)
             opt.zero_grad(set_to_none=True)
             loss.backward()
             torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
             opt.step()
-            tot_loss += loss.item() * len(y)
-            tot_correct += (logits.argmax(1) == y).sum().item()
+            tot_loss = tot_loss + loss.detach().double() * len(y)   # .item()을 스텝마다 부르지 않는다
+            tot_correct = tot_correct + (logits.argmax(1) == y).sum()
             tot_n += len(y)
+        tot_loss, tot_correct = float(tot_loss), int(tot_correct)
 
         lr = opt.param_groups[0]["lr"]
         if sched:

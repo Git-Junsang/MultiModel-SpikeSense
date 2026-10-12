@@ -1,0 +1,22 @@
+====================================================================== 
+전체 40대 학습 | clip_loss=True hop=16 | 채택=마지막 에포크 | layers=40,64,32,2
+끝난 장비 32대 건너뜀, 이 프로세스 1대 → results_q_ToyConveyor_id01.csv
+
+--- [1/1] ToyConveyor_id01
+[ToyConveyor_id01] method=supervised bs=512 epochs=60 sched=cosine clip_loss hop=16
+  train 정상 16200 seg, 다른 ID 풀 3240 seg, val 2000 seg, test 10000 seg
+  파일 단위 손실: 정상 900파일, 이상 180파일
+  ep   1 | train 0.4374/0.614 | val 0.2550/0.606 auc 0.744 | test AUC 0.806 pAUC 0.591 | 2.4s
+  ep  10 | train 0.1489/0.767 | val 0.1693/0.747 auc 0.826 | test AUC 0.910 pAUC 0.785 | 1.4s
+  ep  20 | train 0.1075/0.827 | val 0.2564/0.728 auc 0.837 | test AUC 0.925 pAUC 0.802 | 1.4s
+  ep  30 | train 0.0781/0.868 | val 0.2543/0.774 auc 0.849 | test AUC 0.944 pAUC 0.840 | 2.1s
+  ep  40 | train 0.0766/0.863 | val 0.2980/0.763 auc 0.846 | test AUC 0.943 pAUC 0.838 | 1.4s
+  ep  50 | train 0.0714/0.882 | val 0.2665/0.778 auc 0.861 | test AUC 0.951 pAUC 0.845 | 1.4s
+  ep  60 | train 0.0656/0.892 | val 0.2853/0.787 auc 0.856 | test AUC 0.952 pAUC 0.846 | 2.1s
+  완료 → /mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/software/analysis_data/size_sweep/XS/ToyConveyor_id01
+
+unit                  val_loss     val_auc    test_auc   test_pauc test_f1_bal test_acc_bal test_seg_f1 test_seg_acc test_auc_bestval
+ToyConveyor_id01        0.2853      0.8559      0.9515      0.8461      0.7571      0.7545      0.5480      0.7476      0.9096
+평균                      0.2853      0.8559      0.9515      0.8461      0.7571      0.7545      0.5480      0.7476      0.9096
+
+ALL DONE

@@ -1,4 +1,4 @@
-"""학습 기록 폴더(analysis_data/...) 아래 학습 기록(history.csv)을 모아 에포크·배치 판단 자료를 만든다.
+"""학습 기록 폴더(analysis_result/...) 아래 학습 기록(history.csv)을 모아 에포크·배치 판단 자료를 만든다.
 
 출력: <분석폴더>/summary.csv, <분석폴더>/curves_<그룹>.png
   - best_val_ep : val loss 최소 에포크(체크포인트 선택 기준, test 라벨 미사용)
@@ -102,4 +102,4 @@ def main(root):
 
 
 if __name__ == "__main__":
-    main(sys.argv[1] if len(sys.argv) > 1 else "../analysis_data")
+    main(sys.argv[1] if len(sys.argv) > 1 else "../analysis_result")

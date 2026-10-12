@@ -1,0 +1,25 @@
+#-----------------------------------------------------------
+# xsim v2026.1 (64-bit)
+# SW Build 6511674 on Tue Jun 16 11:01:26 MDT 2026
+# IP Build 6504888 on Tue Jun 09 09:05:25 MDT 2026
+# SharedData Build 6501428 on Mon Jun 08 17:34:18 MDT 2026
+# Start of session at: Fri Oct  9 19:58:22 2026
+# Process ID         : 37388
+# Current directory  : /mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/sim/p3_core
+# Command line       : xsim -nolog -mode tcl -source {xsim.dir/tb_p3_core/xsim_script.tcl}
+# Log file           : 
+# Journal file       : /mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/sim/p3_core/xsim.jou
+# Running On         : Dev-Ubuntu
+# Platform           : Ubuntu
+# Operating System   : Ubuntu 24.04.4 LTS
+# Processor Detail   : Intel(R) Core(TM) i5-14600K
+# CPU Frequency      : 5300.000 MHz
+# CPU Physical cores : 6
+# CPU Logical cores  : 12
+# Host memory        : 17179 MB
+# Swap memory        : 4294 MB
+# Total Virtual      : 21474 MB
+# Available Virtual  : 17981 MB
+#-----------------------------------------------------------
+source xsim.dir/tb_p3_core/xsim_script.tcl
+run -all

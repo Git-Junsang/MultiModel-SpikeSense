@@ -1,0 +1,9 @@
+====================================================================== 
+전체 40대 학습 | clip_loss=True hop=16 | 채택=마지막 에포크 | layers=40,768,512,128,2
+끝난 장비 0대 건너뜀, 이 프로세스 13대 → results_s2of3.csv
+
+--- [1/13] fan_id03
+[fan_id03] method=supervised bs=512 epochs=60 sched=cosine clip_loss hop=16 aug(p=0.5, K=4)
+  train 정상 14778 seg, 다른 ID 풀 2898 seg, val 1820 seg, test 2790 seg
+  파일 단위 손실: 정상 821파일, 이상 161파일
+  ep   1 | train 0.8070/0.539 | val 0.1953/0.499 auc 0.541 | test AUC 0.617 pAUC 0.530 | 7.9s

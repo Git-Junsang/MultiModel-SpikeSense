@@ -11,9 +11,9 @@
 프로세스 하나에서 끝까지 돌며 GPU 메모리를 계속 쥔다. 30분 주기로 LLM이 다시
 올라와도 학습이 끊기지 않게 하기 위함이다(문서: 홈서버 위키 ai/llama-swap.md).
 
-사용: nohup python3 train_all.py > ../analysis_data/train_all.log 2>&1 &
+사용: nohup python3 train_all.py > ../analysis_result/train_all.log 2>&1 &
 
-산출물: 기록·표는 analysis_data/, 체크포인트는 model_weights/<장비>/
+산출물: 기록·표는 analysis_result/, 체크포인트는 model_weights/<장비>/
 """
 
 import os
@@ -26,7 +26,7 @@ import torch
 import dcase_data as dd
 import train
 
-OUT_ROOT = os.path.join(dd.SOFTWARE_DIR, "analysis_data")
+OUT_ROOT = os.path.join(dd.SOFTWARE_DIR, "analysis_result")
 WEIGHT_ROOT = os.path.join(dd.SOFTWARE_DIR, "model_weights")
 COLS = ["unit", "epochs", "sec", "val_loss", "val_auc",
         "test_auc", "test_pauc", "test_f1_bal", "test_acc_bal", "test_seg_f1", "test_seg_acc",
@@ -35,15 +35,20 @@ COLS = ["unit", "epochs", "sec", "val_loss", "val_auc",
 
 def run_unit(machine, mid, out_root, args):
     t0 = time.time()
-    argv = ["--machine", machine, "--mid", mid, "--method", "supervised",
+    wroot = os.path.join(WEIGHT_ROOT, "_sweep", args.tag) if args.tag else WEIGHT_ROOT
+    argv = ["--machine", machine, "--mid", mid, "--method", "supervised", "--layers", args.layers,
             "--epochs", str(args.epochs), "--batch_size", str(args.batch_size),
             "--lr", str(args.lr), "--sched", "cosine", "--seed", str(args.seed),
             "--out_dir", os.path.join(out_root, dd.unit_name(machine, mid)),
-            "--weight_dir", os.path.join(WEIGHT_ROOT, dd.unit_name(machine, mid))]
+            "--weight_dir", os.path.join(wroot, dd.unit_name(machine, mid))]
     if args.clip_loss:
         argv.append("--clip_loss")
     if args.hop:
         argv += ["--hop", str(args.hop)]
+    if args.aug:
+        argv += ["--aug", args.aug, "--aug_p", str(args.aug_p)]
+    if args.bands:
+        argv += ["--bands", args.bands]
     res = train.main(argv)
     m = res["last"]                      # 채택 체크포인트 = 마지막 에포크
     row = {"unit": res["unit"], "epochs": args.epochs, "sec": round(time.time() - t0, 1),
@@ -74,20 +79,45 @@ def main():
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--hop", type=int, default=16)
     ap.add_argument("--no_clip_loss", dest="clip_loss", action="store_false")
+    ap.add_argument("--layers", default="40,384,256,64,2", help="층 크기(P3.6 모델 크기 검증)")
+    ap.add_argument("--nshard", type=int, default=1, help="장비를 n개로 나눠 여러 프로세스가 동시에 학습")
+    ap.add_argument("--shard", type=int, default=0, help="이 프로세스가 맡을 조각 번호(0부터)")
+    ap.add_argument("--units", nargs="*", default=None, help="이 장비들만 학습(예: pump_id03). --nshard보다 우선")
+    ap.add_argument("--res_name", default=None, help="결과 csv 이름(기본: 조각 번호로 정함)")
+    ap.add_argument("--aug", default=None, help="겹침 증강 데이터 경로(train.py --aug). 예: ../data/dataset_augmented")
+    ap.add_argument("--aug_p", type=float, default=0.5)
+    ap.add_argument("--bands", default=None, help="mel 대역 lo:hi만 사용(train.py --bands)")
+    ap.add_argument("--tag", default=None,
+                    help="지정하면 기록은 analysis_result/size_sweep/<tag>/, 체크포인트는 model_weights/_sweep/<tag>/")
     args = ap.parse_args()
 
     # 도중에 LLM이 올라와도 쓸 메모리를 잃지 않도록 1 GiB를 미리 잡아 캐시에 남긴다
-    x = torch.empty(1 << 30, dtype=torch.uint8, device="cuda"); del x
+    if torch.cuda.is_available():
+        x = torch.empty(1 << 30, dtype=torch.uint8, device="cuda"); del x
 
-    out = OUT_ROOT
+    out = os.path.join(OUT_ROOT, "size_sweep", args.tag) if args.tag else OUT_ROOT
     os.makedirs(out, exist_ok=True)
     print("=" * 70, f"\n전체 {len(dd.UNITS)}대 학습 | clip_loss={args.clip_loss} hop={args.hop} "
-          f"| 채택=마지막 에포크", flush=True)
+          f"| 채택=마지막 에포크 | layers={args.layers}", flush=True)
+    # 이미 끝난 장비(같은 폴더의 results*.csv)는 건너뛰고, 남은 장비를 nshard개로 나눈다
+    done = set()
+    for fn in os.listdir(out):
+        if fn.startswith("results") and fn.endswith(".csv"):
+            with open(os.path.join(out, fn)) as fp:
+                done |= {r["unit"] for r in csv.DictReader(fp)}
+    todo = [(m, i) for m, i in dd.UNITS if dd.unit_name(m, i) not in done]
+    if args.units:
+        todo = [(m, i) for m, i in todo if dd.unit_name(m, i) in args.units]
+    else:
+        todo = todo[args.shard::args.nshard]
+    res_name = args.res_name or ("results.csv" if args.nshard == 1 and not done
+                                 else f"results_s{args.shard}of{args.nshard}.csv")
+    print(f"끝난 장비 {len(done)}대 건너뜀, 이 프로세스 {len(todo)}대 → {res_name}", flush=True)
     rows = []
-    for n, (m, i) in enumerate(dd.UNITS, 1):
-        print(f"\n--- [{n}/{len(dd.UNITS)}] {dd.unit_name(m, i)}", flush=True)
+    for n, (m, i) in enumerate(todo, 1):
+        print(f"\n--- [{n}/{len(todo)}] {dd.unit_name(m, i)}", flush=True)
         rows.append(run_unit(m, i, out, args))
-        write_table(rows, os.path.join(out, "results.csv"))   # 중간에 끊겨도 남도록 매번 저장
+        write_table(rows, os.path.join(out, res_name))   # 중간에 끊겨도 남도록 매번 저장
     print("\nALL DONE", flush=True)
 
 
