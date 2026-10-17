@@ -1,0 +1,65 @@
+# P3.9 구현 구성 L·64 lane, membrane potential DDR3, rev 4, 예약 25.5 tile, Host 1 ms batch 입출력, dense 연산(옛 target_exp.py --prefix p38fL64)
+# timeout W = 옛 --stage tune 결과 7 ms, dysta η = 기본 0.01, slackbatch = P3.9 동결 정의
+# 1,024트랙 지표(cond 기준)와 악조건. 옛 p38fL64_fixed_n1024는 기준 행이다
+# 키 설명은 template.toml
+
+mode = "run"
+model = "L"
+lanes = 64
+mem = "ddr"
+rev = 4
+reserve = 25.5
+ovh = 1.1
+bw_mbps = 3015.0
+spk = 0
+bits = 0
+mem_place = "avg"
+tracks = 1024
+host_ms = 1.0
+result_push = false
+offset = "none"
+jitter_ms = 0.8
+gather_ms = 0.0
+perturb = ""
+tail_us = 0.0
+pre_us = 0.0
+scenarios = ["U", "K", "S", "I", "SK", "R"]
+seeds = 20
+seed0 = 0
+warm = 16
+meas = 64
+storage = "G"
+entries = 0
+storage_attrs = {}
+compute = "all"
+sched = "grouping"
+sched_attrs = {}
+search_key = "tracks"
+search_values = []
+search_step = 16
+tune_attr = ""
+tune_values = []
+tune_conds = []
+
+[sweep]
+design = [
+  {label = "A · 한번에", storage = "A", compute = "all"},
+  {label = "A · 한줄씩", storage = "A", compute = "row"},
+  {label = "D · 한줄씩", storage = "D", compute = "row"},
+]
+scheduler = [
+  {sched = "fcfs"},
+  {sched = "edf"},
+  {sched = "grouping"},
+  {label = "dysta", sched = "dysta", sched_attrs = {eta = 0.01}},
+  {label = "timeout", sched = "timeout", sched_attrs = {W = 7000.0}},
+  {sched = "slackbatch_lite"},
+  {sched = "slackbatch"},
+]
+cond = [
+  {label = "기준"},
+  {label = "Host 주기 2 ms (guard가 앎)", host_ms = 2.0},
+  {label = "PCIe 꼬리 +700 µs (guard가 모름)", tail_us = 700.0},
+  {label = "제어 비용 20 %", ovh = 1.2},
+  {label = "DDR3 2.0 GB/s", bw_mbps = 2000.0},
+]

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ============================================================
-# p3_pcie_bench.sh — P3.3 PCIe 지연·지터 측정 묶음 (FPGA Host)
+# p3_pcie_bench.sh — P3.3 PCIe 지연·jitter 측정 묶음 (FPGA Host)
 # ============================================================
 # pcie_lat로 시험을 차례로 돌리고 결과를 <OUT>/<설계>_<시험>_<조건>.txt로 남긴다.
 # 사용: ./p3_pcie_bench.sh <설계 태그> <OUT 폴더> [BRAM 주소] [DDR 주소]
@@ -38,7 +38,7 @@ run h2c_64_p1000          h2c -s 64 -n 5000 -a "$BRAM" -p 1000
 run c2h_64_p1000          c2h -s 64 -n 5000 -a "$BRAM" -p 1000
 run h2c_24576_p32000      h2c -s 24576 -n 300 -a "$BRAM" -p 32000
 if [ -n "$DDR" ]; then
-    # MIG 포트를 호스트(XDMA) 쪽으로 돌리고, narrow burst 플래그를 지운 뒤 시험한다.
+    # MIG 포트를 Host(XDMA) 쪽으로 돌리고, narrow burst 플래그를 지운 뒤 시험한다.
     R="sudo python3 $(dirname "$0")/p3_regs.py"
     $R wr 0x44 1
     $R wr 0x40 4

@@ -1,0 +1,31 @@
+{
+  "format_version": 2,
+  "model_id": 34,
+  "unit": "ToyConveyor_id01",
+  "checkpoint": "software/weights/L_normal_noaug/ToyConveyor_id01/last.pth",
+  "layer_sizes": [
+    40,
+    384,
+    256,
+    64,
+    2
+  ],
+  "weight_scales": [
+    0.010228419867087536,
+    0.00946760553074634,
+    0.010272494451267513,
+    0.021400708851851816
+  ],
+  "weights_bytes": 130176,
+  "params_bytes": 1412,
+  "slot_bytes": 262144,
+  "slot_offset": 8912896,
+  "slot_offset_hex": "0x00880000",
+  "ddr_address": 8912896,
+  "ddr_address_hex": "0x00880000",
+  "sha256": {
+    "weights.bin": "3b19d767160d986e38d3d13fc44ac3efec4691667ca8a1eea84055005e7b3b9b",
+    "params.bin": "0cdfd6f093a4a34fb2227f6b1e53f669176d9e64e91218d1860b9659303ab2da",
+    "model.slot.bin": "3d09a46532052ee6c4c46240759ffc1fa2bee0429afdf9ca00f63707668ce62d"
+  }
+}

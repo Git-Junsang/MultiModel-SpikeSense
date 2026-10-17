@@ -1,14 +1,14 @@
 """논문 그림의 원자료를 모은다(GPU 필요).
 
-평가 분할은 train.prepare와 동일하다(학습에 쓴 이상 파일 절반 제외). 따라서 여기서
-계산한 AUC는 analysis_result/all40/results.csv의 test_auc와 같아야 한다.
+평가 분할은 train_unit.prepare와 동일하다(학습에 쓴 이상 파일 절반 제외). 따라서 여기서
+계산한 AUC는 train_result/L_normal_noaug/results.csv의 test_auc와 같아야 한다.
 
 학습된 40대 모델로 test 세그먼트를 추론해
-  1) 파일 단위 이상 점수·정답  → figures/scores.npz
-  2) 층별 막전위 최대치(하드웨어 정수 단위) → figures/membrane_headroom.csv
-를 저장한다. 그림 생성(make_figures.py)은 GPU 없이 이 파일들만 읽는다.
+  1) 파일 단위 이상 점수·정답  → train_result/eval/scores/scores.npz
+  2) layer별 membrane potential 최대치(하드웨어 정수 단위) → train_result/eval/scores/membrane_headroom.csv
+를 저장한다. 그림 생성(analysis/develop)은 GPU 없이 이 파일들만 읽는다.
 
-사용: python3 collect_scores.py
+사용: python3 scores.py
 """
 
 import os
@@ -17,20 +17,21 @@ import csv
 import numpy as np
 import torch
 
-SW = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, os.path.join(SW, "model_develop"))
+SW = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, os.path.join(SW, "model"))
+sys.path.insert(0, os.path.join(SW, "dataset"))
 import dcase_data as dd
-import snn_model as sm
-import train as tr
+import snn_torch as sm
+import train_unit as tr
 
-OUT = os.path.join(SW, "analysis_result", "figures")
+OUT = os.path.join(SW, "train_result", "eval", "scores")
 DEV = "cuda" if torch.cuda.is_available() else "cpu"
 
 
 @torch.no_grad()
 def run_unit(unit):
     machine, mid = unit.rsplit("_id", 1)
-    ck = torch.load(os.path.join(SW, "model_weights", unit, "last.pth"), map_location=DEV)
+    ck = torch.load(os.path.join(SW, "weights", "L_normal_noaug", unit, "last.pth"), map_location=DEV)
     model = sm.AnomalySNN().to(DEV)
     model.load_state_dict(ck["model_state_dict"])
     model.eval()
@@ -40,7 +41,7 @@ def run_unit(unit):
     x = d["test_seg"]
     y, f = d["test_label"].astype(int), d["test_file"].astype(int)
 
-    # 가중치 스케일(선행 export_weights.py): 막전위 정수 단위 = V_float / scale_W
+    # weight 스케일(선행 export_weights.py): membrane potential 정수 단위 = V_float / scale_W
     scale = [float(fc.weight.abs().max()) / 127.0 for fc in model.fcs]
 
     prob, vmax = [], [0.0] * len(model.lifs)
@@ -74,7 +75,7 @@ def main():
         scores[u], labels[u] = s, y
         rows.append({"unit": u, **{f"L{k+1}": round(v) for k, v in enumerate(head)}})
         print(f"[{n}/{len(units)}] {u:18s} 파일 {len(s):4d} (이상 {y.sum():4d}) "
-              f"| 막전위 정수 최대 {[round(v) for v in head]}", flush=True)
+              f"| membrane potential 정수 최대 {[round(v) for v in head]}", flush=True)
 
     np.savez(os.path.join(OUT, "scores.npz"),
              **{f"score__{u}": v for u, v in scores.items()},

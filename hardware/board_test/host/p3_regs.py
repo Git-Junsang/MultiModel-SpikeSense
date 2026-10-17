@@ -93,7 +93,7 @@ class P3:
             burst_max=128, n=1, max_outst=16, stride=0x21000, slot_cnt=40, slot_mask=63,
             addr_mask=(1 << 25) - 1, wrap=0, seed=0x12345678, gap=0, log_mask=0,
             read_log=True, timeout=60.0):
-        assert self.r('DDR_SEL') == 0, 'DDR_SEL=1(호스트)이면 트래픽 생성기를 쓰지 않는다'
+        assert self.r('DDR_SEL') == 0, 'DDR_SEL=1(Host)이면 트래픽 생성기를 쓰지 않는다'
         cfg = dict(write=int(write), verify=int(verify), amode=amode, pipe=int(pipe), base=base,
                    xfer_beats=xfer_beats, burst_max=burst_max, n=n, max_outst=max_outst,
                    stride=stride, slot_cnt=slot_cnt, slot_mask=slot_mask, addr_mask=addr_mask,

@@ -1,0 +1,54 @@
+# P3.13 논문 실험(옛 paper_exp.py --part converge)
+# L·64 lane, membrane potential DDR3, rev 4, 예약 25.5 tile, 입출력 즉시 전송, spike 2개/cycle
+# 표 2: offset 배정 켬 · offset-order 4에서 scheduler 8개
+# 키 설명은 template.toml
+
+mode = "run"
+model = "L"
+lanes = 64
+mem = "ddr"
+rev = 4
+reserve = 25.5
+ovh = 1.1
+bw_mbps = 3015.0
+spk = 2
+bits = 0
+mem_place = "avg"
+tracks = 1024
+host_ms = 0.0
+result_push = true
+offset = "model"
+jitter_ms = 0.8
+gather_ms = 0.0
+perturb = ""
+tail_us = 0.0
+pre_us = 0.0
+scenarios = ["U", "K", "S", "I", "SK", "R"]
+seeds = 20
+seed0 = 0
+warm = 16
+meas = 64
+storage = "G"
+entries = 4
+storage_attrs = {}
+compute = "all"
+sched = "grouping"
+sched_attrs = {}
+search_key = "tracks"
+search_values = []
+search_step = 16
+tune_attr = ""
+tune_values = []
+tune_conds = []
+
+[sweep]
+scheduler = [
+  {label = "grouping", sched = "grouping"},
+  {label = "dysta", sched = "dysta", sched_attrs = {eta = 0.0001}},
+  {label = "clockwork", sched = "clockwork", sched_attrs = {variant = "A"}},
+  {label = "shepherd", sched = "shepherd"},
+  {label = "timeout", sched = "timeout", sched_attrs = {W = 5000.0}},
+  {label = "deeprt", sched = "deeprt", sched_attrs = {cfg = [14900.0, false]}},
+  {label = "symphony", sched = "symphony", sched_attrs = {slack = 26000.0}},
+  {label = "slackbatch", sched = "slackbatch"},
+]

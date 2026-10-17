@@ -1,32 +1,32 @@
-"""P1.6: 40개 INT8 모델을 바이너리·HEX와 DDR3 이미지로 내보낸다.
+"""P1.6·P3.10: 40개 INT8 모델을 바이너리·HEX와 DDR3 이미지로 내보낸다.
 
 프로젝트 루트에서:
-  python3 software/model_develop/export_models.py
+  python3 software/model/export_models.py                # v1, L → hardware/data/models
+  python3 software/model/export_models.py --format l64   # L, 64 lane → hardware/data/models_l64 (P3.9 구현 기준)
 """
 
 import argparse
 import hashlib
 import json
+import sys
 from pathlib import Path
 
 import numpy as np
 
-import dcase_data as dd
-import model_format as mf
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "dataset"))  # dcase_data는 software/dataset
+import dcase_data as dd  # noqa: E402
+import model_format_v1
+import model_format_v2
 import snn_int8 as si
-import snn_numpy as sn
+import snn_fp32 as sn
 
 ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_WEIGHTS = ROOT / "software" / "model_weights"
-DEFAULT_OUT = ROOT / "hardware" / "data" / "models"
+FORMATS = {"v1": model_format_v1, "l64": model_format_v2.L64, "xl": model_format_v2.XL}
+mf = model_format_v1                   # main()이 --format으로 바꾼다
 
 
 def sha256(data):
     return hashlib.sha256(data).hexdigest()
-
-
-def write_hex(path, data):
-    path.write_text("".join(f"{value:02x}\n" for value in data), encoding="ascii")
 
 
 def equal_q(a, b):
@@ -47,10 +47,10 @@ def export_one(model_id, unit, checkpoint, out_dir, ddr_base):
     unit_dir = out_dir / unit
     unit_dir.mkdir(parents=True, exist_ok=True)
     (unit_dir / "weights.bin").write_bytes(weights)
-    write_hex(unit_dir / "weights.hex", weights)
     (unit_dir / "params.bin").write_bytes(params)
-    write_hex(unit_dir / "params.hex", params)
     (unit_dir / "model.slot.bin").write_bytes(slot)
+    for name, text in mf.hex_files(weights, params).items():
+        (unit_dir / name).write_text(text, encoding="ascii")
 
     scales = [float(layer["scale"]) for layer in q]
     try:
@@ -58,7 +58,7 @@ def export_one(model_id, unit, checkpoint, out_dir, ddr_base):
     except ValueError:
         checkpoint_name = str(checkpoint)
     meta = {
-        "format_version": 1,
+        "format_version": mf.FORMAT_VERSION,
         "model_id": model_id,
         "unit": unit,
         "checkpoint": checkpoint_name,
@@ -80,12 +80,17 @@ def export_one(model_id, unit, checkpoint, out_dir, ddr_base):
 
 
 def main():
+    global mf
     ap = argparse.ArgumentParser()
-    ap.add_argument("--weights", type=Path, default=DEFAULT_WEIGHTS)
-    ap.add_argument("--out", type=Path, default=DEFAULT_OUT)
+    ap.add_argument("--format", choices=FORMATS, default="v1", help="v1: L row-major, l64: L 64 lane, xl: XL 256 lane")
+    ap.add_argument("--weights", type=Path, help="checkpoint 폴더 (기본: 형식별)")
+    ap.add_argument("--out", type=Path, help="출력 폴더 (기본: 형식별)")
     ap.add_argument("--ddr-base", type=lambda x: int(x, 0), default=0,
                     help="DDR3 모델 영역 기준 주소(기본 0, 0x 표기 가능)")
     args = ap.parse_args()
+    mf = FORMATS[args.format]
+    args.weights = args.weights or ROOT / mf.WEIGHTS_DIR
+    args.out = args.out or ROOT / mf.MODELS_DIR
     args.out.mkdir(parents=True, exist_ok=True)
 
     entries, slots = [], []
@@ -103,16 +108,13 @@ def main():
     ddr = b"".join(slots)
     (args.out / "models.ddr.bin").write_bytes(ddr)
     manifest = {
-        "format_version": 1,
+        "format_version": mf.FORMAT_VERSION,
         "model_count": len(entries),
         "ddr_base": args.ddr_base,
         "ddr_base_hex": f"0x{args.ddr_base:08X}",
         "slot_size": mf.SLOT_SIZE,
         "slot_size_hex": f"0x{mf.SLOT_SIZE:X}",
-        "alignment": mf.ALIGN,
-        "weight_offsets": list(mf.WEIGHT_OFFSETS),
-        "beta_offset": mf.BETA_OFFSET,
-        "vth_offset": mf.VTH_OFFSET,
+        **mf.layout(),
         "weights_bytes_per_model": mf.WEIGHT_BYTES,
         "params_bytes_per_model": mf.PARAM_BYTES,
         "ddr_image_bytes": len(ddr),

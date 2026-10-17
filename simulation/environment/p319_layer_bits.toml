@@ -1,0 +1,47 @@
+# P3.19 membrane potential 저장 보강: layer별 저장 bit [L1, L2, L3, L4] = [9, 9, 9, 12]를 12 bit와 비교. BRAM 배분(p313_tradeoff)과 같은 축
+# 9 bit는 RAMB36의 9 bit 폭을 그대로 써 8 bit와 tile 수가 같다
+# L·64 lane, rev 4, 예약 25.5 tile, 즉시 입출력, spike 2개/cycle, Grouping, G.offset-order(offset 순서)
+# 키 설명은 template.toml
+
+mode = "run"
+model = "L"
+lanes = 64
+mem = "ddr"
+rev = 4
+reserve = 25.5
+ovh = 1.10
+bw_mbps = 3015.0
+spk = 2
+bits = 12
+mem_place = "avg"
+tracks = 1024
+host_ms = 0.0
+result_push = true
+offset = "model"
+jitter_ms = 0.8
+gather_ms = 0.0
+perturb = ""
+tail_us = 0.0
+pre_us = 0.0
+scenarios = ["U", "K", "S", "I", "SK", "R"]
+seeds = 10
+seed0 = 0
+warm = 16
+meas = 64
+storage = "G"
+entries = 4
+storage_attrs = {}
+compute = "all"
+sched = "grouping"
+sched_attrs = {}
+search_key = "tracks"
+search_values = []
+search_step = 16
+tune_attr = ""
+tune_values = []
+tune_conds = []
+
+[sweep]
+jitter_ms = [0.8, 1.6, 3.2]
+bits = [12, [9, 9, 9, 12]]
+entries = [2, 3, 4, 5, 6, 8, 10]

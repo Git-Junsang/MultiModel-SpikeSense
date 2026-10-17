@@ -1,0 +1,45 @@
+# P3.17 simulation 보강: 편중 배정(K)에서 offset 간격을 모델의 트랙 수에 비례하게. offset 배정하면 S = U, SK = K라 U·K만
+# L·64 lane, rev 4, 예약 25.5 tile, 입출력 즉시 전송, spike 2개/cycle, Grouping, G.offset-order(offset 순서), 남는 BRAM에 12 bit membrane potential
+# 키 설명은 template.toml
+
+mode = "run"
+model = "L"
+lanes = 64
+mem = "ddr"
+rev = 4
+reserve = 25.5
+ovh = 1.10
+bw_mbps = 3015.0
+spk = 2
+bits = 12
+mem_place = "avg"
+tracks = 1024
+host_ms = 0.0
+result_push = true
+offset = "model"
+jitter_ms = 0.8
+gather_ms = 0.0
+perturb = ""
+tail_us = 0.0
+pre_us = 0.0
+scenarios = ["U", "K"]
+seeds = 20
+seed0 = 0
+warm = 16
+meas = 64
+storage = "G"
+entries = 4
+storage_attrs = {}
+compute = "all"
+sched = "grouping"
+sched_attrs = {}
+search_key = "tracks"
+search_values = []
+search_step = 16
+tune_attr = ""
+tune_values = []
+tune_conds = []
+
+[sweep]
+offset = ["model", "model_w"]
+jitter_ms = [0.4, 0.8, 1.6]

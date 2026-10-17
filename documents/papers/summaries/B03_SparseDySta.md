@@ -39,10 +39,10 @@ Dysta scheduler resource는 LUT 553, DSP 3, on-chip RAM 0.5 KB였다. 우리 구
 
 Dysta의 sparsity 대신 다음 정보를 쓴다.
 
-- model cache hit
+- 모델 cache hit
 - 남은 weight byte
 - 진행 중인 prefetch
-- track compute와 state DMA
+- 트랙 compute와 state DMA
 - deadline slack
 
 이미 completion time에 넣은 transfer를 별도 penalty로 다시 더하면 안 된다.
@@ -51,8 +51,8 @@ Dysta의 sparsity 대신 다음 정보를 쓴다.
 
 - Dysta는 ANN과 soft SLO를 다룬다.
 - 우리는 periodic 32 ms hard deadline을 다룬다.
-- Dysta는 model weight fetch를 scheduling cost로 보지 않는다.
+- Dysta는 모델 weight fetch를 scheduling cost로 보지 않는다.
 
-P3.8 비교에서는 Dysta식 순서가 평균 latency를 조금 줄였지만 off-chip byte는 줄이지 못했다. 느린 DDR3 조건에서는 miss가 났다.
+P3.8 비교에서는 Dysta Method 순서가 평균 응답 시간을 조금 줄였지만 off-chip byte는 줄이지 못했다. 느린 DDR3 조건에서는 miss가 났다.
 
 원문 확인: algorithm 1~3, 결과 표 5·그림 12, resource 표 6.

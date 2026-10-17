@@ -1,18 +1,18 @@
 """P1.5 양자화 방식 후보 비교 (방식 선택 근거).
 
-후보별로 40대 test 세트의 파일 단위 AUC·균형 F1·FP32 대비 판정 일치율, 층별 포화(넘침) 횟수와
-막전위·누산 |최대|, 임계값 정수 최대를 잰다. 채택안(A_sat)의 정식 구현은
-`model_develop/snn_int8.py`이고 정식 비교는 `compare_quant.py`다.
+후보별로 40대 test 세트의 파일 단위 AUC·균형 F1·FP32 대비 판정 일치율, layer별 포화(넘침) 횟수와
+membrane potential·누산 |최대|, threshold 정수 최대를 잰다. 채택안(A_sat)의 정식 구현은
+`model/snn_int8.py`이고 정식 비교는 `quant_int8.py`다.
 
-  A_*  층별 대칭 스케일(선행 방식)          R_*  뉴런별 스케일(출력층만 층별: argmax 단위를 맞추기 위함)
+  A_*  layer별 대칭 스케일(선행 방식)       R_*  뉴런별 스케일(출력 layer만 layer별: argmax 단위를 맞추기 위함)
   prior 16 bit 넘침 시 wrap(선행 RTL)       sat  16 bit 포화
   rnd  누설 반올림(기본 내림)               b12  beta Q0.12(기본 Q0.8)
 
-뉴런별 스케일은 하드웨어 곱셈 없이 임계값·막전위 단위로 흡수되지만, 임계값 정수가 커진다.
+뉴런별 스케일은 하드웨어 곱셈 없이 threshold·membrane potential 단위로 흡수되지만, threshold 정수가 커진다.
 정수 연산은 float64 행렬곱(값이 2^53 미만이라 정확) + int64 원소 연산으로 흉내 낸다.
 
-결과: analysis_develop/quant_int8/variants.csv
-사용법: python3 analysis_develop/quant_variants.py [--units ...] [--cfgs ...]
+결과: train_result/eval/quant_variants/results.csv
+사용법: python3 model/eval/quant_variants.py [--units ...] [--cfgs ...]
 """
 
 import os
@@ -22,11 +22,12 @@ import argparse
 import numpy as np
 import torch
 
-SW = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, os.path.join(SW, "model_develop"))
+SW = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, os.path.join(SW, "model"))
+sys.path.insert(0, os.path.join(SW, "dataset"))
 import dcase_data as dd
-import train
-import snn_numpy as sn
+import train_unit
+import snn_fp32 as sn
 from sklearn.metrics import roc_auc_score, f1_score
 
 CFGS = {
@@ -99,9 +100,9 @@ def int_forward(q, x, cfg):
 
 def run_unit(machine, mid, cfg_names):
     unit = dd.unit_name(machine, mid)
-    pth = os.path.join(SW, "model_weights", unit, "last.pth")
+    pth = os.path.join(SW, "weights", "L_normal_noaug", unit, "last.pth")
     a = torch.load(pth, map_location="cpu", weights_only=False)["args"]
-    d = train.prepare(machine, mid, a["method"], a["val_frac"], a["seed"], "cpu", a.get("hop"))
+    d = train_unit.prepare(machine, mid, a["method"], a["val_frac"], a["seed"], "cpu", a.get("hop"))
     x = d["test_seg"].numpy()
     y, f, b = d["test_label"], d["test_file"], d["bal_idx"]
     layers = sn.load_params(pth)
@@ -127,7 +128,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--units", nargs="*")
     ap.add_argument("--cfgs", nargs="*", default=list(CFGS))
-    ap.add_argument("--out", default=os.path.join(SW, "analysis_develop", "quant_int8", "variants.csv"))
+    ap.add_argument("--out", default=os.path.join(SW, "train_result", "eval", "quant_variants", "results.csv"))
     args = ap.parse_args()
     os.makedirs(os.path.dirname(args.out), exist_ok=True)
     units = [(m, i) for m, i in dd.UNITS if not args.units or dd.unit_name(m, i) in args.units]
@@ -143,7 +144,7 @@ def main():
         w.writerows(allrows)
 
     fp_auc = {r["unit"]: r["auc"] for r in allrows if r["cfg"] == "FP32"}
-    print(f"\n{'후보':10s} {'AUC':>7s} {'ΔAUC 최소':>9s} {'최대':>7s} {'F1b':>7s} {'일치 평균':>8s} {'최저':>7s}  넘침 L1/2/3/4  |막전위| 최대  vth_q 최대")
+    print(f"\n{'후보':10s} {'AUC':>7s} {'ΔAUC 최소':>9s} {'최대':>7s} {'F1b':>7s} {'일치 평균':>8s} {'최저':>7s}  넘침 L1/2/3/4  |membrane potential| 최대  vth_q 최대")
     for c in ["FP32"] + args.cfgs:
         rs = [r for r in allrows if r["cfg"] == c]
         d = [r["auc"] - fp_auc[r["unit"]] for r in rs]

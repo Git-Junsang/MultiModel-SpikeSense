@@ -6,7 +6,7 @@
 //                build_p3.tcl의 -addr_map으로 고른다.
 //   p3_bd      : XDMA(Gen2 ×2) + JTAG-AXI + SmartConnect + BRAM 64 KiB (p3_bd.tcl)
 //   p3_core    : 레지스터(AXI-Lite) + 트래픽 생성기(ddr_tgen)
-//   정적 MUX   : MIG AXI 포트를 트래픽 생성기(ddr_sel=0) 또는 호스트 DMA(ddr_sel=1)에 연결.
+//   정적 MUX   : MIG AXI 포트를 트래픽 생성기(ddr_sel=0) 또는 Host DMA(ddr_sel=1)에 연결.
 //                전환은 양쪽이 모두 쉬고 있을 때만 한다(소프트웨어 규칙).
 //                트래픽 생성기가 MIG에 직접 붙으므로 DDR3 측정에 인터커넥트 지연이 섞이지 않는다.
 //
@@ -105,7 +105,7 @@ module p3_top (
 
     // ---------------- 블록 디자인 ----------------
     wire         lnk_up;
-    // 호스트 DDR 포트 (ui_clk)
+    // Host DDR 포트 (ui_clk)
     wire [31:0]  h_awaddr, h_araddr;
     wire [7:0]   h_awlen, h_arlen;
     wire [2:0]   h_awsize, h_arsize;
@@ -182,7 +182,7 @@ module p3_top (
         .m_rresp(t_rresp)
     );
 
-    // ---------------- 정적 MUX (sel: 0 = 트래픽 생성기, 1 = 호스트) ----------------
+    // ---------------- 정적 MUX (sel: 0 = 트래픽 생성기, 1 = Host) ----------------
     wire s = ddr_sel;
     assign mi_awaddr  = s ? h_awaddr[29:0] : t_awaddr;
     assign mi_awlen   = s ? h_awlen   : t_awlen;
@@ -219,7 +219,7 @@ module p3_top (
     assign h_rresp    = mi_rresp;
     assign t_rresp    = mi_rresp;
 
-    // 호스트 경로에서 32 B 미만 크기의 다중 beat 버스트(narrow burst)를 보면 표시한다.
+    // Host 경로에서 32 B 미만 크기의 다중 beat 버스트(narrow burst)를 보면 표시한다.
     // MIG는 narrow burst 미지원(C_S_AXI_SUPPORTS_NARROW_BURST=0)으로 생성했다.
     always @(posedge ui_clk) begin
         if (ui_rst || narrow_clr) narrow_seen <= 1'b0;
@@ -246,7 +246,7 @@ module p3_top (
 
 `ifdef P3_FIT
     // ---------------- BRAM 적합성 실험 (P3.2·P3.4, build_p3.tcl -fit) ----------------
-    // 트래픽 생성기의 DDR3 읽기 데이터를 가중치 캐시 쓰기(fill)로 쓴다.
+    // 트래픽 생성기의 DDR3 읽기 데이터를 weight cache 쓰기(fill)로 쓴다.
     wire [31:0] fit_sig;
     mem_fit #(.N_ENT(`FIT_N_ENT), .SLICE_BUF(`FIT_SLICE_BUF), .BV_ALL40(`FIT_BV_ALL40),
               .Q_BRAM(`FIT_Q_BRAM)) u_fit (

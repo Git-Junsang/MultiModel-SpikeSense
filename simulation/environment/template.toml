@@ -1,0 +1,69 @@
+# 실험 1개 = 환경 파일 1개. 이 파일을 복사해 값을 바꾼다. 키는 빼거나 더할 수 없다(engine이 멈춤).
+#   python3 simulation/engine/engine.py simulation/environment/<파일>.toml --jobs 11
+#   결과: simulation/result/<파일 이름>.csv(점별 요약), <파일 이름>_runs.csv.gz(실행별 원자료). 형식은 engine.py 첫머리
+# 기본값 = P3.13 제안 구성(L·64 lane·1,024트랙, offset 배정 jitter 0.8 ms, Grouping, G.offset-order entry 4, 남는 BRAM에 12 bit membrane potential, 입출력 즉시 전송)
+# 시간 단위: 이름에 _ms·_us가 붙은 키만 그 단위. 나머지 시간 값(sched_attrs 등)은 engine 본체와 같은 µs
+
+mode = "run"           # run: 점마다 시나리오 × seed 실행 | search: miss 0인 마지막 값 찾기 | tune: scheduler 조절값 고르기
+
+# ---- 하드웨어 ----
+model = "L"            # L (40-384-256-64-2) | XL (40-768-512-128-2)
+lanes = 64             # 연산 lane 수
+mem = "ddr"            # membrane potential 위치: ddr | onchip | auto(BRAM에 들어가면 onchip)
+rev = 4                # configure 가정 판 1~5 (configure 설명 참고)
+reserve = 25.5         # 시뮬레이터 밖 BRAM 예약 tile(요청 표·ring 등)
+ovh = 1.10             # 제어 비용 배수
+bw_mbps = 3015.0       # DDR3 유효 대역폭 MB/s(= B/µs). 3,015 = P3.1 실측. 부품 크기는 3,015 기준으로 정하고 실행만 이 값
+spk = 2                # 0 = dense 연산, 1·2 = L2·L3에서 cycle당 누산하는 spike 입력 수(spike 0 건너뛰기)
+bits = 12              # 0 = membrane potential 전부 mem 위치(16 bit). 12·16 등 = 남는 BRAM에 들어가는 트랙만 on-chip, 나머지는 이 bit 수로 DDR3
+                       # layer마다 다르면 목록 [L1, L2, L3, L4]. 예: [8, 8, 10, 16]
+mem_place = "avg"      # membrane potential on-chip 계산: avg(on-chip 트랙 비율만큼 요청당 평균) | id(track_id < on-chip 수, id는 모델과 무관)
+                       # | offset(Host가 모델 offset·트랙 offset 순서로 id를 매김). id·offset은 DDR3 membrane potential을 id 순서로 붙여 두고 이어진 트랙은 DMA 한 번
+
+# ---- 부하 ----
+tracks = 1024
+host_ms = 0.0          # Host가 입력을 모아 보내는 주기 ms. 0 = 생성 즉시 H2C
+result_push = true     # true = 연산이 끝나면 결과를 바로 C2H. false = host_ms 주기로 모아 읽음(host_ms > 0일 때만)
+offset = "model"       # none(트랙마다 무작위 offset) | model(offset 배정, offset 간격 0.8 ms) | model_w(offset 간격 ∝ 모델의 트랙 수)
+                       # | scatter(고르게 나눈 offset)
+jitter_ms = 0.8        # offset = model·model_w일 때 같은 모델 트랙의 offset 퍼짐
+gather_ms = 0.0        # Host offset 단위 모아 보내기 대기 D ms(offset = model·model_w). 모델·주기마다 다 준비되거나 offset + D에 한꺼번에. 0 = 즉시
+perturb = ""           # "" | shift(30 % 늦게 합류, 30 % 중간 이탈) | strag1 · strag5(요청 1 · 5 %가 0~16 ms 늦게 도착)
+tail_us = 0.0          # 모든 입력·결과 전송에 더하는 지연 µs. scheduler guard는 모른다
+pre_us = 0.0           # 외부 지연 µs(오디오 buffer·전처리). 입력에만 더한다. t_gen = 수음 시각이라 scheduler guard도 안다
+scenarios = ["U", "K", "S", "I", "SK", "R"]   # U 균등, K 편중, S 동시, I 띄엄띄엄, SK 동시+편중, R 무작위 혼잡도
+seeds = 20             # 시나리오마다 seed 수
+seed0 = 0              # 첫 seed. 조정(tune)은 평가 seed와 겹치지 않게 100을 쓴다
+warm = 16              # 예열 주기 수
+meas = 64              # 측정 주기 수(32 ms × 64 = 2.048 s)
+
+# ---- 부품 ----
+storage = "G"          # A 전체cache(LRU) | B 부분상주 | B_l1 L1상주 | C 고정혼합 | C_lru 혼합 | D 스트림 | E 인기고정 | F 다음사용
+                       # | G offset-order | G_prefetch offset-order+prefetch | R 복제 | noload 적재 0 하한
+entries = 4            # weight entry 수(A·C_lru·E·F·G·R). 0 = BRAM 예산에 들어가는 최대
+storage_attrs = {}     # 저장 정책 속성. 예: R 복제의 {R = 5, THR = 8}
+compute = "all"        # all 한번에 | row 한줄씩 | prefetch(G_prefetch 전용) | wide 넓게 읽기(R 전용)
+sched = "grouping"     # fcfs | edf | grouping | timeout | dysta | dysta_req | clockwork | symphony | shepherd | deeprt | wspt
+                       # | wspt_fix | wspt_rep | slackbatch | slackbatch_lite (P3.9 동결) | slackbatch_hw | slackbatch_lite_hw
+                       # | slackbatch_v0 | slackbatch_lite_v0 | score | score_nocap | score2 | score3 | lazy | lazys
+                       # | timeout_batch | timeout_batch16
+sched_attrs = {}       # scheduler 속성(µs). 예: {W = 5000.0}(timeout), {eta = 1e-4}(dysta), {variant = "A"}(clockwork),
+                       # {slack = 26000.0}(symphony), {cfg = [14900.0, false]}(deeprt), {slack_ratio = 0.2}(slackbatch),
+                       # {robust = true}(guard 결과 회수 여유에 PCIe 실측 worst case), {margin = ...}(회수 여유를 직접)
+
+# ---- mode = "search" ----
+search_key = "tracks"  # 바꿔 가며 찾을 키
+search_values = []     # 시험 순서(통과 → 실패로 단조라고 가정). 비우면 tracks는 search_step 단위로 연산 가동률 100 %까지
+search_step = 16
+
+# ---- mode = "tune" ----
+tune_attr = ""         # sched_attrs에서 고를 속성
+tune_values = []       # 후보
+tune_conds = []        # 모든 후보가 함께 통과해야 하는 조건(덮어쓸 키 표). 예: [{}, {tail_us = 700.0}, {ovh = 1.2}]. 비우면 이 환경만
+
+# ---- 여러 점 ----
+# 키 = 값 목록. 축의 곱마다 한 점. 축 이름이 위 키면 그 값을 바꾸고, 아니면 값이 표여야 하며 표의 키들을 한꺼번에 바꾼다
+# (표의 label은 결과 표의 이름). 예:
+#   jitter_ms = [0.0, 0.8, 3.2]
+#   design = [{label = "A · 한번에", storage = "A", compute = "all"}, {storage = "D", compute = "row"}]
+[sweep]

@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """analyze_p3.py — P3.1(DDR3)·P3.3(PCIe) 보드 측정 원자료 → 요약표(Markdown)
 
-입력 (software/analysis_develop/p3_meas/raw/):
+입력 (hardware/board_test/p3_meas/result/raw/):
   ddr_<tag>.jsonl          p3_ddr_bench.py 출력 (tag = brc / rbc: MIG 주소 매핑)
   pcie/<시험>_<조건>.txt   pcie_lat.c 출력 (한 줄 = 표본 1개, ns)
   pcie/ts_sync*.txt        "t0_ns ts_cycles t1_ns"
-출력: software/analysis_develop/p3_meas/summary_ddr.md, summary_pcie.md
+출력: hardware/board_test/p3_meas/result/summary_ddr.md, summary_pcie.md
 
-    python3 software/analysis_develop/analyze_p3.py
+    python3 hardware/board_test/host/analyze_p3.py
 """
 import glob
 import json
@@ -16,8 +16,8 @@ import os
 import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-RAW = os.path.join(HERE, 'p3_meas', 'raw')
-OUT = os.path.join(HERE, 'p3_meas')
+OUT = os.path.join(HERE, '..', 'p3_meas', 'result')
+RAW = os.path.join(OUT, 'raw')
 CYC_NS = 10.0                 # ui_clk 100 MHz
 ASSUMED_BPS = 2.0e9           # 제안서의 실효 대역폭 가정
 
@@ -32,7 +32,7 @@ def load_ddr():
 
 
 def lat_stats(r, key='log_lat'):
-    """전송별 지연 기록(사이클) → µs 통계. 기록이 없으면 min/평균/max만."""
+    """전송별 지연 기록(cycle) → µs 통계. 기록이 없으면 min/평균/max만."""
     res = r['res']
     out = {'n': res['xfers'], 'min': res['lat_min'] * CYC_NS / 1e3,
            'avg': res['lat_sum'] / max(res['xfers'], 1) * CYC_NS / 1e3,
@@ -54,7 +54,7 @@ def f3(x):
 def ddr_summary(recs):
     tags = sorted({k[0] for k in recs})
     L = ['# P3.1 DDR3 측정 요약 (자동 생성: analyze_p3.py)', '',
-         '단위: GB/s = 1e9 B/s, 지연 µs. 사이클 기준 ui_clk 100 MHz. tag: brc = BANK_ROW_COLUMN, '
+         '단위: GB/s = 1e9 B/s, 지연 µs. cycle 기준 ui_clk 100 MHz. tag: brc = BANK_ROW_COLUMN, '
          'rbc = ROW_BANK_COLUMN (MIG 주소 매핑).', '']
 
     def get(tag, grp, lab):
@@ -96,7 +96,7 @@ def ddr_summary(recs):
     sizes = [512, 1024, 2048, 4096, 8192, 15360, 16384, 32768, 65536, 98304, 130176]
     for t in tags:
         L += [f'## 슬라이스 크기별 읽기 ({t})', '',
-              '모델 전환 = 매 슬라이스 40개 모델 슬롯 중 무작위 슬롯의 시작 주소. 같은 모델 = 연속 주소. '
+              '모델 전환 = 매 슬라이스 40개 모델 slot 중 무작위 slot의 시작 주소. 같은 모델 = 연속 주소. '
               'blocking = 앞 슬라이스가 끝나야 다음 요청, pipelined = 연속 요청. '
               '`가정 시간` = 크기 / 2.0 GB/s.', '',
               '| 크기 B | 가정 시간 | 전환·blk GB/s | 전환·blk 지연 평균 / p99 / 최대 | 첫 데이터 평균 | '
@@ -133,7 +133,7 @@ def ddr_summary(recs):
         L.append('')
 
     # model
-    L += ['## 모델·층 단위 가져오기 (blocking, 40슬롯)', '',
+    L += ['## 모델·layer 단위 가져오기 (blocking, 40 slot)', '',
           '| tag | 구간 | 크기 B | 순서 | GB/s | 지연 평균 / p99 / 최대 µs | 가정 시간 µs |',
           '|---|---|---:|---|---:|---|---:|']
     for t in tags:
@@ -181,7 +181,7 @@ def pct(v, q):
 def pcie_summary():
     files = sorted(glob.glob(os.path.join(RAW, 'pcie', '*.txt')))
     L = ['# P3.3 PCIe 지연 요약 (자동 생성: analyze_p3.py)', '',
-         '단위 µs. 호스트 CLOCK_MONOTONIC_RAW로 잰 호출 1회 시간. `p` 조건은 주기 대기 후 측정.', '',
+         '단위 µs. Host CLOCK_MONOTONIC_RAW로 잰 호출 1회 시간. `p` 조건은 주기 대기 후 측정.', '',
          '| 시험 | 표본 | 최소 | 평균 | p50 | p99 | p99.9 | 최대 | 표준편차 |',
          '|---|---:|---:|---:|---:|---:|---:|---:|---:|']
     ts_rows = []
@@ -197,8 +197,8 @@ def pcie_summary():
                  f'{pct(v, 99):.2f} | {pct(v, 99.9):.2f} | {v.max():.2f} | {v.std():.2f} |')
     L.append('')
     if ts_rows:
-        L += ['## 호스트·FPGA 시계 관계 (TS 레지스터 읽기)', '',
-              'FPGA TS = ui_clk(보드 200 MHz 발진기 → MIG MMCM 100 MHz) 계수기. 호스트 시각 = '
+        L += ['## Host·FPGA 시계 관계 (TS 레지스터 읽기)', '',
+              'FPGA TS = ui_clk(보드 200 MHz 발진기 → MIG MMCM 100 MHz) 계수기. Host 시각 = '
               '읽기 전후 중간값. 1차 회귀의 기울기로 상대 주파수 오차(ppm)를, 잔차로 판독 불확도를 본다.', '',
               '| 파일 | 표본 | 구간 s | 주파수 오차 ppm | 잔차 p99 µs | 왕복 p50 µs | 왕복 p99 µs |',
               '|---|---:|---:|---:|---:|---:|---:|']

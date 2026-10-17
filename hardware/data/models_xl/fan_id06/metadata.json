@@ -1,0 +1,31 @@
+{
+  "format_version": 2,
+  "model_id": 5,
+  "unit": "fan_id06",
+  "checkpoint": "software/weights/XL_mixed_aug/fan_id06/last.pth",
+  "layer_sizes": [
+    40,
+    768,
+    512,
+    128,
+    2
+  ],
+  "weight_scales": [
+    0.008145767872727762,
+    0.005874714044135387,
+    0.00812019794944703,
+    0.01362574194359967
+  ],
+  "weights_bytes": 489728,
+  "params_bytes": 2820,
+  "slot_bytes": 524288,
+  "slot_offset": 2621440,
+  "slot_offset_hex": "0x00280000",
+  "ddr_address": 2621440,
+  "ddr_address_hex": "0x00280000",
+  "sha256": {
+    "weights.bin": "2f0220b3756749527b862f8690c151e134139eac4218f028c7853620f265651b",
+    "params.bin": "7be380f3c342a74baf77eb5f81d88a43a351040221f916f23d30f841ab4aae65",
+    "model.slot.bin": "222f145a7b5e489733a0452279d3b8f035f0892a7e04ae771a2492f7e680aa5b"
+  }
+}

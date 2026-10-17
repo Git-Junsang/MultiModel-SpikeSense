@@ -1,0 +1,56 @@
+# P3.13 논문 실험(옛 paper_exp.py --part ablation)
+# L·64 lane, membrane potential DDR3, rev 4, 예약 25.5 tile, 입출력 즉시 전송, spike 2개/cycle
+# 표 1: offset 배정 끔/켬 × cache 없음/LRU/offset-order, Grouping
+# 키 설명은 template.toml
+
+mode = "run"
+model = "L"
+lanes = 64
+mem = "ddr"
+rev = 4
+reserve = 25.5
+ovh = 1.1
+bw_mbps = 3015.0
+spk = 2
+bits = 0
+mem_place = "avg"
+tracks = 1024
+host_ms = 0.0
+result_push = true
+offset = "model"
+jitter_ms = 0.8
+gather_ms = 0.0
+perturb = ""
+tail_us = 0.0
+pre_us = 0.0
+scenarios = ["U", "K", "S", "I", "SK", "R"]
+seeds = 20
+seed0 = 0
+warm = 16
+meas = 64
+storage = "G"
+entries = 4
+storage_attrs = {}
+compute = "all"
+sched = "grouping"
+sched_attrs = {}
+search_key = "tracks"
+search_values = []
+search_step = 16
+tune_attr = ""
+tune_values = []
+tune_conds = []
+
+[sweep]
+design = [
+  {label = "끔·없음", offset = "none", storage = "D"},
+  {label = "끔·LRU10", offset = "none", storage = "A", entries = 10},
+  {label = "끔·offset-order10", offset = "none", storage = "G", entries = 10},
+  {label = "켬·없음", storage = "D"},
+  {label = "켬·LRU10", storage = "A", entries = 10},
+  {label = "켬·LRU4", storage = "A", entries = 4},
+  {label = "켬·LRU2", storage = "A", entries = 2},
+  {label = "켬·offset-order2", storage = "G", entries = 2},
+  {label = "켬·offset-order4", storage = "G", entries = 4},
+  {label = "켬·offset-order10", storage = "G", entries = 10},
+]

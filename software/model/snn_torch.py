@@ -1,18 +1,21 @@
-"""다중 모델 SNN 가속기용 PLIF-T 모델 (`40→384→256→64→2`).
+"""다중 모델 SNN 가속기용 PLIF 모델 (`40→384→256→64→2`).
 
 선행 SpikeSense-Edge `snn_model.py`(`40→128→32→2`)를 확장했다.
-- 가중치 층 4개(bias 없음), INT8 기준 130,176 B = 127.125 KiB
-- PLIF-T 뉴런 706개(384 + 256 + 64 + 2), 뉴런별 beta·threshold 학습
+- weight layer 4개(bias 없음), INT8 기준 130,176 B = 127.125 KiB
+- PLIF 뉴런 706개(384 + 256 + 64 + 2), 뉴런별 beta·threshold 학습
 - 뉴런 갱신 규칙(누설 → 적분 → 발화 → soft reset)과 surrogate gradient는 선행과 같다.
-  RTL `plift_core`와 INT8 골든 참조(P1.7)가 이 규칙을 따른다.
+  RTL `plift_core`와 INT8 golden 참조(P1.7)가 이 규칙을 따른다.
 """
 
 import torch
 import torch.nn as nn
 import numpy as np
 
-# 모델 구조 (PROPOSAL.md §3, 중간보고 기준)
+# 모델 구조 (design_references/02_MODEL.md §2)
 LAYER_SIZES = (40, 384, 256, 64, 2)
+# 모델 크기 이름 (archive/design/MODEL_SIZE_PLAN.md §2.1). 학습 이름 <크기>_<용도>_<학습방법>의 <크기>
+ARCHS = {"XS": (40, 64, 32, 2), "P": (40, 128, 32, 2), "S": (40, 128, 64, 32, 2),
+         "M": (40, 256, 128, 64, 2), "L": LAYER_SIZES, "XL": (40, 768, 512, 128, 2)}
 N_WEIGHTS = sum(a * b for a, b in zip(LAYER_SIZES[:-1], LAYER_SIZES[1:]))  # 130,176
 N_NEURONS = sum(LAYER_SIZES[1:])                                            # 706
 
@@ -54,7 +57,7 @@ def grouped_beta(n_neurons, betas):
     return out
 
 
-# PLIF-T (Parametric LIF with Learnable Threshold) 뉴런
+# PLIF 뉴런(Parametric LIF). 누설 계수와 threshold를 함께 학습한다
 
 class PLIFLayer(nn.Module):
     def __init__(self, n_neurons, init_beta=0.8, init_threshold=1.0):
@@ -65,14 +68,14 @@ class PLIFLayer(nn.Module):
         w_beta = np.broadcast_to(_logit(init_beta), (n_neurons,))
         self.w_beta = nn.Parameter(torch.tensor(w_beta, dtype=torch.float32))
 
-        # 학습 가능한 임계값
+        # 학습 가능한 threshold
         self.w_thr = nn.Parameter(torch.full((n_neurons,), init_threshold, dtype=torch.float32))
 
     def beta(self):
         return torch.sigmoid(self.w_beta)
 
     def threshold(self):
-        # 임계값이 0 이하로 내려가지 않도록 최소 0.1로 클램프
+        # threshold가 0 이하로 내려가지 않도록 최소 0.1로 클램프
         return torch.clamp(self.w_thr, min=0.1)
 
     def forward(self, input_current, membrane):
@@ -82,7 +85,7 @@ class PLIFLayer(nn.Module):
         membrane = beta * membrane + input_current
         spikes = spike_fn(membrane, thr)
 
-        # Soft reset: 발화 시 임계값만큼 막전위 차감
+        # Soft reset: 발화 시 threshold만큼 membrane potential 차감
         membrane = membrane - spikes * thr
 
         return spikes, membrane
@@ -93,8 +96,8 @@ class PLIFLayer(nn.Module):
 
 # SNN 모델 구조
 
-# 층별 초기 beta 그룹. 은닉층 1·2는 선행 hidden1·hidden2 값을 그대로 쓰고,
-# 추가된 은닉층 3은 hidden2 값을 따른다. 출력층은 선행과 같이 0.85 단일값.
+# layer별 초기 beta 그룹. 은닉 layer 1·2는 선행 hidden1·hidden2 값을 그대로 쓰고,
+# 추가된 은닉 layer 3은 hidden2 값을 따른다. 출력 layer는 선행과 같이 0.85 단일값.
 INIT_BETAS = (
     (0.70, 0.80, 0.90, 0.95),
     (0.75, 0.85, 0.90, 0.95),
@@ -104,18 +107,18 @@ INIT_BETAS = (
 
 
 def default_betas(layer_sizes):
-    """층 수에 맞춘 초기 beta 그룹: 은닉층 1은 INIT_BETAS[0], 나머지 은닉층은 INIT_BETAS[1],
-    출력층은 0.85. 기본 구조에서는 INIT_BETAS와 같고, `40→128→32→2`에서는 선행 모델과 같다(P3.6)."""
+    """layer 수에 맞춘 초기 beta 그룹: 은닉 layer 1은 INIT_BETAS[0], 나머지 은닉 layer는 INIT_BETAS[1],
+    출력 layer는 0.85. 기본 구조에서는 INIT_BETAS와 같고, `40→128→32→2`에서는 선행 모델과 같다(P3.6)."""
     n_hidden = len(layer_sizes) - 2
     return (INIT_BETAS[0],) + (INIT_BETAS[1],) * (n_hidden - 1) + (INIT_BETAS[-1],)
 
 
 class AnomalySNN(nn.Module):
-    """`40→384→256→64→2` PLIF-T SNN.
+    """`40→384→256→64→2` PLIF SNN.
 
     출력 2개는 0 = 정상, 1 = 이상(2026-09-23 확정). 결함 종류 분류는 DCASE 데이터에
     해당 라벨이 없어 채택하지 않았다.
-    판정은 선행과 같이 출력층 막전위의 시간 평균 argmax를 쓴다.
+    판정은 선행과 같이 출력 layer membrane potential의 시간 평균 argmax를 쓴다.
     """
 
     def __init__(self, layer_sizes=LAYER_SIZES, init_betas=INIT_BETAS, init_threshold=1.0):
@@ -139,7 +142,7 @@ class AnomalySNN(nn.Module):
     def forward(self, spike_input):
         """spike_input: [batch, T, n_input].
 
-        반환: (출력 스파이크 [B, T, 2], 출력 막전위 [B, T, 2], 마지막 은닉층 스파이크 [B, T, 64])
+        반환: (출력 spike [B, T, 2], 출력 membrane potential [B, T, 2], 마지막 은닉 layer spike [B, T, 64])
         """
         batch_size, n_timesteps = spike_input.shape[:2]
         device = spike_input.device
@@ -165,7 +168,7 @@ class AnomalySNN(nn.Module):
 
     @staticmethod
     def predict(output_mem):
-        """출력 막전위 시간 평균의 argmax → 클래스 인덱스"""
+        """출력 membrane potential 시간 평균의 argmax → 클래스 인덱스"""
         return output_mem.mean(dim=1).argmax(dim=1)
 
     def weight_count(self):
@@ -181,7 +184,7 @@ if __name__ == "__main__":
     print(f"구조        : {'→'.join(map(str, model.layer_sizes))}")
     for i, fc in enumerate(model.fcs, 1):
         print(f"  L{i} weight : {tuple(fc.weight.shape)} = {fc.weight.numel():,} B (INT8)")
-    print(f"가중치 수   : {n_w:,} ({n_w / 1024:.1f} KiB INT8)")
+    print(f"weight 수   : {n_w:,} ({n_w / 1024:.1f} KiB INT8)")
     print(f"뉴런 수     : {n_n}")
     print(f"PLIF 파라미터: {sum(p.numel() for l in model.lifs for p in l.parameters()):,} (beta·thr, 뉴런당 2개)")
     assert n_w == N_WEIGHTS == 130_176

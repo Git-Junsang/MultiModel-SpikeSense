@@ -1,0 +1,53 @@
+# P3.13 논문 실험(옛 paper_exp.py --part arrival)
+# L·64 lane, membrane potential DDR3, rev 4, 예약 25.5 tile, 입출력 즉시 전송, spike 2개/cycle
+# 그림 4: 도착 패턴 7개, 제안 구성. 동시 도착은 S·SK, 나머지는 U·K
+# 키 설명은 template.toml
+
+mode = "run"
+model = "L"
+lanes = 64
+mem = "ddr"
+rev = 4
+reserve = 25.5
+ovh = 1.1
+bw_mbps = 3015.0
+spk = 2
+bits = 0
+mem_place = "avg"
+tracks = 1024
+host_ms = 0.0
+result_push = true
+offset = "model"
+jitter_ms = 0.8
+gather_ms = 0.0
+perturb = ""
+tail_us = 0.0
+pre_us = 0.0
+scenarios = ["U", "K", "S", "I", "SK", "R"]
+seeds = 20
+seed0 = 0
+warm = 16
+meas = 64
+storage = "G"
+entries = 4
+storage_attrs = {}
+compute = "all"
+sched = "grouping"
+sched_attrs = {}
+search_key = "tracks"
+search_values = []
+search_step = 16
+tune_attr = ""
+tune_values = []
+tune_conds = []
+
+[sweep]
+pattern = [
+  {label = "무작위 offset", offset = "none", scenarios = ["U", "K"]},
+  {label = "동시 도착", offset = "none", scenarios = ["S", "SK"]},
+  {label = "고르게 나눈 offset", offset = "scatter", scenarios = ["U", "K"]},
+  {label = "offset 배정", scenarios = ["U", "K"]},
+  {label = "offset 배정 + 교대", perturb = "shift", scenarios = ["U", "K"]},
+  {label = "offset 배정 + 지연 1 %", perturb = "strag1", scenarios = ["U", "K"]},
+  {label = "offset 배정 + 지연 5 %", perturb = "strag5", scenarios = ["U", "K"]},
+]

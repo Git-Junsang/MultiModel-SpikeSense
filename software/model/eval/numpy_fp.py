@@ -1,15 +1,15 @@
 """P0.8 NumPy 순전파 검증.
 
 1) 선행 재현: 선행 SpikeSense-Edge `test_model_numpy.py`(INT8, `40→128→32→2`)를 선행
-   저장소의 가중치 HEX로 돌려 선행 골든 벡터(막전위·스파이크)와 비트 단위로 비교한다.
+   저장소의 weight HEX로 돌려 선행 golden vector(membrane potential·spike)와 비트 단위로 비교한다.
    선행 저장소는 읽기만 한다.
-2) FP 일치: 학습한 40대 모델(`model_weights/<장비>/last.pth`)마다 DCASE test 평가 세트
-   (train.prepare의 supervised 분할, 학습과 같은 seed)를 PyTorch(CPU FP32)와
-   `snn_numpy`(FP32)로 순전파해 층별 스파이크·출력 막전위·판정·파일 단위 AUC를 비교한다.
-   스파이크가 다르면 처음 달라진 지점의 |mem - thr|를 기록해 반올림 차이인지 확인한다.
+2) FP 일치: 학습한 40대 모델(`weights/L_normal_noaug/<장비>/last.pth`)마다 DCASE test 평가 세트
+   (train_unit.prepare의 supervised 분할, 학습과 같은 seed)를 PyTorch(CPU FP32)와
+   `snn_fp32`(FP32)로 순전파해 layer별 spike·출력 membrane potential·판정·파일 단위 AUC를 비교한다.
+   spike가 다르면 처음 달라진 지점의 |mem - thr|를 기록해 반올림 차이인지 확인한다.
 
-결과: analysis_develop/numpy_fp/{results.csv, prior.txt}
-사용법: python3 analysis_develop/check_numpy_fp.py [--units fan_id01 ...]
+결과: train_result/eval/numpy_fp/{results.csv, prior.txt}
+사용법: python3 model/eval/numpy_fp.py [--units fan_id01 ...]
 """
 
 import os
@@ -19,26 +19,27 @@ import argparse
 import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-SOFTWARE = os.path.dirname(HERE)
-sys.path.insert(0, os.path.join(SOFTWARE, "model_develop"))
+SOFTWARE = os.path.dirname(os.path.dirname(HERE))
+sys.path.insert(0, os.path.join(SOFTWARE, "model"))
+sys.path.insert(0, os.path.join(SOFTWARE, "dataset"))
 
 import torch
 from sklearn.metrics import roc_auc_score
 
 import dcase_data as dd
-import train
-import snn_numpy as sn
-from snn_model import AnomalySNN
+import train_unit
+import snn_fp32 as sn
+from snn_torch import AnomalySNN
 
 PRIOR_WEIGHTS = "/mnt/nas/data/2026-CAU/서울대학교 학부인턴/Project/SpikeSense-Edge/hardware/src/weights"
-OUT = os.path.join(HERE, "numpy_fp")
+OUT = os.path.join(SOFTWARE, "train_result", "eval", "numpy_fp")
 
 
 def check_prior():
     # references/에는 선행 train.py도 있어 sys.path에 넣지 않고 파일로 읽는다
     import importlib.util
     spec = importlib.util.spec_from_file_location(
-        "prior_test_model_numpy", os.path.join(SOFTWARE, "model_develop", "references", "test_model_numpy.py"))
+        "prior_test_model_numpy", os.path.join(SOFTWARE, "model", "references", "test_model_numpy.py"))
     t = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(t)
     w = PRIOR_WEIGHTS
@@ -78,7 +79,7 @@ def softmax_p1(mean_mem):
 
 
 def first_div_margin(layers, x, t_spk):
-    """세그먼트별로 스파이크가 처음 달라진 지점에서 NumPy 막전위와 임계값의 차 |mem - thr|.
+    """세그먼트별로 spike가 처음 달라진 지점에서 NumPy membrane potential과 threshold의 차 |mem - thr|.
 
     반환: (분기 세그먼트 수, 최대 |mem - thr|). 반올림 차이라면 ~1e-6 이하다.
     """
@@ -100,10 +101,10 @@ def first_div_margin(layers, x, t_spk):
 @torch.no_grad()
 def check_unit(machine, mid, ref_auc):
     unit = dd.unit_name(machine, mid)
-    pth = os.path.join(SOFTWARE, "model_weights", unit, "last.pth")
+    pth = os.path.join(SOFTWARE, "weights", "L_normal_noaug", unit, "last.pth")
     ckpt = torch.load(pth, map_location="cpu", weights_only=False)
     a = ckpt["args"]
-    data = train.prepare(machine, mid, a["method"], a["val_frac"], a["seed"], "cpu", a.get("hop"))
+    data = train_unit.prepare(machine, mid, a["method"], a["val_frac"], a["seed"], "cpu", a.get("hop"))
     x = data["test_seg"]
     y, f = data["test_label"], data["test_file"]
 
@@ -112,7 +113,7 @@ def check_unit(machine, mid, ref_auc):
     model.eval()
     layers = sn.load_params(pth)
 
-    # 층별 스파이크를 함께 받기 위해 PyTorch 쪽도 층 루프를 직접 돈다(모듈 호출은 그대로).
+    # layer별 spike를 함께 받기 위해 PyTorch 쪽도 layer 루프를 직접 돈다(모듈 호출은 그대로).
     B, T, _ = x.shape
     t_mems = [lif.init_membrane(B) for lif in model.lifs]
     t_spk = [[] for _ in model.lifs]
@@ -161,7 +162,7 @@ def main():
         fp.write("\n".join(lines) + "\n")
 
     ref = {}
-    with open(os.path.join(SOFTWARE, "analysis_result", "all40", "results.csv")) as fp:
+    with open(os.path.join(SOFTWARE, "train_result", "L_normal_noaug", "results.csv")) as fp:
         for r in csv.DictReader(fp):
             ref[r["unit"]] = float(r["test_auc"])
 

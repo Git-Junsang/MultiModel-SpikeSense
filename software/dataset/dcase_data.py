@@ -1,4 +1,4 @@
-"""DCASE 2020 Task2 데이터 목록·특징 추출·캐시.
+"""DCASE 2020 Task2 데이터 목록·특징 추출·cache.
 
 모델 1개 = 장비 1대(기종 + ID). 전체 41대 중 fan id_00을 제외한 40대를 쓴다.
 제외한 장비의 wav는 저장소에서 삭제했다. 처음에는 slider id_06을
@@ -6,7 +6,7 @@
 slider id_06은 0.998) 2026-09-23에 둘을 맞바꿨다.
 
 특징은 선행 train.py와 같다: 16 kHz, n_fft 1024, hop 512(32 ms), 40 mel,
-파일 단위 power_to_db(ref=max, top_db 80) → [0, 1] 정규화, 31프레임(992 ms) 세그먼트.
+파일 단위 power_to_db(ref=max, top_db 80) → [0, 1] 정규화, 31 frame(992 ms) 세그먼트.
 """
 
 import os
@@ -17,8 +17,8 @@ import librosa
 from multiprocessing import Pool
 
 SOFTWARE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DATA_DIR = os.path.join(SOFTWARE_DIR, "data", "dataset_dcase")
-CACHE_DIR = os.path.join(SOFTWARE_DIR, "data", "mel_dcase")
+DATA_DIR = os.path.join(SOFTWARE_DIR, "dataset", "dcase")
+CACHE_DIR = os.path.join(SOFTWARE_DIR, "dataset", "mel_dcase")
 
 SR, N_FFT, HOP, N_MELS = 16000, 1024, 512, 40
 SEG_FRAMES = 31          # 31 × 32 ms = 992 ms
@@ -39,6 +39,11 @@ assert len(UNITS) == 40
 
 def unit_name(machine, mid):
     return f"{machine}_id{mid}"
+
+
+def aug_path(root, unit, name):
+    """겹침 증강 dataset(dcase_augmented, dcase_augmented_easy)의 장비 파일: <root>/<종류>/<장비>_<name>"""
+    return os.path.join(root, unit.rsplit("_id", 1)[0], f"{unit}_{name}")
 
 
 def _wavs(folder, prefix):
@@ -111,7 +116,7 @@ def _segments(mel, hop=SEG_FRAMES):
 
 
 def load_unit(machine, mid, split, workers=10, hop=SEG_FRAMES):
-    """장비 1대의 세그먼트 캐시를 읽거나 만든다.
+    """장비 1대의 세그먼트 cache를 읽거나 만든다.
 
     hop < SEG_FRAMES면 구간을 겹쳐 자른다. 학습 표본을 늘리는 용도이며, 평가는
     겹치지 않는 기본 분할(hop = SEG_FRAMES)로 한다.

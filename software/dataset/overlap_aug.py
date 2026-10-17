@@ -8,26 +8,26 @@
   그중 강한 겹침 수   K ~ round(정규(1.5, 0.5)), 1~2 (K ≤ N), 나머지는 약한 겹침
   겹침 수준(SNR, dB) = 10·log10(대상 전력 / 겹친 소리 전력), 녹음 전체 기준
                       강함 ~ 정규(0, 3), −9~9 / 약함 ~ 정규(15, 3), 6~24
-  종류 ~ 균일(6종), ID ~ 균일(그 종류에서 대상 장비 제외), 녹음 ~ 균일(뱅크), 시작 위치 ~ 균일(원형 이동)
+  종류 ~ 균일(6종), ID ~ 균일(그 종류에서 대상 장비 제외), 녹음 ~ 균일(bank), 시작 위치 ~ 균일(원형 이동)
   겹치는 소리는 **정상음만** 쓴다(이상음을 섞으면 대상 라벨이 오염된다).
   배경 소음: 원본 녹음에 이미 들어 있다. 배경 소음만 따로 녹음한 파일은 없어, 약한 겹침 여러 대가 넓게 깔린
   배경 역할을 한다(합성 소음은 넣지 않음).
 
 학습과 평가의 겹침 소리는 서로 다른 녹음이다.
-  학습 뱅크 = 장비마다 train 폴더 정상 녹음 50개, 평가 뱅크 = 장비마다 test 폴더 정상 녹음 50개.
+  학습 bank = 장비마다 train 폴더 정상 녹음 50개, 평가 bank = 장비마다 test 폴더 정상 녹음 50개.
 
-출력 software/data/dataset_augmented/
-  bank_train.json, bank_test.json          뱅크 녹음 목록
-  <장비>_train.npz  mel [K, ΣT, 40] float16, off [F+1]     train 폴더 파일(list_files 순서)마다 K가지 섞음
-  <장비>_test.npz   fit [K, ΣT_a, 40], fit_files [A], fit_off [A+1]
-                        test 이상 파일의 K가지 섞음(학습 뱅크) — supervised 학습에 쓰는 이상 파일용
-                    eval [4, ΣT, 40], off [F+1]  test 전체 파일의 평가 조건(평가 뱅크)
+출력 software/dataset/dcase_augmented/ (--preset easy: dcase_augmented_easy/). 장비 파일은 종류 폴더 아래(dcase_data.aug_path)
+  bank_train.json, bank_test.json          bank 녹음 목록
+  <종류>/<장비>_train.npz  mel [K, ΣT, 40] float16, off [F+1]     train 폴더 파일(list_files 순서)마다 K가지 섞음
+  <종류>/<장비>_test.npz   fit [K, ΣT_a, 40], fit_files [A], fit_off [A+1]
+                        test 이상 파일의 K가지 섞음(학습 bank) — supervised 학습에 쓰는 이상 파일용
+                    eval [4, ΣT, 40], off [F+1]  test 전체 파일의 평가 조건(평가 bank)
                         T1 = 학습과 같은 분포, T2_p6 / T2_0 / T2_m6 = 강한 1대 SNR +6 / 0 / −6 dB + 약한 3대
-  <장비>_recipes.jsonl                      섞음마다 사용한 소리·위치·SNR
+  <종류>/<장비>_recipes.jsonl               섞음마다 사용한 소리·위치·SNR
 
     python3 overlap_aug.py --selftest
     python3 overlap_aug.py [--workers 11]
-    python3 overlap_aug.py --samples slider_id00:normal_id_00_00000001.wav …   # 들어 볼 wav → dataset_augmented/samples/
+    python3 overlap_aug.py --samples slider_id00:normal_id_00_00000001.wav …   # 들어 볼 wav → dcase_augmented/samples/
 """
 import argparse
 import json
@@ -43,7 +43,7 @@ import numpy as np  # noqa: E402
 
 import dcase_data as dd  # noqa: E402
 
-OUT = os.path.join(dd.SOFTWARE_DIR, "data", "dataset_augmented")
+OUT = os.path.join(dd.SOFTWARE_DIR, "dataset", "dcase_augmented")
 SEED = 2026
 K_TRAIN = 4                      # 학습용 녹음마다 만드는 섞음 수
 BANK_PER_UNIT = 50
@@ -54,15 +54,15 @@ SNR_STRONG = (0.0, 3.0, -9.0, 9.0)
 SNR_WEAK = (15.0, 3.0, 6.0, 24.0)
 # 난이도 설정. easy(2026-10-11, 결과 보기 전 결정): 강한 겹침을 MIMII의 가장 쉬운 조건(+6 dB)에 맞추고 약한 겹침도 3 dB 낮춤.
 # 개수·종류·위치와 난수 순서는 같아서, 같은 소리가 같은 자리에 더 작게 섞인다(SNR = hard + 6 / + 3 dB, 범위만 다름).
-PRESETS = {"hard": dict(SNR_STRONG=(0.0, 3.0, -9.0, 9.0), SNR_WEAK=(15.0, 3.0, 6.0, 24.0), sub=""),
-           "easy": dict(SNR_STRONG=(6.0, 3.0, 0.0, 12.0), SNR_WEAK=(18.0, 3.0, 9.0, 27.0), sub="easy")}
+PRESETS = {"hard": dict(SNR_STRONG=(0.0, 3.0, -9.0, 9.0), SNR_WEAK=(15.0, 3.0, 6.0, 24.0), out="dcase_augmented"),
+           "easy": dict(SNR_STRONG=(6.0, 3.0, 0.0, 12.0), SNR_WEAK=(18.0, 3.0, 9.0, 27.0), out="dcase_augmented_easy")}
 
 
 def apply_preset(name):
     global SNR_STRONG, SNR_WEAK, OUT
     p = PRESETS[name]
     SNR_STRONG, SNR_WEAK = p["SNR_STRONG"], p["SNR_WEAK"]
-    OUT = os.path.join(dd.SOFTWARE_DIR, "data", "dataset_augmented", p["sub"])
+    OUT = os.path.join(dd.SOFTWARE_DIR, "dataset", p["out"])
 EVAL_CONDS = ["T1", "T2_p6", "T2_0", "T2_m6"]
 T2_SNR = {"T2_p6": 6.0, "T2_0": 0.0, "T2_m6": -6.0}
 UNITS_BY_TYPE = {t: [dd.unit_name(t, i) for i in ids] for t, ids in dd.MACHINE_IDS.items()}
@@ -78,7 +78,7 @@ def _count(rng, mu, sd, lo, hi):
 
 
 def sample_recipe(rng, target, cond="T1"):
-    """대상 장비에 섞을 소리 목록 [(장비, 뱅크 번호, 시작 비율, SNR dB, 강함 여부)]"""
+    """대상 장비에 섞을 소리 목록 [(장비, bank 번호, 시작 비율, SNR dB, 강함 여부)]"""
     if cond == "T1":
         n = _count(rng, *N_TOTAL)
         k = min(n, _count(rng, *N_STRONG))
@@ -109,7 +109,7 @@ def mix(s, recipe, bank):
 
 
 def load_bank(split):
-    """장비마다 정상 녹음 BANK_PER_UNIT개(고정 시드)를 메모리에 올린다"""
+    """장비마다 정상 녹음 BANK_PER_UNIT개(고정 seed)를 메모리에 올린다"""
     names, waves = {}, {}
     for ui, (m, i) in enumerate(dd.UNITS):
         paths, labels = dd.list_files(m, i, split)
@@ -138,7 +138,7 @@ def build_unit(ui):
                      "mix": [[u, names["train" if kind.startswith("fit") or split == "train" else "test"][u][bi],
                               st, snr, int(strong)] for u, bi, st, snr, strong in r]})
 
-    # train 폴더: 파일마다 K가지 (학습 뱅크)
+    # train 폴더: 파일마다 K가지 (학습 bank)
     paths, _ = dd.list_files(m, i, "train")
     mels = [[] for _ in range(K_TRAIN)]
     for f, p in enumerate(paths):
@@ -148,9 +148,10 @@ def build_unit(ui):
             mels[k].append(dd.mel_from_wave(mix(s, r, BANK["train"])))
             rec("train", os.path.basename(p), f"k{k}", r)
     packed = [_pack(x) for x in mels]
-    np.savez(os.path.join(OUT, f"{unit}_train.npz"), mel=np.stack([a for a, _ in packed]), off=packed[0][1])
+    os.makedirs(os.path.dirname(dd.aug_path(OUT, unit, "train.npz")), exist_ok=True)
+    np.savez(dd.aug_path(OUT, unit, "train.npz"), mel=np.stack([a for a, _ in packed]), off=packed[0][1])
 
-    # test 폴더: 이상 파일은 학습용 K가지(학습 뱅크), 전체 파일은 평가 조건 4가지(평가 뱅크)
+    # test 폴더: 이상 파일은 학습용 K가지(학습 bank), 전체 파일은 평가 조건 4가지(평가 bank)
     paths, labels = dd.list_files(m, i, "test")
     fit = [[] for _ in range(K_TRAIN)]
     ev = [[] for _ in EVAL_CONDS]
@@ -169,10 +170,10 @@ def build_unit(ui):
             rec("test", os.path.basename(p), cond, r)
     fp = [_pack(x) for x in fit]
     ep = [_pack(x) for x in ev]
-    np.savez(os.path.join(OUT, f"{unit}_test.npz"),
+    np.savez(dd.aug_path(OUT, unit, "test.npz"),
              fit=np.stack([a for a, _ in fp]), fit_off=fp[0][1], fit_files=np.asarray(fit_files, np.int32),
              eval=np.stack([a for a, _ in ep]), off=ep[0][1], conds=np.asarray(EVAL_CONDS))
-    with open(os.path.join(OUT, f"{unit}_recipes.jsonl"), "w") as fo:
+    with open(dd.aug_path(OUT, unit, "recipes.jsonl"), "w") as fo:
         for r in recs:
             fo.write(json.dumps(r, ensure_ascii=False) + "\n")
     return unit, len(paths), len(fit_files)
@@ -226,7 +227,7 @@ def export_samples(specs):
         unit, fname = spec.split(":")
         machine, mid = unit.rsplit("_id", 1)
         split = "test"                        # 평가 조건(T1·T2) 기록은 test 파일에만 있다
-        recs = {r["kind"]: r["mix"] for r in map(json.loads, open(os.path.join(OUT, f"{unit}_recipes.jsonl")))
+        recs = {r["kind"]: r["mix"] for r in map(json.loads, open(dd.aug_path(OUT, unit, "recipes.jsonl")))
                 if r["file"] == fname and r["split"] == split}
         s = dd.read_wave(os.path.join(dd.DATA_DIR, machine, split, fname))
         waves = {"orig": s}
@@ -264,8 +265,8 @@ def main():
     ap.add_argument("--workers", type=int, default=11)
     ap.add_argument("--selftest", action="store_true")
     ap.add_argument("--samples", nargs="+", help="장비:test파일명. 섞음 기록대로 wav를 다시 만든다")
-    ap.add_argument("--preset", choices=list(PRESETS), default="hard", help="easy → dataset_augmented/easy/")
-    ap.add_argument("--units", nargs="+", help="이 장비만 만든다(예: valve_id00). 겹침 뱅크는 40대 전체")
+    ap.add_argument("--preset", choices=list(PRESETS), default="hard", help="easy → dataset/dcase_augmented_easy/")
+    ap.add_argument("--units", nargs="+", help="이 장비만 만든다(예: valve_id00). 겹침 bank는 40대 전체")
     a = ap.parse_args()
     apply_preset(a.preset)
     if a.selftest:
@@ -278,7 +279,7 @@ def main():
         BANK_NAMES[split], BANK[split] = load_bank(split)
         with open(os.path.join(OUT, f"bank_{split}.json"), "w") as f:
             json.dump(BANK_NAMES[split], f, ensure_ascii=False, indent=1)
-    print(f"뱅크 적재 {time.time() - t0:.0f} s", flush=True)
+    print(f"bank 적재 {time.time() - t0:.0f} s", flush=True)
     order = sorted(range(len(dd.UNITS)), key=lambda u: -len(dd.list_files(*dd.UNITS[u], "test")[0]))
     if a.units:
         order = [u for u in order if dd.unit_name(*dd.UNITS[u]) in a.units]

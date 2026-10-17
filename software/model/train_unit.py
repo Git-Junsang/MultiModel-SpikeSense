@@ -1,6 +1,6 @@
 """장비 1대(모델 1개) 학습 — 정상/이상 2진 분류.
 
-선행 train.py의 학습 흐름(FocalLoss, 출력 막전위 시간평균, Adam, grad clip,
+선행 train.py의 학습 흐름(FocalLoss, 출력 membrane potential 시간평균, Adam, grad clip,
 SpecAugment 마스킹)을 따른다. 이상 샘플의 출처를 세 가지 중에서 고른다:
 
   other_id : 같은 기종의 다른 ID 정상 소리를 이상으로 쓴다.
@@ -11,10 +11,10 @@ SpecAugment 마스킹)을 따른다. 이상 샘플의 출처를 세 가지 중�
              전체로 평가한다. 정상만으로 학습하는 DCASE 원래 조건과 다르므로 공식
              순위표와 직접 비교하지 않는다. 선행 SpikeSense-Edge와 같은 지도학습 조건이며,
              other_id·mix로는 실제 이상을 탐지하지 못한 결과가 이 선택의 근거다
-             (analysis_result/REPORT.md).
+             (train_result/L_normal_noaug/REPORT.md).
 
-모든 방법에서 학습 배치 전체(정상·이상)에 선행과 같은 시간·주파수 마스킹을 적용한다.
-출력층은 2뉴런이며 0 = 정상, 1 = 이상이다.
+모든 방법에서 학습 batch 전체(정상·이상)에 선행과 같은 시간·주파수 마스킹을 적용한다.
+출력 layer는 2뉴런이며 0 = 정상, 1 = 이상이다.
 
 검증(val): 대상 ID train 정상 중 10% 파일 + 같은 방법으로 만든 학습용 이상. 체크포인트 선택 기준.
 평가(test): 대상 ID의 DCASE test(실제 정상·이상). 파일 단위 AUC·pAUC(FPR ≤ 0.1).
@@ -22,6 +22,7 @@ test 지표는 기록만 하고 모델 선택에 쓰지 않는다.
 """
 
 import os
+import sys
 import csv
 import json
 import time
@@ -31,8 +32,9 @@ import torch
 import torch.nn as nn
 from sklearn.metrics import roc_auc_score, f1_score
 
-import dcase_data as dd
-from snn_model import AnomalySNN, LAYER_SIZES, default_betas
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "dataset"))  # dcase_data는 software/dataset
+import dcase_data as dd  # noqa: E402
+from snn_torch import AnomalySNN, LAYER_SIZES, default_betas
 
 N_CLASS = 2          # 출력 0 = 정상, 1 = 이상
 
@@ -48,10 +50,10 @@ class FocalLoss(nn.Module):
         return (-(1 - pt) ** self.gamma * log_pt).mean()
 
 
-# ── 마스킹·학습용 이상 생성 (GPU 배치 연산) ──
+# ── 마스킹·학습용 이상 생성 (GPU batch 연산) ──
 
 def spec_mask(x, gen, p=0.5, frac=0.15):
-    """선행 MelDataset과 같은 마스킹: 확률 p로 주파수 6 mel, 시간 4 프레임 폭을 0으로."""
+    """선행 MelDataset과 같은 마스킹: 확률 p로 주파수 6 mel, 시간 4 frame 폭을 0으로."""
     B, T, F = x.shape
     x = x.clone()
     fw, tw = int(F * frac), int(T * frac)
@@ -121,7 +123,7 @@ def _aug_segments(mel, off, files, hop):
 
 def prepare(machine, mid, method, val_frac, seed, device, hop=None, aug=None):
     """hop을 주면 학습용 풀만 구간을 겹쳐 자른다. val·test는 항상 기본 분할이다.
-    aug(dataset_augmented 경로)를 주면 학습 풀과 같은 순서의 겹침 증강 세그먼트 train_pool_aug [K, S, 31, 40]를
+    aug(dcase_augmented 경로)를 주면 학습 풀과 같은 순서의 겹침 증강 세그먼트 train_pool_aug [K, S, 31, 40]를
     함께 만든다(supervised만). val·test는 깨끗한 원본 그대로다."""
     rng = np.random.RandomState(seed)
     tgt = dd.load_unit(machine, mid, "train")
@@ -138,7 +140,7 @@ def prepare(machine, mid, method, val_frac, seed, device, hop=None, aug=None):
     aug_pool = None
     if aug:
         assert method == "supervised", "겹침 증강은 supervised 학습만 지원"
-        a = np.load(os.path.join(aug, f"{dd.unit_name(machine, mid)}_train.npz"))
+        a = np.load(dd.aug_path(aug, dd.unit_name(machine, mid), "train.npz"))
         vset = set(val_files.tolist())
         aug_pool = [_aug_segments(a["mel"], a["off"], [f for f in np.unique(tgt["file_idx"]) if f not in vset], h)]
         assert aug_pool[0].shape[1] == len(tr_n)
@@ -154,7 +156,7 @@ def prepare(machine, mid, method, val_frac, seed, device, hop=None, aug=None):
         fit_mask = np.isin(src["file_idx"], fit_files[n_val:])
         tr_o, tr_of = [src["seg"][fit_mask]], [src["file_idx"][fit_mask]]
         if aug:
-            b = np.load(os.path.join(aug, f"{dd.unit_name(machine, mid)}_test.npz"))
+            b = np.load(dd.aug_path(aug, dd.unit_name(machine, mid), "test.npz"))
             pos = {int(f): j for j, f in enumerate(b["fit_files"])}         # 이상 파일만 담겨 있음
             fo = np.concatenate([[0], np.cumsum(np.diff(b["fit_off"]))])
             fsel = sorted(int(f) for f in fit_files[n_val:])
@@ -206,7 +208,7 @@ def group_by_file(file_idx):
 
 
 def clip_batches(groups, data, method, batch_size, gen):
-    """파일 단위 배치. 정상 파일 전체 + 같은 수의 이상 파일을 섞어 내보낸다."""
+    """파일 단위 batch. 정상 파일 전체 + 같은 수의 이상 파일을 섞어 내보낸다."""
     g_norm, g_anom = groups
     dev = data["train_normal"].device
     n = len(g_norm)
@@ -287,17 +289,17 @@ def main(argv=None):
     ap.add_argument("--clip_loss", action="store_true",
                     help="파일 단위 손실: 한 파일의 세그먼트 출력을 평균해 손실을 계산한다(추론과 같은 합치기)")
     ap.add_argument("--hop", type=int, default=None,
-                    help="학습 구간을 겹쳐 자를 때의 프레임 간격(예: 16). val·test는 겹치지 않는다")
+                    help="학습 구간을 겹쳐 자를 때의 frame 간격(예: 16). val·test는 겹치지 않는다")
     ap.add_argument("--val_frac", type=float, default=0.1)
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--out_dir", default=None, help="학습 기록(history.csv, args.json) 위치")
     ap.add_argument("--weight_dir", default=None, help="체크포인트(best_val.pth, last.pth) 위치")
     ap.add_argument("--layers", default=",".join(map(str, LAYER_SIZES)),
-                    help="층 크기(쉼표 구분). 기본 40,384,256,64,2. P3.6 모델 크기 검증용")
-    ap.add_argument("--aug", default=None, help="겹침 증강 데이터 경로(software/data/dataset_augmented). clip_loss 필요")
+                    help="layer 크기(쉼표 구분). 기본 40,384,256,64,2. P3.6 모델 크기 검증용")
+    ap.add_argument("--aug", default=None, help="겹침 증강 dataset 경로(software/dataset/dcase_augmented 또는 dcase_augmented_easy). clip_loss 필요")
     ap.add_argument("--aug_p", type=float, default=0.5, help="파일마다 섞은 버전으로 바꿀 확률")
     ap.add_argument("--bands", default=None,
-                    help="mel 대역 lo:hi만 입력으로 쓴다(주파수 대역 고르기, 예: 13:40 = 중심 1 kHz 이상). 입력 층 크기 = hi − lo")
+                    help="mel 대역 lo:hi만 입력으로 쓴다(주파수 대역 고르기, 예: 13:40 = 중심 1 kHz 이상). 입력 layer 크기 = hi − lo")
     args = ap.parse_args(argv)
     if args.aug and not args.clip_loss:
         ap.error("--aug는 --clip_loss와 함께 쓴다")
@@ -308,8 +310,8 @@ def main(argv=None):
 
     name = dd.unit_name(args.machine, args.mid)
     tag = f"{args.method}_bs{args.batch_size}_{args.sched}_e{args.epochs}"
-    out_dir = args.out_dir or os.path.join(dd.SOFTWARE_DIR, "analysis_result", "train_runs", name, tag)
-    w_dir = args.weight_dir or os.path.join(dd.SOFTWARE_DIR, "model_weights", name)
+    out_dir = args.out_dir or os.path.join(dd.SOFTWARE_DIR, "train_result", "train_runs", name, tag)
+    w_dir = args.weight_dir or os.path.join(dd.SOFTWARE_DIR, "weights", "train_runs", name, tag)
     os.makedirs(out_dir, exist_ok=True)
     os.makedirs(w_dir, exist_ok=True)
     with open(os.path.join(out_dir, "args.json"), "w") as f:

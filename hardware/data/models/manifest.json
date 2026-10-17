@@ -23,7 +23,7 @@
       "format_version": 1,
       "model_id": 0,
       "unit": "fan_id01",
-      "checkpoint": "software/model_weights/fan_id01/last.pth",
+      "checkpoint": "software/weights/L_normal_noaug/fan_id01/last.pth",
       "layer_sizes": [
         40,
         384,
@@ -54,7 +54,7 @@
       "format_version": 1,
       "model_id": 1,
       "unit": "fan_id02",
-      "checkpoint": "software/model_weights/fan_id02/last.pth",
+      "checkpoint": "software/weights/L_normal_noaug/fan_id02/last.pth",
       "layer_sizes": [
         40,
         384,
@@ -85,7 +85,7 @@
       "format_version": 1,
       "model_id": 2,
       "unit": "fan_id03",
-      "checkpoint": "software/model_weights/fan_id03/last.pth",
+      "checkpoint": "software/weights/L_normal_noaug/fan_id03/last.pth",
       "layer_sizes": [
         40,
         384,
@@ -116,7 +116,7 @@
       "format_version": 1,
       "model_id": 3,
       "unit": "fan_id04",
-      "checkpoint": "software/model_weights/fan_id04/last.pth",
+      "checkpoint": "software/weights/L_normal_noaug/fan_id04/last.pth",
       "layer_sizes": [
         40,
         384,
@@ -147,7 +147,7 @@
       "format_version": 1,
       "model_id": 4,
       "unit": "fan_id05",
-      "checkpoint": "software/model_weights/fan_id05/last.pth",
+      "checkpoint": "software/weights/L_normal_noaug/fan_id05/last.pth",
       "layer_sizes": [
         40,
         384,
@@ -178,7 +178,7 @@
       "format_version": 1,
       "model_id": 5,
       "unit": "fan_id06",
-      "checkpoint": "software/model_weights/fan_id06/last.pth",
+      "checkpoint": "software/weights/L_normal_noaug/fan_id06/last.pth",
       "layer_sizes": [
         40,
         384,
@@ -209,7 +209,7 @@
       "format_version": 1,
       "model_id": 6,
       "unit": "pump_id00",
-      "checkpoint": "software/model_weights/pump_id00/last.pth",
+      "checkpoint": "software/weights/L_normal_noaug/pump_id00/last.pth",
       "layer_sizes": [
         40,
         384,
@@ -240,7 +240,7 @@
       "format_version": 1,
       "model_id": 7,
       "unit": "pump_id01",
-      "checkpoint": "software/model_weights/pump_id01/last.pth",
+      "checkpoint": "software/weights/L_normal_noaug/pump_id01/last.pth",
       "layer_sizes": [
         40,
         384,
@@ -271,7 +271,7 @@
       "format_version": 1,
       "model_id": 8,
       "unit": "pump_id02",
-      "checkpoint": "software/model_weights/pump_id02/last.pth",
+      "checkpoint": "software/weights/L_normal_noaug/pump_id02/last.pth",
       "layer_sizes": [
         40,
         384,
@@ -302,7 +302,7 @@
       "format_version": 1,
       "model_id": 9,
       "unit": "pump_id03",
-      "checkpoint": "software/model_weights/pump_id03/last.pth",
+      "checkpoint": "software/weights/L_normal_noaug/pump_id03/last.pth",
       "layer_sizes": [
         40,
         384,
@@ -333,7 +333,7 @@
       "format_version": 1,
       "model_id": 10,
       "unit": "pump_id04",
-      "checkpoint": "software/model_weights/pump_id04/last.pth",
+      "checkpoint": "software/weights/L_normal_noaug/pump_id04/last.pth",
       "layer_sizes": [
         40,
         384,
@@ -364,7 +364,7 @@
       "format_version": 1,
       "model_id": 11,
       "unit": "pump_id05",
-      "checkpoint": "software/model_weights/pump_id05/last.pth",
+      "checkpoint": "software/weights/L_normal_noaug/pump_id05/last.pth",
       "layer_sizes": [
         40,
         384,
@@ -395,7 +395,7 @@
       "format_version": 1,
       "model_id": 12,
       "unit": "pump_id06",
-      "checkpoint": "software/model_weights/pump_id06/last.pth",
+      "checkpoint": "software/weights/L_normal_noaug/pump_id06/last.pth",
       "layer_sizes": [
         40,
         384,
@@ -426,7 +426,7 @@
       "format_version": 1,
       "model_id": 13,
       "unit": "slider_id00",
-      "checkpoint": "software/model_weights/slider_id00/last.pth",
+      "checkpoint": "software/weights/L_normal_noaug/slider_id00/last.pth",
       "layer_sizes": [
         40,
         384,
@@ -457,7 +457,7 @@
       "format_version": 1,
       "model_id": 14,
       "unit": "slider_id01",
-      "checkpoint": "software/model_weights/slider_id01/last.pth",
+      "checkpoint": "software/weights/L_normal_noaug/slider_id01/last.pth",
       "layer_sizes": [
         40,
         384,
@@ -488,7 +488,7 @@
       "format_version": 1,
       "model_id": 15,
       "unit": "slider_id02",
-      "checkpoint": "software/model_weights/slider_id02/last.pth",
+      "checkpoint": "software/weights/L_normal_noaug/slider_id02/last.pth",
       "layer_sizes": [
         40,
         384,
@@ -519,7 +519,7 @@
       "format_version": 1,
       "model_id": 16,
       "unit": "slider_id03",
-      "checkpoint": "software/model_weights/slider_id03/last.pth",
+      "checkpoint": "software/weights/L_normal_noaug/slider_id03/last.pth",
       "layer_sizes": [
         40,
         384,
@@ -550,7 +550,7 @@
       "format_version": 1,
       "model_id": 17,
       "unit": "slider_id04",
-      "checkpoint": "software/model_weights/slider_id04/last.pth",
+      "checkpoint": "software/weights/L_normal_noaug/slider_id04/last.pth",
       "layer_sizes": [
         40,
         384,
@@ -581,7 +581,7 @@
       "format_version": 1,
       "model_id": 18,
       "unit": "slider_id05",
-      "checkpoint": "software/model_weights/slider_id05/last.pth",
+      "checkpoint": "software/weights/L_normal_noaug/slider_id05/last.pth",
       "layer_sizes": [
         40,
         384,
@@ -612,7 +612,7 @@
       "format_version": 1,
       "model_id": 19,
       "unit": "slider_id06",
-      "checkpoint": "software/model_weights/slider_id06/last.pth",
+      "checkpoint": "software/weights/L_normal_noaug/slider_id06/last.pth",
       "layer_sizes": [
         40,
         384,
@@ -643,7 +643,7 @@
       "format_version": 1,
       "model_id": 20,
       "unit": "valve_id00",
-      "checkpoint": "software/model_weights/valve_id00/last.pth",
+      "checkpoint": "software/weights/L_normal_noaug/valve_id00/last.pth",
       "layer_sizes": [
         40,
         384,
@@ -674,7 +674,7 @@
       "format_version": 1,
       "model_id": 21,
       "unit": "valve_id01",
-      "checkpoint": "software/model_weights/valve_id01/last.pth",
+      "checkpoint": "software/weights/L_normal_noaug/valve_id01/last.pth",
       "layer_sizes": [
         40,
         384,
@@ -705,7 +705,7 @@
       "format_version": 1,
       "model_id": 22,
       "unit": "valve_id02",
-      "checkpoint": "software/model_weights/valve_id02/last.pth",
+      "checkpoint": "software/weights/L_normal_noaug/valve_id02/last.pth",
       "layer_sizes": [
         40,
         384,
@@ -736,7 +736,7 @@
       "format_version": 1,
       "model_id": 23,
       "unit": "valve_id03",
-      "checkpoint": "software/model_weights/valve_id03/last.pth",
+      "checkpoint": "software/weights/L_normal_noaug/valve_id03/last.pth",
       "layer_sizes": [
         40,
         384,
@@ -767,7 +767,7 @@
       "format_version": 1,
       "model_id": 24,
       "unit": "valve_id04",
-      "checkpoint": "software/model_weights/valve_id04/last.pth",
+      "checkpoint": "software/weights/L_normal_noaug/valve_id04/last.pth",
       "layer_sizes": [
         40,
         384,
@@ -798,7 +798,7 @@
       "format_version": 1,
       "model_id": 25,
       "unit": "valve_id05",
-      "checkpoint": "software/model_weights/valve_id05/last.pth",
+      "checkpoint": "software/weights/L_normal_noaug/valve_id05/last.pth",
       "layer_sizes": [
         40,
         384,
@@ -829,7 +829,7 @@
       "format_version": 1,
       "model_id": 26,
       "unit": "valve_id06",
-      "checkpoint": "software/model_weights/valve_id06/last.pth",
+      "checkpoint": "software/weights/L_normal_noaug/valve_id06/last.pth",
       "layer_sizes": [
         40,
         384,
@@ -860,7 +860,7 @@
       "format_version": 1,
       "model_id": 27,
       "unit": "ToyCar_id01",
-      "checkpoint": "software/model_weights/ToyCar_id01/last.pth",
+      "checkpoint": "software/weights/L_normal_noaug/ToyCar_id01/last.pth",
       "layer_sizes": [
         40,
         384,
@@ -891,7 +891,7 @@
       "format_version": 1,
       "model_id": 28,
       "unit": "ToyCar_id02",
-      "checkpoint": "software/model_weights/ToyCar_id02/last.pth",
+      "checkpoint": "software/weights/L_normal_noaug/ToyCar_id02/last.pth",
       "layer_sizes": [
         40,
         384,
@@ -922,7 +922,7 @@
       "format_version": 1,
       "model_id": 29,
       "unit": "ToyCar_id03",
-      "checkpoint": "software/model_weights/ToyCar_id03/last.pth",
+      "checkpoint": "software/weights/L_normal_noaug/ToyCar_id03/last.pth",
       "layer_sizes": [
         40,
         384,
@@ -953,7 +953,7 @@
       "format_version": 1,
       "model_id": 30,
       "unit": "ToyCar_id04",
-      "checkpoint": "software/model_weights/ToyCar_id04/last.pth",
+      "checkpoint": "software/weights/L_normal_noaug/ToyCar_id04/last.pth",
       "layer_sizes": [
         40,
         384,
@@ -984,7 +984,7 @@
       "format_version": 1,
       "model_id": 31,
       "unit": "ToyCar_id05",
-      "checkpoint": "software/model_weights/ToyCar_id05/last.pth",
+      "checkpoint": "software/weights/L_normal_noaug/ToyCar_id05/last.pth",
       "layer_sizes": [
         40,
         384,
@@ -1015,7 +1015,7 @@
       "format_version": 1,
       "model_id": 32,
       "unit": "ToyCar_id06",
-      "checkpoint": "software/model_weights/ToyCar_id06/last.pth",
+      "checkpoint": "software/weights/L_normal_noaug/ToyCar_id06/last.pth",
       "layer_sizes": [
         40,
         384,
@@ -1046,7 +1046,7 @@
       "format_version": 1,
       "model_id": 33,
       "unit": "ToyCar_id07",
-      "checkpoint": "software/model_weights/ToyCar_id07/last.pth",
+      "checkpoint": "software/weights/L_normal_noaug/ToyCar_id07/last.pth",
       "layer_sizes": [
         40,
         384,
@@ -1077,7 +1077,7 @@
       "format_version": 1,
       "model_id": 34,
       "unit": "ToyConveyor_id01",
-      "checkpoint": "software/model_weights/ToyConveyor_id01/last.pth",
+      "checkpoint": "software/weights/L_normal_noaug/ToyConveyor_id01/last.pth",
       "layer_sizes": [
         40,
         384,
@@ -1108,7 +1108,7 @@
       "format_version": 1,
       "model_id": 35,
       "unit": "ToyConveyor_id02",
-      "checkpoint": "software/model_weights/ToyConveyor_id02/last.pth",
+      "checkpoint": "software/weights/L_normal_noaug/ToyConveyor_id02/last.pth",
       "layer_sizes": [
         40,
         384,
@@ -1139,7 +1139,7 @@
       "format_version": 1,
       "model_id": 36,
       "unit": "ToyConveyor_id03",
-      "checkpoint": "software/model_weights/ToyConveyor_id03/last.pth",
+      "checkpoint": "software/weights/L_normal_noaug/ToyConveyor_id03/last.pth",
       "layer_sizes": [
         40,
         384,
@@ -1170,7 +1170,7 @@
       "format_version": 1,
       "model_id": 37,
       "unit": "ToyConveyor_id04",
-      "checkpoint": "software/model_weights/ToyConveyor_id04/last.pth",
+      "checkpoint": "software/weights/L_normal_noaug/ToyConveyor_id04/last.pth",
       "layer_sizes": [
         40,
         384,
@@ -1201,7 +1201,7 @@
       "format_version": 1,
       "model_id": 38,
       "unit": "ToyConveyor_id05",
-      "checkpoint": "software/model_weights/ToyConveyor_id05/last.pth",
+      "checkpoint": "software/weights/L_normal_noaug/ToyConveyor_id05/last.pth",
       "layer_sizes": [
         40,
         384,
@@ -1232,7 +1232,7 @@
       "format_version": 1,
       "model_id": 39,
       "unit": "ToyConveyor_id06",
-      "checkpoint": "software/model_weights/ToyConveyor_id06/last.pth",
+      "checkpoint": "software/weights/L_normal_noaug/ToyConveyor_id06/last.pth",
       "layer_sizes": [
         40,
         384,

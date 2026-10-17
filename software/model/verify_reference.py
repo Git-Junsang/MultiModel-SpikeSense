@@ -5,14 +5,14 @@ import importlib.util
 def load(name, path):
     sp = importlib.util.spec_from_file_location(name, path)
     m = importlib.util.module_from_spec(sp); sp.loader.exec_module(m); return m
-new = load("new_snn", "snn_model.py")
+new = load("new_snn", "snn_torch.py")
 ref = load("ref_snn", "references/snn_model.py")
 
 torch.manual_seed(0)
 r = ref.AnomalySNN(n_input=40)
 n = new.AnomalySNN(layer_sizes=(40,128,32,2),
                    init_betas=((0.70,0.80,0.90,0.95),(0.75,0.85,0.90,0.95),0.85))
-# 가중치·PLIF 파라미터를 선행에서 그대로 복사
+# weight·PLIF 파라미터를 선행에서 그대로 복사
 n.fcs[0].weight.data.copy_(r.fc1.weight.data); n.fcs[1].weight.data.copy_(r.fc2.weight.data)
 n.fcs[2].weight.data.copy_(r.fc3.weight.data)
 for a, b in zip(n.lifs, [r.hidden1_lif, r.hidden2_lif, r.output_lif]):
@@ -28,7 +28,7 @@ print("초기 beta 그룹 일치 L1:", torch.allclose(n2.lifs[0].w_beta, r.hidde
 x = (torch.rand(8, 31, 40) < 0.3).float()
 with torch.no_grad():
     a = r(x); b = n(x)
-for i, name in enumerate(["출력 스파이크", "출력 막전위", "은닉 스파이크"]):
+for i, name in enumerate(["출력 spike", "출력 membrane potential", "은닉 spike"]):
     print(f"{name}: 최대 절대오차 {(a[i]-b[i]).abs().max().item():.3e}  동일 {torch.equal(a[i], b[i])}")
 
 # 역전파 경로도 같은지
@@ -40,5 +40,5 @@ g = max((r.fc1.weight.grad - n.fcs[0].weight.grad).abs().max().item(),
 print(f"기울기 최대 절대오차 {g:.3e}")
 
 m = new.AnomalySNN()
-print(f"확정 구조 가중치 {m.weight_count():,} | 뉴런 {m.neuron_count()} | "
+print(f"확정 구조 weight {m.weight_count():,} | 뉴런 {m.neuron_count()} | "
       f"PLIF 파라미터 {sum(p.numel() for l in m.lifs for p in l.parameters()):,}")

@@ -6,13 +6,13 @@
 #       -tclargs [-addr_map BANK_ROW_COLUMN|ROW_BANK_COLUMN] [-proj_dir <ASCII 경로>] [-jobs N]
 #       [-fit N_ENT,SLICE_BUF,BV_ALL40,Q_BRAM]
 #
-# -fit: BRAM 적합성 실험(P3.2·P3.4). mem_fit.v의 온칩 메모리 골격을 넣고, 측정용
+# -fit: BRAM 적합성 실험(P3.2·P3.4). mem_fit.v의 on-chip 메모리 골격을 넣고, 측정용
 #   BRAM 64 KiB·JTAG-AXI를 빼고, 지연 기록을 16개로 줄여 배치·배선까지만 한다
-#   (비트스트림 없음). 예: -fit 4,1,1,1 → 엔트리 4개, 슬라이스 버퍼, β·vth 40모델 상주, 큐 BRAM
+#   (비트스트림 없음). 예: -fit 4,1,1,1 → entry 4개, 슬라이스 버퍼, β·vth 40모델 상주, queue BRAM
 #
-# -addr_map: MIG 사용자 주소 → DDR3 (뱅크, 행, 열) 매핑. 기본값은 P1.6과 같은
-#   BANK_ROW_COLUMN. ROW_BANK_COLUMN은 4 KiB(한 행)마다 뱅크가 바뀌어 순차 접근에서
-#   다음 뱅크의 행을 미리 열 수 있다. 두 비트스트림의 측정값을 비교한다(P3.1).
+# -addr_map: MIG 사용자 주소 → DDR3 (bank, 행, 열) 매핑. 기본값은 P1.6과 같은
+#   BANK_ROW_COLUMN. ROW_BANK_COLUMN은 4 KiB(한 행)마다 bank가 바뀌어 순차 접근에서
+#   다음 bank의 행을 미리 열 수 있다. 두 비트스트림의 측정값을 비교한다(P3.1).
 # 기본 프로젝트 위치: ~/mmss_build/p3_<addr_map 소문자 약칭> (공백 없는 경로, build_p06.tcl 참고)
 # 산출물: <proj_dir>/p3_top.bit·.ltx·.mcs, <proj_dir>/reports/*.rpt
 # ============================================================

@@ -2,8 +2,8 @@
 
 작성일: 2026-09-23
 
-Code: `software/model_develop/{train,train_all}.py`
-Checkpoint: `software/model_weights/<unit>/last.pth`
+Code: `software/model/{train,train_all}.py`
+Checkpoint: `software/weights/L_normal_noaug/<unit>/last.pth`
 
 ## 1. 조건
 
@@ -81,4 +81,4 @@ INT16 범위를 넘은 모델은 없었다. Threshold도 모두 127 이하였다
 - 실제 이상 절반을 학습에 썼다. DCASE official leaderboard와 직접 비교하지 않는다.
 - 40대 구성은 test 결과를 보고 1대를 제외했다.
 - 장비별 training seed는 하나다.
-- INT8 결과는 [P2.5 보고서](<../../documents/reports/P2.5 Research Report.md>)를 따른다.
+- INT8 결과는 [P2.5 보고서](<../../../documents/reports/P2.5 Research Report.md>)를 따른다.

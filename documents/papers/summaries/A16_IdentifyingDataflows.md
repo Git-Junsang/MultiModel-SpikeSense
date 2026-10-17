@@ -35,14 +35,14 @@ Timeloop 기반 분석이다. FPGA board 실측이 아니다.
 512 × 706 × 2 B = 722,944 B = 706 KiB
 ```
 
-Track이 늘면 state BRAM이 늘고 model cache가 줄어든다. A16은 이 공간 경쟁을 분석해야 한다는 근거다.
+트랙이 늘면 state BRAM이 늘고 모델 cache가 줄어든다. A16은 이 공간 경쟁을 분석해야 한다는 근거다.
 
 차이:
 
-- A16은 단일 model의 내부 dataflow를 다룬다.
-- 우리는 model·track 단위 scheduling을 다룬다.
+- A16은 단일 모델의 내부 dataflow를 다룬다.
+- 우리는 모델·트랙 단위 scheduling을 다룬다.
 - 미래 timestep이 아직 없어 temporal batching을 그대로 쓸 수 없다.
 
-Membrane pressure와 temporal reuse 자체는 신규성이 아니다. 우리 기여 범위는 다중 track state와 model cache의 결합 효과다.
+Membrane pressure와 temporal reuse 자체는 신규성이 아니다. 우리 기여 범위는 다중 트랙 state와 모델 cache의 결합 효과다.
 
 원문 확인: 문제 §2, 규칙 §3.3, 평가 §4~5.

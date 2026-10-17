@@ -1,0 +1,46 @@
+# P3.5 24조합: 저장 3 × scheduler 4 × 연산 2(옛 run_sim.py). 32 lane, 512트랙, rev 1, membrane potential auto
+# Host batch 없음, dense 연산, 예약 0, 시나리오 U, seed 5
+# 키 설명은 template.toml
+
+mode = "run"
+model = "L"
+lanes = 32
+mem = "auto"
+rev = 1
+reserve = 0.0
+ovh = 1.1
+bw_mbps = 3015.0
+spk = 0
+bits = 0
+mem_place = "avg"
+tracks = 512
+host_ms = 0.0
+result_push = true
+offset = "none"
+jitter_ms = 0.8
+gather_ms = 0.0
+perturb = ""
+tail_us = 0.0
+pre_us = 0.0
+scenarios = ["U"]
+seeds = 5
+seed0 = 0
+warm = 16
+meas = 64
+storage = "G"
+entries = 0
+storage_attrs = {}
+compute = "all"
+sched = "grouping"
+sched_attrs = {}
+search_key = "tracks"
+search_values = []
+search_step = 16
+tune_attr = ""
+tune_values = []
+tune_conds = []
+
+[sweep]
+storage = ["A", "B_l1", "C_lru"]
+sched = ["fcfs", "edf", "grouping", "score"]
+compute = ["all", "row"]

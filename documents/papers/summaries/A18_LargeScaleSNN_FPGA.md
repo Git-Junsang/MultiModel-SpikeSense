@@ -43,10 +43,10 @@ Weight는 source neuron이 fire할 때만 읽는다. 여러 update가 같은 BRA
 차이:
 
 - A18은 단일 network simulation이다.
-- model cache 교체와 request deadline이 없다.
-- A18의 on-chip state는 누적 synaptic current다. 우리 state는 track별 membrane이다.
+- 모델 cache 교체와 request deadline이 없다.
+- A18의 on-chip state는 누적 synaptic current다. 우리 state는 트랙별 membrane potential이다.
 
-On-chip state와 off-chip weight 구성은 기존 기법이다. 우리 연구는 여러 model의 cache와 여러 track의 실행 순서를 다룬다.
+on-chip state와 off-chip weight 구성은 기존 기법이다. 우리 연구는 여러 모델의 cache와 여러 트랙의 실행 순서를 다룬다.
 
 MIG와 memory interface resource도 실제 구현에서 측정해야 한다는 근거로 쓴다.
 

@@ -1,0 +1,46 @@
+# P3.17·P3.19: membrane potential on-chip을 트랙별로(평균 대신), DDR3 membrane potential을 offset 순서로 붙여 두면 DMA 횟수가 주는지
+# 즉시 보내기와 모아 보내기(D 0.8 ms = jitter)에서 비교
+# L·64 lane, rev 4, 예약 25.5 tile, 입출력 즉시 전송, spike 2개/cycle, Grouping, G.offset-order(offset 순서), 남는 BRAM에 12 bit membrane potential
+# 키 설명은 template.toml
+
+mode = "run"
+model = "L"
+lanes = 64
+mem = "ddr"
+rev = 4
+reserve = 25.5
+ovh = 1.10
+bw_mbps = 3015.0
+spk = 2
+bits = 12
+mem_place = "avg"
+tracks = 1024
+host_ms = 0.0
+result_push = true
+offset = "model"
+jitter_ms = 0.8
+gather_ms = 0.0
+perturb = ""
+tail_us = 0.0
+pre_us = 0.0
+scenarios = ["U", "K", "S", "I", "SK", "R"]
+seeds = 20
+seed0 = 0
+warm = 16
+meas = 64
+storage = "G"
+entries = 4
+storage_attrs = {}
+compute = "all"
+sched = "grouping"
+sched_attrs = {}
+search_key = "tracks"
+search_values = []
+search_step = 16
+tune_attr = ""
+tune_values = []
+tune_conds = []
+
+[sweep]
+mem_place = ["avg", "id", "offset"]
+send = [{label = "즉시", gather_ms = 0.0}, {label = "모아 보내기 D 0.8 ms", gather_ms = 0.8}]

@@ -1,5 +1,5 @@
 /* ============================================================
- * pcie_lat.c — P3.3 PCIe Host↔FPGA 지연·지터 측정 (FPGA Host, root 권한)
+ * pcie_lat.c — P3.3 PCIe Host↔FPGA 지연·jitter 측정 (FPGA Host, root 권한)
  * ============================================================
  * 대상 설계: p3_top (XDMA Gen2 ×2, BAR0 = AXI-Lite 레지스터 64 KiB, 설정 BAR =
  * XDMA 레지스터, DMA 주소 0x0001_0000 = BRAM 64 KiB, 0x8000_0000 = DDR3 1 GiB).
@@ -12,9 +12,9 @@
  *   mmio_rd     BAR0 SCRATCH 32 bit 읽기 1회 왕복 (레지스터 블록까지: SmartConnect·CDC 포함)
  *   mmio_cfg    설정 BAR(XDMA 내부 레지스터 0x0) 읽기 1회 왕복 (사용자 로직 없음)
  *   mmio_wr     SCRATCH에 32 bit 쓰기 w회 + 읽기 1회(쓰기 완료 보장)까지의 시간
- *   ts_sync     (호스트 t0, FPGA TS, 호스트 t1) 표본 — 시계 오프셋·드리프트 추정용
- *   h2c         write(): 호스트 → FPGA DMA, 크기 s, 1회 시간
- *   c2h         read():  FPGA → 호스트 DMA
+ *   ts_sync     (Host t0, FPGA TS, Host t1) 표본 — 시계 offset·드리프트 추정용
+ *   h2c         write(): Host → FPGA DMA, 크기 s, 1회 시간
+ *   c2h         read():  FPGA → Host DMA
  *   rt          h2c 후 c2h 후 비교, 왕복 시간
  *   load        파일을 H2C로 쓰고 C2H로 읽어 비교, 처리량 (모델 이미지 적재)
  * 출력: 표본마다 한 줄. 기본은 지연(ns). ts_sync는 "t0_ns ts_cycles t1_ns".

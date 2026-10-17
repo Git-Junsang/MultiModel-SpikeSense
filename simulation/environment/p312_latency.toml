@@ -1,0 +1,58 @@
+# P3.12 평균 응답 시간 단축: 연산·입출력·cache 교체·scheduler를 하나씩 더함(옛 latency_exp.py)
+# L·64 lane, membrane potential DDR3, rev 4, 예약 25.5 tile, 1,024트랙, entry 수 = BRAM 예산 최대
+# 키 설명은 template.toml
+
+mode = "run"
+model = "L"
+lanes = 64
+mem = "ddr"
+rev = 4
+reserve = 25.5
+ovh = 1.1
+bw_mbps = 3015.0
+spk = 2
+bits = 0
+mem_place = "avg"
+tracks = 1024
+host_ms = 0.0
+result_push = true
+offset = "none"
+jitter_ms = 0.8
+gather_ms = 0.0
+perturb = ""
+tail_us = 0.0
+pre_us = 0.0
+scenarios = ["U", "K", "S", "I", "SK", "R"]
+seeds = 20
+seed0 = 0
+warm = 16
+meas = 64
+storage = "G"
+entries = 0
+storage_attrs = {}
+compute = "all"
+sched = "grouping"
+sched_attrs = {}
+search_key = "tracks"
+search_values = []
+search_step = 16
+tune_attr = ""
+tune_values = []
+tune_conds = []
+
+[sweep]
+row = [
+  {label = "0 기준: Clockwork Method, dense, Host 1 ms batch", storage = "A", sched = "clockwork", sched_attrs = {variant = "A"}, spk = 0, host_ms = 1.0, result_push = false},
+  {label = "1 + spike 0 건너뛰기", storage = "A", sched = "clockwork", sched_attrs = {variant = "A"}, spk = 1, host_ms = 1.0, result_push = false},
+  {label = "2 + spike 2개/cycle", storage = "A", sched = "clockwork", sched_attrs = {variant = "A"}, host_ms = 1.0, result_push = false},
+  {label = "3 + 결과 즉시 전송", storage = "A", sched = "clockwork", sched_attrs = {variant = "A"}, host_ms = 1.0},
+  {label = "4 + 입력 즉시 전송", storage = "A", sched = "clockwork", sched_attrs = {variant = "A"}},
+  {label = "5 + G.offset-order 교체", storage = "G", sched = "clockwork", sched_attrs = {variant = "A"}},
+  {label = "6 + WSPT (제안)", storage = "G", sched = "wspt"},
+  {label = "참고: 6 + 도착 예측 prefetch", storage = "G_prefetch", compute = "prefetch", sched = "wspt"},
+  {label = "참고: 6, 적재 0 하한", storage = "noload", sched = "wspt"},
+  {label = "참고: 6 구성 + Grouping", storage = "G", sched = "grouping"},
+  {label = "참고: 6 구성 + Dysta Method", storage = "G", sched = "dysta", sched_attrs = {eta = 0.0001}},
+  {label = "참고: 6 구성 + SlackBatch", storage = "G", sched = "slackbatch"},
+  {label = "참고: P3.11 동결 SlackBatch, dense, Host 1 ms", storage = "A", sched = "slackbatch", spk = 0, host_ms = 1.0, result_push = false},
+]

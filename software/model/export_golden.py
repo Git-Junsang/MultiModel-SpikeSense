@@ -1,27 +1,31 @@
-"""P1.7: 내보낸 모델만 읽어 INT8 RTL 대조용 골든 벡터를 만든다.
+"""P1.7: 내보낸 모델만 읽어 INT8 RTL 대조용 golden vector를 만든다.
 
-모델당 test 세트의 첫 정상·이상 세그먼트를 사용한다. 각 NPZ는 입력과 모든 층의
-전류, 포화 후/발화 전 막전위, 스파이크, soft reset 후 막전위를 담는다.
+모델당 test 세트의 첫 정상·이상 세그먼트를 사용한다. 각 NPZ는 입력과 모든 layer의
+전류, 포화 후/발화 전 membrane potential, spike, soft reset 후 membrane potential을 담는다.
 fan_id01 정상 벡터는 $readmemh용 HEX로도 생성한다.
 
 프로젝트 루트에서:
-  python3 software/model_develop/make_golden_vectors.py
+  python3 software/model/export_golden.py                # v1, L
+  python3 software/model/export_golden.py --format l64   # L, 64 lane → hardware/data/golden_l64
 """
 
 import argparse
 import json
+import sys
 from pathlib import Path
 
 import numpy as np
 
-import dcase_data as dd
-import model_format as mf
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "dataset"))  # dcase_data는 software/dataset
+import dcase_data as dd  # noqa: E402
+import model_format_v1
+import model_format_v2
 import snn_int8 as si
 
 ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_MODELS = ROOT / "hardware" / "data" / "models"
-DEFAULT_CACHE = ROOT / "software" / "data" / "mel_dcase"
-DEFAULT_OUT = ROOT / "hardware" / "data" / "golden"
+DEFAULT_CACHE = ROOT / "software" / "dataset" / "mel_dcase"
+FORMATS = {"v1": model_format_v1, "l64": model_format_v2.L64, "xl": model_format_v2.XL}
+mf = model_format_v1                   # main()이 --format으로 바꾼다
 
 
 def trace_arrays(x_q, q):
@@ -108,20 +112,25 @@ def stress_vectors(out_dir):
 
 
 def main():
+    global mf
     ap = argparse.ArgumentParser()
-    ap.add_argument("--models", type=Path, default=DEFAULT_MODELS)
+    ap.add_argument("--format", choices=FORMATS, default="v1")
+    ap.add_argument("--models", type=Path, help="모델 폴더 (기본: 형식별)")
     ap.add_argument("--cache", type=Path, default=DEFAULT_CACHE)
-    ap.add_argument("--out", type=Path, default=DEFAULT_OUT)
+    ap.add_argument("--out", type=Path, help="출력 폴더 (기본: 형식별)")
     ap.add_argument("--hex-unit", default="fan_id01")
     args = ap.parse_args()
+    mf = FORMATS[args.format]
+    args.models = args.models or ROOT / mf.MODELS_DIR
+    args.out = args.out or ROOT / mf.GOLDEN_DIR
     args.out.mkdir(parents=True, exist_ok=True)
     records = real_vectors(args.models, args.cache, args.out, args.hex_unit)
     stress = stress_vectors(args.out)
-    manifest = {"format_version": 1, "integer_reference": "software/model_develop/snn_int8.py",
+    manifest = {"format_version": 1, "integer_reference": "software/model/snn_int8.py",
                 "real_vector_count": len(records), "records": records, "stress": stress}
     (args.out / "manifest.json").write_text(
         json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    print(f"실데이터 골든 {len(records)}개 + 포화 stress {len(stress)}개 -> {args.out}")
+    print(f"실데이터 golden {len(records)}개 + 포화 stress {len(stress)}개 -> {args.out}")
 
 
 if __name__ == "__main__":

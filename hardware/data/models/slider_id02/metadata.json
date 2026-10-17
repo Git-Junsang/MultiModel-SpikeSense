@@ -2,7 +2,7 @@
   "format_version": 1,
   "model_id": 15,
   "unit": "slider_id02",
-  "checkpoint": "software/model_weights/slider_id02/last.pth",
+  "checkpoint": "software/weights/L_normal_noaug/slider_id02/last.pth",
   "layer_sizes": [
     40,
     384,

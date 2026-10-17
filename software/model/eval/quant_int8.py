@@ -1,16 +1,17 @@
 """P1.5 INT8 양자화 정확도 비교 (선행 `compare_quant.py` 확장).
 
-1) 정수 규칙 확인: `snn_int8.forward`에 선행 SpikeSense-Edge의 INT8 가중치 HEX(`40→128→32→2`)를
-   넣어 선행 골든 벡터(출력 막전위·스파이크)와 비트 단위로 비교한다. 선행 RTL과 같은 정수
-   규칙인지 확인하는 용도다. 선행 골든은 넘침이 없어 포화 추가와 무관하게 같아야 한다.
-2) 40대 비교: `model_weights/<장비>/last.pth`를 `snn_int8.quantize`로 변환해 DCASE test 평가 세트
-   (train.prepare의 supervised 분할, 학습과 같은 seed)에서 FP32(`snn_numpy`)와 비교한다.
-   지표: 파일 단위 AUC·pAUC, 균형 F1·정확도, 세그먼트 판정 일치율, 층별 스파이크 불일치율,
-   층별 누산·막전위 |최대|와 16 bit 포화 횟수, 파라미터 범위.
-   INT8 점수는 출력 막전위 평균 × 출력층 스케일에 softmax를 씌운 P(이상)이다(FP와 같은 식).
+1) 정수 규칙 확인: `snn_int8.forward`에 선행 SpikeSense-Edge의 INT8 weight HEX(`40→128→32→2`)를
+   넣어 선행 golden vector(출력 membrane potential·spike)와 비트 단위로 비교한다. 선행 RTL과 같은 정수
+   규칙인지 확인하는 용도다. 선행 golden은 넘침이 없어 포화 추가와 무관하게 같아야 한다.
+2) 40대 비교: `weights/L_normal_noaug/<장비>/last.pth`를 `snn_int8.quantize`로 변환해 DCASE test 평가 세트
+   (train_unit.prepare의 supervised 분할, 학습과 같은 seed)에서 FP32(`snn_fp32`)와 비교한다.
+   지표: 파일 단위 AUC·pAUC, 균형 F1·정확도, 세그먼트 판정 일치율, layer별 spike 불일치율,
+   layer별 누산·membrane potential |최대|와 16 bit 포화 횟수, 파라미터 범위.
+   INT8 점수는 출력 membrane potential 평균 × 출력 layer 스케일에 softmax를 씌운 P(이상)이다(FP와 같은 식).
 
-결과: analysis_develop/quant_int8/{results.csv, summary.txt, prior.txt}
-사용법: python3 analysis_develop/compare_quant.py [--units fan_id01 ...]
+결과: train_result/eval/quant_int8/{results.csv, summary.txt, prior.txt}
+사용법: python3 model/eval/quant_int8.py [--units fan_id01 ...] [--weights 폴더 --out 폴더]
+P3.10 XL_mixed_aug: --weights weights/XL_mixed_aug --out train_result/eval/quant_int8_xl_aug
 """
 
 import os
@@ -21,24 +22,26 @@ import importlib.util
 import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-SOFTWARE = os.path.dirname(HERE)
-sys.path.insert(0, os.path.join(SOFTWARE, "model_develop"))
+SOFTWARE = os.path.dirname(os.path.dirname(HERE))
+sys.path.insert(0, os.path.join(SOFTWARE, "model"))
+sys.path.insert(0, os.path.join(SOFTWARE, "dataset"))
 
 import torch
 from sklearn.metrics import roc_auc_score, f1_score
 
 import dcase_data as dd
-import train
-import snn_numpy as sn
+import train_unit
+import snn_fp32 as sn
 import snn_int8 as si
 
 PRIOR_WEIGHTS = "/mnt/nas/data/2026-CAU/서울대학교 학부인턴/Project/SpikeSense-Edge/hardware/src/weights"
-OUT = os.path.join(HERE, "quant_int8")
+OUT = os.path.join(SOFTWARE, "train_result", "eval", "quant_int8")
+WEIGHTS = os.path.join(SOFTWARE, "weights", "L_normal_noaug")
 
 
 def check_prior():
     spec = importlib.util.spec_from_file_location(
-        "prior_test_model_numpy", os.path.join(SOFTWARE, "model_develop", "references", "test_model_numpy.py"))
+        "prior_test_model_numpy", os.path.join(SOFTWARE, "model", "references", "test_model_numpy.py"))
     t = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(t)
     w = PRIOR_WEIGHTS
@@ -57,7 +60,7 @@ def check_prior():
         r = (np.array_equal(mem, g_mem), np.array_equal(st["spk"][-1][0], g_spk))
         ok &= all(r)
         lines.append(f"{tag:8s} mel{mel.shape} mem={r[0]} spk={r[1]} 포화={st['sat']} 판정={si.predict(mem[None])[0]}")
-    lines.append(f"선행 골든 비트 일치: {'PASS' if ok else 'FAIL'}")
+    lines.append(f"선행 golden 비트 일치: {'PASS' if ok else 'FAIL'}")
     return ok, lines
 
 
@@ -79,9 +82,9 @@ def metrics(logit, y, f, b):
 
 def run_unit(machine, mid):
     unit = dd.unit_name(machine, mid)
-    pth = os.path.join(SOFTWARE, "model_weights", unit, "last.pth")
+    pth = os.path.join(WEIGHTS, unit, "last.pth")
     a = torch.load(pth, map_location="cpu", weights_only=False)["args"]
-    data = train.prepare(machine, mid, a["method"], a["val_frac"], a["seed"], "cpu", a.get("hop"))
+    data = train_unit.prepare(machine, mid, a["method"], a["val_frac"], a["seed"], "cpu", a.get("hop"))
     x = data["test_seg"].numpy()
     y, f, b = data["test_label"], data["test_file"], data["bal_idx"]
 
@@ -131,17 +134,21 @@ def summarize(rows):
     out.append(f"AUC 0.9 이상 INT8 {int((col('int8_auc') >= 0.9).sum())}대 / FP32 {int((col('fp_auc') >= 0.9).sum())}대, "
                f"INT8 최저 {col('int8_auc').min():.4f}({rows[int(col('int8_auc').argmin())]['unit']})")
     for l in L:
-        out.append(f"L{l}: 스파이크 불일치 평균 {col(f'spk_mis_L{l}').mean():.4f}  누산 |최대| {int(col(f'acc_max_L{l}').max())}  "
-                   f"막전위 |최대| {int(col(f'mem_max_L{l}').max())} ({col(f'mem_max_L{l}').max() / 32767 * 100:.1f}% of INT16)  "
+        out.append(f"L{l}: spike 불일치 평균 {col(f'spk_mis_L{l}').mean():.4f}  누산 |최대| {int(col(f'acc_max_L{l}').max())}  "
+                   f"membrane potential |최대| {int(col(f'mem_max_L{l}').max())} ({col(f'mem_max_L{l}').max() / 32767 * 100:.1f}% of INT16)  "
                    f"포화 {int(col(f'sat_L{l}').sum())}회  vth_q {int(col(f'vth_min_L{l}').min())}~{int(col(f'vth_max_L{l}').max())}  "
                    f"beta_q {int(col(f'beta_min_L{l}').min())}~{int(col(f'beta_max_L{l}').max())}")
     return out
 
 
 def main():
+    global WEIGHTS, OUT
     ap = argparse.ArgumentParser()
     ap.add_argument("--units", nargs="*", default=None, help="예: fan_id01 pump_id00 (기본: 40대)")
+    ap.add_argument("--weights", default=WEIGHTS, help="checkpoint 폴더 (예: weights/XL_mixed_aug)")
+    ap.add_argument("--out", default=OUT, help="결과 폴더")
     args = ap.parse_args()
+    WEIGHTS, OUT = os.path.abspath(args.weights), os.path.abspath(args.out)
     os.makedirs(OUT, exist_ok=True)
 
     ok, lines = check_prior()
@@ -149,7 +156,7 @@ def main():
     with open(os.path.join(OUT, "prior.txt"), "w") as fp:
         fp.write("\n".join(lines) + "\n")
     if not ok:
-        sys.exit("선행 골든과 정수 규칙이 다르다. 40대 비교를 중단한다.")
+        sys.exit("선행 golden과 정수 규칙이 다르다. 40대 비교를 중단한다.")
 
     units = [(m, i) for m, i in dd.UNITS if not args.units or dd.unit_name(m, i) in args.units]
     rows = []

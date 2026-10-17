@@ -1,0 +1,53 @@
+# P3.21 비교: 비교군 scheduler와 SW·HW 협력 설계를 같은 조건에서. entry 4(제안과 같은 BRAM)와 10
+# L·64 lane, rev 4, 예약 25.5 tile, 즉시 입출력, spike 2개/cycle, 남는 BRAM에 12 bit membrane potential, jitter 0.8 ms
+# 비교군 Dysta Method·DeepRT Method(offset 배정 없음, LRU), ablation offset 배정 없음(Grouping+LRU)·HW만·SW만·SW+HW(제안). 같은 BRAM·trace
+# 키 설명은 template.toml
+
+mode = "run"
+model = "L"
+lanes = 64
+mem = "ddr"
+rev = 4
+reserve = 25.5
+ovh = 1.10
+bw_mbps = 3015.0
+spk = 2
+bits = 12
+mem_place = "avg"
+tracks = 1024
+host_ms = 0.0
+result_push = true
+offset = "model"
+jitter_ms = 0.8
+gather_ms = 0.0
+perturb = ""
+tail_us = 0.0
+pre_us = 0.0
+scenarios = ["U", "K", "S", "I", "SK", "R"]
+seeds = 10
+seed0 = 0
+warm = 16
+meas = 64
+storage = "G"
+entries = 4
+storage_attrs = {}
+compute = "all"
+sched = "grouping"
+sched_attrs = {}
+search_key = "tracks"
+search_values = []
+search_step = 16
+tune_attr = ""
+tune_values = []
+tune_conds = []
+
+[sweep]
+method = [
+  {label = "Grouping(offset 배정 없음)", offset = "none", storage = "A", sched = "grouping"},
+  {label = "Dysta Method", offset = "none", storage = "A", sched = "dysta", sched_attrs = {eta = 0.0001}},
+  {label = "DeepRT Method", offset = "none", storage = "A", sched = "deeprt", sched_attrs = {cfg = [14900.0, false]}},
+  {label = "HW만: offset-order cache", offset = "none", storage = "G", sched = "grouping"},
+  {label = "SW만: Host offset 배정", offset = "model", storage = "A", sched = "grouping"},
+  {label = "SW+HW: 제안", offset = "model", storage = "G", sched = "grouping"},
+]
+entries = [4, 10]

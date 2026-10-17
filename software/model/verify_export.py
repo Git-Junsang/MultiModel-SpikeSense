@@ -1,18 +1,27 @@
-"""P1.6/P1.7 산출물의 크기·레이아웃·비트 일치를 전수 검증한다."""
+"""P1.6/P1.7·P3.10 산출물의 크기·레이아웃·비트 일치를 전수 검증한다.
+
+  python3 software/model/verify_export.py                # v1, L
+  python3 software/model/verify_export.py --format l64   # L, 64 lane (xl: XL_mixed_aug, 256 lane)
+"""
 
 import argparse
 import hashlib
 import json
+import sys
 from pathlib import Path
 
 import numpy as np
 
-import dcase_data as dd
-import model_format as mf
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "dataset"))  # dcase_data는 software/dataset
+import dcase_data as dd  # noqa: E402
+import model_format_v1
+import model_format_v2
 import snn_int8 as si
-import snn_numpy as sn
+import snn_fp32 as sn
 
 ROOT = Path(__file__).resolve().parents[2]
+FORMATS = {"v1": model_format_v1, "l64": model_format_v2.L64, "xl": model_format_v2.XL}
+mf = model_format_v1                   # main()이 --format으로 바꾼다
 
 
 def digest(data):
@@ -38,20 +47,60 @@ def verify_models(models_dir, weights_dir):
         weights = (target / "weights.bin").read_bytes()
         params = (target / "params.bin").read_bytes()
         slot = (target / "model.slot.bin").read_bytes()
-        assert len(weights) == mf.WEIGHT_BYTES == 130_176
-        assert len(params) == mf.PARAM_BYTES == 1_412
+        assert len(weights) == mf.WEIGHT_BYTES
+        assert len(params) == mf.PARAM_BYTES
         assert len(slot) == mf.SLOT_SIZE
         assert slot == ddr[model_id * mf.SLOT_SIZE:(model_id + 1) * mf.SLOT_SIZE]
         for name, data in (("weights.bin", weights), ("params.bin", params), ("model.slot.bin", slot)):
             assert digest(data) == entry["sha256"][name]
-        hex_weights = bytes(int(line, 16) for line in (target / "weights.hex").read_text().splitlines())
-        hex_params = bytes(int(line, 16) for line in (target / "params.hex").read_text().splitlines())
-        assert hex_weights == weights and hex_params == params
+        for name, text in mf.hex_files(weights, params).items():
+            assert (target / name).read_text(encoding="ascii") == text, name
 
         direct = si.quantize(sn.load_params(weights_dir / unit / "last.pth"))
         assert same_q(direct, mf.q_from_files(target / "weights.bin", target / "params.bin"))
         assert same_q(direct, mf.q_from_slot(slot))
     return manifest
+
+
+# design_references/02_MODEL.md §6에 적은 값. model_format_v2가 계산한 값과 따로 둔다
+SPEC_V2 = {"l64": dict(lanes=64, offs=(0x005C0, 0x041C0, 0x1C1C0, 0x201C0), words=2034),
+           "xl": dict(lanes=256, offs=(0x00B40, 0x08340, 0x68340, 0x78340), words=2169)}
+
+
+def verify_v2_layout(fmt, models_dir, weights_dir, unit="fan_id01"):
+    """02_MODEL.md §6 주소식으로 byte를 직접 찾아 checkpoint 양자화 값과 비교한다(model_format_v2 변환과 독립)."""
+    spec = SPEC_V2[fmt]
+    lanes = spec["lanes"]
+    q = si.quantize(sn.load_params(weights_dir / unit / "last.pth"))
+    ws = [layer["W"] for layer in q]
+    slot = np.frombuffer((models_dir / unit / "model.slot.bin").read_bytes(), np.int8)
+    for w, off in zip(ws[:-1], spec["offs"]):
+        n, k = w.shape
+        if n >= lanes:
+            g, i, j = np.meshgrid(range(n // lanes), range(k), range(lanes), indexing="ij")
+            assert np.array_equal(slot[off + (g * k + i) * lanes + j], w[lanes * g + j, i])
+        else:
+            i, j = np.meshgrid(range(k), range(n), indexing="ij")
+            assert np.array_equal(slot[off + i * n + j], w[j, i])
+    w = ws[-1]
+    j = np.arange(w.size)
+    assert np.array_equal(slot[spec["offs"][-1] + j], w[j // w.shape[1], j % w.shape[1]])
+    beta = np.concatenate([layer["beta"] for layer in q])
+    vth = np.concatenate([layer["vth"] for layer in q])
+    n = np.arange(beta.size)
+    assert np.array_equal(slot.view(np.uint8)[2 * n], beta) and np.array_equal(slot.view(np.uint8)[2 * n + 1], vth)
+
+    lines = (models_dir / unit / "entry.hex").read_text(encoding="ascii").splitlines()
+    assert len(lines) == spec["words"] and all(len(line) == 2 * lanes for line in lines)
+    word = lambda k: np.frombuffer(bytes.fromhex(lines[k])[::-1], np.int8)     # lane 0 = 최하위 byte
+    at = 0
+    for w in ws[:-1]:                                     # layer마다 첫 word = 첫 그룹의 입력 0
+        n = min(w.shape[0], lanes)
+        assert np.array_equal(word(at)[:n], w[:n, 0]) and not word(at)[n:].any()
+        at += -(-w.shape[0] // lanes) * w.shape[1]
+    assert np.array_equal(np.concatenate([word(k) for k in range(at, spec["words"])]), ws[-1].reshape(-1))
+    params = (models_dir / unit / "params.hex").read_text(encoding="ascii").splitlines()
+    assert [int(x, 16) for x in params] == [(int(v) << 8) | int(b) for b, v in zip(beta, vth)]
 
 
 def load_arrays(path):
@@ -129,16 +178,24 @@ def verify_integer_matmul(models_dir, golden_dir):
 
 
 def main():
+    global mf
     ap = argparse.ArgumentParser()
-    ap.add_argument("--models", type=Path, default=ROOT / "hardware" / "data" / "models")
-    ap.add_argument("--golden", type=Path, default=ROOT / "hardware" / "data" / "golden")
-    ap.add_argument("--weights", type=Path, default=ROOT / "software" / "model_weights")
+    ap.add_argument("--format", choices=FORMATS, default="v1")
+    ap.add_argument("--models", type=Path, help="기본: 형식별")
+    ap.add_argument("--golden", type=Path, help="기본: 형식별")
+    ap.add_argument("--weights", type=Path, help="기본: 형식별")
     args = ap.parse_args()
+    mf = FORMATS[args.format]
+    args.models = args.models or ROOT / mf.MODELS_DIR
+    args.golden = args.golden or ROOT / mf.GOLDEN_DIR
+    args.weights = args.weights or ROOT / mf.WEIGHTS_DIR
     verify_models(args.models, args.weights)
+    if args.format in SPEC_V2:
+        verify_v2_layout(args.format, args.models, args.weights)
     golden = verify_golden(args.models, args.golden)
     verify_integer_matmul(args.models, args.golden)
     saturation = [item["saturation_counts"] for item in golden["stress"]]
-    print(f"PASS: 모델 40개, 실데이터 벡터 80개, stress 2개, 포화={saturation}")
+    print(f"PASS {args.format}: 모델 40개, 실데이터 벡터 80개, stress 2개, 포화={saturation}")
 
 
 if __name__ == "__main__":

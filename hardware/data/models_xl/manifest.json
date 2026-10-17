@@ -1,0 +1,1265 @@
+{
+  "format_version": 2,
+  "model_count": 40,
+  "ddr_base": 0,
+  "ddr_base_hex": "0x00000000",
+  "slot_size": 524288,
+  "slot_size_hex": "0x80000",
+  "lanes": 256,
+  "param_offset": 0,
+  "param_section_bytes": 2880,
+  "weight_offsets": [
+    2880,
+    33600,
+    426816,
+    492352
+  ],
+  "used_bytes": 492608,
+  "entry_words": 2169,
+  "weights_bytes_per_model": 489728,
+  "params_bytes_per_model": 2820,
+  "ddr_image_bytes": 20971520,
+  "ddr_image_sha256": "c63534dfcb6e4cac715e6a19abb56dfadcb0d572c1addac07f4e9365f7e77669",
+  "models": [
+    {
+      "format_version": 2,
+      "model_id": 0,
+      "unit": "fan_id01",
+      "checkpoint": "software/weights/XL_mixed_aug/fan_id01/last.pth",
+      "layer_sizes": [
+        40,
+        768,
+        512,
+        128,
+        2
+      ],
+      "weight_scales": [
+        0.008643501386867734,
+        0.006238801272835318,
+        0.008091585842643197,
+        0.013631671432435042
+      ],
+      "weights_bytes": 489728,
+      "params_bytes": 2820,
+      "slot_bytes": 524288,
+      "slot_offset": 0,
+      "slot_offset_hex": "0x00000000",
+      "ddr_address": 0,
+      "ddr_address_hex": "0x00000000",
+      "sha256": {
+        "weights.bin": "9f1945f7d86cd8ee5d4551651a71fda809aa8af21a8e5eb0a9d256d29c1f7ce4",
+        "params.bin": "e4ba7842a806e39392b2f1e0706c8d6695d42ceda1d204cac56d87822684aedd",
+        "model.slot.bin": "8ef5bde467d0ee23453993527bcd75359bbdcaf74b131e916b71d0046dd747e1"
+      }
+    },
+    {
+      "format_version": 2,
+      "model_id": 1,
+      "unit": "fan_id02",
+      "checkpoint": "software/weights/XL_mixed_aug/fan_id02/last.pth",
+      "layer_sizes": [
+        40,
+        768,
+        512,
+        128,
+        2
+      ],
+      "weight_scales": [
+        0.007673178601452685,
+        0.007120404187149889,
+        0.00804584232840951,
+        0.01328232344679945
+      ],
+      "weights_bytes": 489728,
+      "params_bytes": 2820,
+      "slot_bytes": 524288,
+      "slot_offset": 524288,
+      "slot_offset_hex": "0x00080000",
+      "ddr_address": 524288,
+      "ddr_address_hex": "0x00080000",
+      "sha256": {
+        "weights.bin": "cdcf3e0047f8a607270fe6c1853e4518f685348a6854b0158aaf63a7e56ce8e2",
+        "params.bin": "286717d380c84befe736c045b8568bc1c2d0693954418b0614b74615f3e417ad",
+        "model.slot.bin": "8a8e3d7e2690645afd511d122d28cd6cb5306413d54668377babe33947806df8"
+      }
+    },
+    {
+      "format_version": 2,
+      "model_id": 2,
+      "unit": "fan_id03",
+      "checkpoint": "software/weights/XL_mixed_aug/fan_id03/last.pth",
+      "layer_sizes": [
+        40,
+        768,
+        512,
+        128,
+        2
+      ],
+      "weight_scales": [
+        0.008337121310196524,
+        0.006944361634141817,
+        0.007940234161737397,
+        0.01141390462559978
+      ],
+      "weights_bytes": 489728,
+      "params_bytes": 2820,
+      "slot_bytes": 524288,
+      "slot_offset": 1048576,
+      "slot_offset_hex": "0x00100000",
+      "ddr_address": 1048576,
+      "ddr_address_hex": "0x00100000",
+      "sha256": {
+        "weights.bin": "74e079168cdc2091e252de4f886b2c4e0027d12ce51c4744f345b2f220b7280b",
+        "params.bin": "6df946fda4cf0c9d0b9c229f89df443af954f4df88b339a0dcee453846086577",
+        "model.slot.bin": "0e0cccfd4546a064d973bde4caff09d4da98e739f4751f98d7f4b7b4f6877f81"
+      }
+    },
+    {
+      "format_version": 2,
+      "model_id": 3,
+      "unit": "fan_id04",
+      "checkpoint": "software/weights/XL_mixed_aug/fan_id04/last.pth",
+      "layer_sizes": [
+        40,
+        768,
+        512,
+        128,
+        2
+      ],
+      "weight_scales": [
+        0.007527117184766634,
+        0.00577882378120122,
+        0.00802783233912911,
+        0.011300046612897257
+      ],
+      "weights_bytes": 489728,
+      "params_bytes": 2820,
+      "slot_bytes": 524288,
+      "slot_offset": 1572864,
+      "slot_offset_hex": "0x00180000",
+      "ddr_address": 1572864,
+      "ddr_address_hex": "0x00180000",
+      "sha256": {
+        "weights.bin": "509b7b7b1099dc1cce6a5f9fea4ea7535960e5f6d74f55c42a9d53be9ecb72f8",
+        "params.bin": "c6ad05ae25de3c87be4a30b91a3e1fdcce96d535ba283a247b147e856ecabfd8",
+        "model.slot.bin": "2826f050196725c2b42a513bfb78f7a96a2983a20704bd38d6081e11b876a831"
+      }
+    },
+    {
+      "format_version": 2,
+      "model_id": 4,
+      "unit": "fan_id05",
+      "checkpoint": "software/weights/XL_mixed_aug/fan_id05/last.pth",
+      "layer_sizes": [
+        40,
+        768,
+        512,
+        128,
+        2
+      ],
+      "weight_scales": [
+        0.008133478990689976,
+        0.00689415762743612,
+        0.008201648869852382,
+        0.013577993460527555
+      ],
+      "weights_bytes": 489728,
+      "params_bytes": 2820,
+      "slot_bytes": 524288,
+      "slot_offset": 2097152,
+      "slot_offset_hex": "0x00200000",
+      "ddr_address": 2097152,
+      "ddr_address_hex": "0x00200000",
+      "sha256": {
+        "weights.bin": "aa0af417fe7f21e1e185aa16858b7d75f684d90676199d505b97d51ea9ca34ae",
+        "params.bin": "c244b9d843f29a91b87273519d1178f349ed105995f5e6d6e7c11ee99f14380a",
+        "model.slot.bin": "574d1c78a7bf673ba1a1a343a3f29917021867fee4ec5264004ce232f8a9fc7f"
+      }
+    },
+    {
+      "format_version": 2,
+      "model_id": 5,
+      "unit": "fan_id06",
+      "checkpoint": "software/weights/XL_mixed_aug/fan_id06/last.pth",
+      "layer_sizes": [
+        40,
+        768,
+        512,
+        128,
+        2
+      ],
+      "weight_scales": [
+        0.008145767872727762,
+        0.005874714044135387,
+        0.00812019794944703,
+        0.01362574194359967
+      ],
+      "weights_bytes": 489728,
+      "params_bytes": 2820,
+      "slot_bytes": 524288,
+      "slot_offset": 2621440,
+      "slot_offset_hex": "0x00280000",
+      "ddr_address": 2621440,
+      "ddr_address_hex": "0x00280000",
+      "sha256": {
+        "weights.bin": "2f0220b3756749527b862f8690c151e134139eac4218f028c7853620f265651b",
+        "params.bin": "7be380f3c342a74baf77eb5f81d88a43a351040221f916f23d30f841ab4aae65",
+        "model.slot.bin": "222f145a7b5e489733a0452279d3b8f035f0892a7e04ae771a2492f7e680aa5b"
+      }
+    },
+    {
+      "format_version": 2,
+      "model_id": 6,
+      "unit": "pump_id00",
+      "checkpoint": "software/weights/XL_mixed_aug/pump_id00/last.pth",
+      "layer_sizes": [
+        40,
+        768,
+        512,
+        128,
+        2
+      ],
+      "weight_scales": [
+        0.007859530411367341,
+        0.007108635789766086,
+        0.0077256152010339455,
+        0.013368263958007331
+      ],
+      "weights_bytes": 489728,
+      "params_bytes": 2820,
+      "slot_bytes": 524288,
+      "slot_offset": 3145728,
+      "slot_offset_hex": "0x00300000",
+      "ddr_address": 3145728,
+      "ddr_address_hex": "0x00300000",
+      "sha256": {
+        "weights.bin": "d0250079a51badbf45c698c24a9881c1162b01e32589bcca3c235967aaaad351",
+        "params.bin": "a410471a3d8a643f2dbf3fee83792141655cf54d7ced806763b068610866eab5",
+        "model.slot.bin": "42c74975d1864c022aac290fafe7e46a31c7067b6c64208bae6105597d0790ea"
+      }
+    },
+    {
+      "format_version": 2,
+      "model_id": 7,
+      "unit": "pump_id01",
+      "checkpoint": "software/weights/XL_mixed_aug/pump_id01/last.pth",
+      "layer_sizes": [
+        40,
+        768,
+        512,
+        128,
+        2
+      ],
+      "weight_scales": [
+        0.008476897487490196,
+        0.006430479485218919,
+        0.007827977965197226,
+        0.012418206282488005
+      ],
+      "weights_bytes": 489728,
+      "params_bytes": 2820,
+      "slot_bytes": 524288,
+      "slot_offset": 3670016,
+      "slot_offset_hex": "0x00380000",
+      "ddr_address": 3670016,
+      "ddr_address_hex": "0x00380000",
+      "sha256": {
+        "weights.bin": "f625abb295f54f9fc330c754aa3dd5e62c3b1cd04d5a02f3a76ebcf23f178d18",
+        "params.bin": "b5c811065071d0a59ef6b472b98f55ebe6e0dc4e6928b8ed94a7ee029993c418",
+        "model.slot.bin": "58d8e90588a4e36291540a9035a14712fe77694fb951c49fad16ecf5117f5697"
+      }
+    },
+    {
+      "format_version": 2,
+      "model_id": 8,
+      "unit": "pump_id02",
+      "checkpoint": "software/weights/XL_mixed_aug/pump_id02/last.pth",
+      "layer_sizes": [
+        40,
+        768,
+        512,
+        128,
+        2
+      ],
+      "weight_scales": [
+        0.008249142977196401,
+        0.006623393437993808,
+        0.008525033635417307,
+        0.012802375583198126
+      ],
+      "weights_bytes": 489728,
+      "params_bytes": 2820,
+      "slot_bytes": 524288,
+      "slot_offset": 4194304,
+      "slot_offset_hex": "0x00400000",
+      "ddr_address": 4194304,
+      "ddr_address_hex": "0x00400000",
+      "sha256": {
+        "weights.bin": "1c23bf58b066fbbe34f42cbd223db79619f5801d8778982c7c091989231cec94",
+        "params.bin": "0697de0cb9c73fe04bd3f166b71df4ca16dbe7de5c8654fc3ca2c07e7c0a7292",
+        "model.slot.bin": "ce60cd66d41690f43e868b12f8b65f0f3372d08e80cab374b020a1663914e70c"
+      }
+    },
+    {
+      "format_version": 2,
+      "model_id": 9,
+      "unit": "pump_id03",
+      "checkpoint": "software/weights/XL_mixed_aug/pump_id03/last.pth",
+      "layer_sizes": [
+        40,
+        768,
+        512,
+        128,
+        2
+      ],
+      "weight_scales": [
+        0.008175823632187731,
+        0.006646589500697579,
+        0.008102671367915596,
+        0.013575282622510053
+      ],
+      "weights_bytes": 489728,
+      "params_bytes": 2820,
+      "slot_bytes": 524288,
+      "slot_offset": 4718592,
+      "slot_offset_hex": "0x00480000",
+      "ddr_address": 4718592,
+      "ddr_address_hex": "0x00480000",
+      "sha256": {
+        "weights.bin": "b6814155773cd811598bfc84e942bebc24e8e6b619e0cfdb3efc6bb2dd6579d0",
+        "params.bin": "5da308f344aa20a09e07caf9dbf098374a7691b692dd87b9fce48c460533ab3b",
+        "model.slot.bin": "bbcc4879b9b897585ffb6b730db3b5cafcfb94f5a51550cd66104c274cd25e95"
+      }
+    },
+    {
+      "format_version": 2,
+      "model_id": 10,
+      "unit": "pump_id04",
+      "checkpoint": "software/weights/XL_mixed_aug/pump_id04/last.pth",
+      "layer_sizes": [
+        40,
+        768,
+        512,
+        128,
+        2
+      ],
+      "weight_scales": [
+        0.00819738267913578,
+        0.0063648223876953125,
+        0.007838444446954201,
+        0.013662993438600555
+      ],
+      "weights_bytes": 489728,
+      "params_bytes": 2820,
+      "slot_bytes": 524288,
+      "slot_offset": 5242880,
+      "slot_offset_hex": "0x00500000",
+      "ddr_address": 5242880,
+      "ddr_address_hex": "0x00500000",
+      "sha256": {
+        "weights.bin": "7dae850233cf3e07b03fdb21615568879992d6592561789ef45699ac37493a59",
+        "params.bin": "59cbfb0f3f4800d74702e20975d78115783e3220ed915a712aba12f796707663",
+        "model.slot.bin": "cacc1e15809c8f1ae489cd76f357486835b9a5ed74f31ab416b3ffa983533116"
+      }
+    },
+    {
+      "format_version": 2,
+      "model_id": 11,
+      "unit": "pump_id05",
+      "checkpoint": "software/weights/XL_mixed_aug/pump_id05/last.pth",
+      "layer_sizes": [
+        40,
+        768,
+        512,
+        128,
+        2
+      ],
+      "weight_scales": [
+        0.008066586622102993,
+        0.006525247585116409,
+        0.007720955244199497,
+        0.013418095318351204
+      ],
+      "weights_bytes": 489728,
+      "params_bytes": 2820,
+      "slot_bytes": 524288,
+      "slot_offset": 5767168,
+      "slot_offset_hex": "0x00580000",
+      "ddr_address": 5767168,
+      "ddr_address_hex": "0x00580000",
+      "sha256": {
+        "weights.bin": "941361c5df2927f8af06f531fbf3a2939f1eaceb274d5d90f1e27fbc4035db6d",
+        "params.bin": "a379e1932042ea42c9a3aca76269ddb7be6490e2668245ee8bbf7e2312524750",
+        "model.slot.bin": "517f379a60fe8ceef60bf4b212833694ee54a2f4d30b472e705a169c104c5900"
+      }
+    },
+    {
+      "format_version": 2,
+      "model_id": 12,
+      "unit": "pump_id06",
+      "checkpoint": "software/weights/XL_mixed_aug/pump_id06/last.pth",
+      "layer_sizes": [
+        40,
+        768,
+        512,
+        128,
+        2
+      ],
+      "weight_scales": [
+        0.007722687533521276,
+        0.006372443334324154,
+        0.007885763025659276,
+        0.013469353435546394
+      ],
+      "weights_bytes": 489728,
+      "params_bytes": 2820,
+      "slot_bytes": 524288,
+      "slot_offset": 6291456,
+      "slot_offset_hex": "0x00600000",
+      "ddr_address": 6291456,
+      "ddr_address_hex": "0x00600000",
+      "sha256": {
+        "weights.bin": "ed696ce37d4c84cb1ae8f2fbf3697cd640eccd258df2585a7c5a092d195c5c25",
+        "params.bin": "8c65ceb0438c1bfe6cf5ef0393d7b92933cc6140a48f598a2d3c67a862255c48",
+        "model.slot.bin": "803e15ae8608dd00e7517d7fe29229cf627a08714c8ac7c987de8443dd9ec4af"
+      }
+    },
+    {
+      "format_version": 2,
+      "model_id": 13,
+      "unit": "slider_id00",
+      "checkpoint": "software/weights/XL_mixed_aug/slider_id00/last.pth",
+      "layer_sizes": [
+        40,
+        768,
+        512,
+        128,
+        2
+      ],
+      "weight_scales": [
+        0.007936503943495862,
+        0.006592123996554397,
+        0.007979734676090752,
+        0.011045742222643274
+      ],
+      "weights_bytes": 489728,
+      "params_bytes": 2820,
+      "slot_bytes": 524288,
+      "slot_offset": 6815744,
+      "slot_offset_hex": "0x00680000",
+      "ddr_address": 6815744,
+      "ddr_address_hex": "0x00680000",
+      "sha256": {
+        "weights.bin": "b22593048a30ca70f2b82a8869ccc20c94f56b619bb7e3eadd2afa5c65ae7485",
+        "params.bin": "018e93549a8b4b46e067084cf4c33363ec3bba1f0298023bc2069390d139d2c1",
+        "model.slot.bin": "9699d67698b7699a3a53820b18d335b9006c455924ef59e2eb6b0deabca82653"
+      }
+    },
+    {
+      "format_version": 2,
+      "model_id": 14,
+      "unit": "slider_id01",
+      "checkpoint": "software/weights/XL_mixed_aug/slider_id01/last.pth",
+      "layer_sizes": [
+        40,
+        768,
+        512,
+        128,
+        2
+      ],
+      "weight_scales": [
+        0.008664700928635485,
+        0.00611497567394587,
+        0.008436602870310386,
+        0.013450963290657585
+      ],
+      "weights_bytes": 489728,
+      "params_bytes": 2820,
+      "slot_bytes": 524288,
+      "slot_offset": 7340032,
+      "slot_offset_hex": "0x00700000",
+      "ddr_address": 7340032,
+      "ddr_address_hex": "0x00700000",
+      "sha256": {
+        "weights.bin": "6e8ff581e82dae80d6e096a0d37154ddbe3a2e931b96243d526165a139e35c74",
+        "params.bin": "3c6af28dc15e959950063621cfeb5d1979c270cbccb94842f5eefa4b90c7dec0",
+        "model.slot.bin": "6961566463d746ac52438dfeff97c2bfe236b1dc8e9c3659eaddfa93300dc2f2"
+      }
+    },
+    {
+      "format_version": 2,
+      "model_id": 15,
+      "unit": "slider_id02",
+      "checkpoint": "software/weights/XL_mixed_aug/slider_id02/last.pth",
+      "layer_sizes": [
+        40,
+        768,
+        512,
+        128,
+        2
+      ],
+      "weight_scales": [
+        0.007978722805113305,
+        0.005814181538078729,
+        0.008210227245420922,
+        0.01361480660325899
+      ],
+      "weights_bytes": 489728,
+      "params_bytes": 2820,
+      "slot_bytes": 524288,
+      "slot_offset": 7864320,
+      "slot_offset_hex": "0x00780000",
+      "ddr_address": 7864320,
+      "ddr_address_hex": "0x00780000",
+      "sha256": {
+        "weights.bin": "7b22e6955ff8b09c7cf31e547af8ba5aedb17a6eb4ccbfc8c9d4ae2677fd5075",
+        "params.bin": "6a9a77f609b0b362c9b57d67a048e391773cd8c2e1c9f0e7d772edf6dffee6cb",
+        "model.slot.bin": "6fff2db865fd263dccfc89bcb230afa7bc514df9a35d21c1fdbe930c85f8d567"
+      }
+    },
+    {
+      "format_version": 2,
+      "model_id": 16,
+      "unit": "slider_id03",
+      "checkpoint": "software/weights/XL_mixed_aug/slider_id03/last.pth",
+      "layer_sizes": [
+        40,
+        768,
+        512,
+        128,
+        2
+      ],
+      "weight_scales": [
+        0.007829402375408984,
+        0.006212228395807462,
+        0.007933192365751492,
+        0.013535407584483228
+      ],
+      "weights_bytes": 489728,
+      "params_bytes": 2820,
+      "slot_bytes": 524288,
+      "slot_offset": 8388608,
+      "slot_offset_hex": "0x00800000",
+      "ddr_address": 8388608,
+      "ddr_address_hex": "0x00800000",
+      "sha256": {
+        "weights.bin": "e91a6b5cdd8f538b84cbf5e0616b0eba4d1bf0d93eb8b81953cc787fe62079e2",
+        "params.bin": "a2c1771cd5791cac1db5dcb79b04c0361fff4b34e44abeadce2526b76d78478f",
+        "model.slot.bin": "ca9bc680bdc52c9249cf120ea5281346afbc773c7cd3381b22fa09ea86d1aaf9"
+      }
+    },
+    {
+      "format_version": 2,
+      "model_id": 17,
+      "unit": "slider_id04",
+      "checkpoint": "software/weights/XL_mixed_aug/slider_id04/last.pth",
+      "layer_sizes": [
+        40,
+        768,
+        512,
+        128,
+        2
+      ],
+      "weight_scales": [
+        0.008245149935324362,
+        0.00670175711939654,
+        0.009005280930226244,
+        0.012747534616725651
+      ],
+      "weights_bytes": 489728,
+      "params_bytes": 2820,
+      "slot_bytes": 524288,
+      "slot_offset": 8912896,
+      "slot_offset_hex": "0x00880000",
+      "ddr_address": 8912896,
+      "ddr_address_hex": "0x00880000",
+      "sha256": {
+        "weights.bin": "d95852d021241ef5d8ab97d2a24f737a02233285956da5a996f6abea6bf69981",
+        "params.bin": "d0c58777a854ecd4a31d16b725eba5a14633cdcc1995e840721214a40d7301b7",
+        "model.slot.bin": "fa5751e18ee9732ef622b9be83684e18ce848438f2ac9054bc563d7254391a4d"
+      }
+    },
+    {
+      "format_version": 2,
+      "model_id": 18,
+      "unit": "slider_id05",
+      "checkpoint": "software/weights/XL_mixed_aug/slider_id05/last.pth",
+      "layer_sizes": [
+        40,
+        768,
+        512,
+        128,
+        2
+      ],
+      "weight_scales": [
+        0.007989579298364835,
+        0.006208110512710932,
+        0.007960380531671479,
+        0.01376852088087187
+      ],
+      "weights_bytes": 489728,
+      "params_bytes": 2820,
+      "slot_bytes": 524288,
+      "slot_offset": 9437184,
+      "slot_offset_hex": "0x00900000",
+      "ddr_address": 9437184,
+      "ddr_address_hex": "0x00900000",
+      "sha256": {
+        "weights.bin": "edb485a6ac15be050bf667135f5cbe14565886019f151e53695c14c064162b54",
+        "params.bin": "e62a9d501b72eac563377e84641432fb421a9c852fd0caae751065bfd40d3f43",
+        "model.slot.bin": "1d56a1f57e0983b7ddefecf5d9fe8ba3ccceaa3b6267bcdb1aa2b338c8950ca1"
+      }
+    },
+    {
+      "format_version": 2,
+      "model_id": 19,
+      "unit": "slider_id06",
+      "checkpoint": "software/weights/XL_mixed_aug/slider_id06/last.pth",
+      "layer_sizes": [
+        40,
+        768,
+        512,
+        128,
+        2
+      ],
+      "weight_scales": [
+        0.007976100200743188,
+        0.006507853823383962,
+        0.008349153000538744,
+        0.014425356557050089
+      ],
+      "weights_bytes": 489728,
+      "params_bytes": 2820,
+      "slot_bytes": 524288,
+      "slot_offset": 9961472,
+      "slot_offset_hex": "0x00980000",
+      "ddr_address": 9961472,
+      "ddr_address_hex": "0x00980000",
+      "sha256": {
+        "weights.bin": "19d1ece0bb2eb759c7985878bf3c0798d7f646a13b0facd338dd7509df65c394",
+        "params.bin": "3acd4fa3ce3e9ce6fb075170d42fd756b4f9cab0be9a242893182dfb64992f7a",
+        "model.slot.bin": "498f016ae6690584cb0957921cae23f68674c88fffcf207ab294f8d42113e2d5"
+      }
+    },
+    {
+      "format_version": 2,
+      "model_id": 20,
+      "unit": "valve_id00",
+      "checkpoint": "software/weights/XL_mixed_aug/valve_id00/last.pth",
+      "layer_sizes": [
+        40,
+        768,
+        512,
+        128,
+        2
+      ],
+      "weight_scales": [
+        0.007465727685943363,
+        0.005926845580574096,
+        0.0087481906094889,
+        0.014316152399919164
+      ],
+      "weights_bytes": 489728,
+      "params_bytes": 2820,
+      "slot_bytes": 524288,
+      "slot_offset": 10485760,
+      "slot_offset_hex": "0x00A00000",
+      "ddr_address": 10485760,
+      "ddr_address_hex": "0x00A00000",
+      "sha256": {
+        "weights.bin": "d6499eb8c07a880bb3816ededc10203721fe356f7e43c9d212ab7b7dabf3cfae",
+        "params.bin": "076dd192961da2100d7ccce783b5e6919266f4c15933d091522bf8da2dd60aa6",
+        "model.slot.bin": "7d0630243a5d15ef40d55b752d42e5c684e638f5b77758cc7cf3b54365b93b36"
+      }
+    },
+    {
+      "format_version": 2,
+      "model_id": 21,
+      "unit": "valve_id01",
+      "checkpoint": "software/weights/XL_mixed_aug/valve_id01/last.pth",
+      "layer_sizes": [
+        40,
+        768,
+        512,
+        128,
+        2
+      ],
+      "weight_scales": [
+        0.007547223192500317,
+        0.006377946673415777,
+        0.009616856499919741,
+        0.013560317632720226
+      ],
+      "weights_bytes": 489728,
+      "params_bytes": 2820,
+      "slot_bytes": 524288,
+      "slot_offset": 11010048,
+      "slot_offset_hex": "0x00A80000",
+      "ddr_address": 11010048,
+      "ddr_address_hex": "0x00A80000",
+      "sha256": {
+        "weights.bin": "32f07f03094eb4be2075fcc861f114782cb20e4fe3d73e10b9a7edc6dbd7be60",
+        "params.bin": "b19932e86e067af170adc23d7d7d7a7e51586b6af8aee42433bac2c2f4331b8b",
+        "model.slot.bin": "3bd5b7fc9bfed3f88b100eb4be0f384b8cb4b872766a821bfbcfa1b89eb5b520"
+      }
+    },
+    {
+      "format_version": 2,
+      "model_id": 22,
+      "unit": "valve_id02",
+      "checkpoint": "software/weights/XL_mixed_aug/valve_id02/last.pth",
+      "layer_sizes": [
+        40,
+        768,
+        512,
+        128,
+        2
+      ],
+      "weight_scales": [
+        0.007193081491575467,
+        0.005903060980669157,
+        0.008774227983369602,
+        0.013708809229332632
+      ],
+      "weights_bytes": 489728,
+      "params_bytes": 2820,
+      "slot_bytes": 524288,
+      "slot_offset": 11534336,
+      "slot_offset_hex": "0x00B00000",
+      "ddr_address": 11534336,
+      "ddr_address_hex": "0x00B00000",
+      "sha256": {
+        "weights.bin": "cd113cb83a658463f27f7e0f7862f8c8e7467f226f09c80652ea02eb50c65423",
+        "params.bin": "3f563c6eaa349688129ca04ae2221c9fde42402238641707f42257af66cd186d",
+        "model.slot.bin": "cce431ee5f72c816ed8d377d3265bab58b094a9b301d5fdb102a3a9e1c1cc57e"
+      }
+    },
+    {
+      "format_version": 2,
+      "model_id": 23,
+      "unit": "valve_id03",
+      "checkpoint": "software/weights/XL_mixed_aug/valve_id03/last.pth",
+      "layer_sizes": [
+        40,
+        768,
+        512,
+        128,
+        2
+      ],
+      "weight_scales": [
+        0.007844811349403201,
+        0.006901523259681041,
+        0.007984359433331827,
+        0.01405458375224917
+      ],
+      "weights_bytes": 489728,
+      "params_bytes": 2820,
+      "slot_bytes": 524288,
+      "slot_offset": 12058624,
+      "slot_offset_hex": "0x00B80000",
+      "ddr_address": 12058624,
+      "ddr_address_hex": "0x00B80000",
+      "sha256": {
+        "weights.bin": "5fd7af9f8d9a87675eff9c82df1741e895ef5e89fbd05a0b2a78f2e3c35ad6c9",
+        "params.bin": "c18166c4c636a6a14b1e925e2def1043adb97a434b6fd7eadc7ff3b0a9e82e9d",
+        "model.slot.bin": "b1a7fdbc5cb658259a9a2febfbf64c4285e8678aea48c809a862c283e432512a"
+      }
+    },
+    {
+      "format_version": 2,
+      "model_id": 24,
+      "unit": "valve_id04",
+      "checkpoint": "software/weights/XL_mixed_aug/valve_id04/last.pth",
+      "layer_sizes": [
+        40,
+        768,
+        512,
+        128,
+        2
+      ],
+      "weight_scales": [
+        0.007027942833937998,
+        0.009855846720417654,
+        0.007842884288998101,
+        0.01205959751850038
+      ],
+      "weights_bytes": 489728,
+      "params_bytes": 2820,
+      "slot_bytes": 524288,
+      "slot_offset": 12582912,
+      "slot_offset_hex": "0x00C00000",
+      "ddr_address": 12582912,
+      "ddr_address_hex": "0x00C00000",
+      "sha256": {
+        "weights.bin": "19cec040868e7cded3089d122aa8cf5898131472f0b0159585ad8c3529f995da",
+        "params.bin": "8534f50d795e15387ad76ca7edfddb360846ddd91cc7251af96a42ca54860142",
+        "model.slot.bin": "f9e09a5516661a027a5d9db284d3e993d2ff3802e3d24067f3ac3f5d56cb99bf"
+      }
+    },
+    {
+      "format_version": 2,
+      "model_id": 25,
+      "unit": "valve_id05",
+      "checkpoint": "software/weights/XL_mixed_aug/valve_id05/last.pth",
+      "layer_sizes": [
+        40,
+        768,
+        512,
+        128,
+        2
+      ],
+      "weight_scales": [
+        0.007118106827022522,
+        0.005877418780890036,
+        0.008003326851551928,
+        0.013803433245561254
+      ],
+      "weights_bytes": 489728,
+      "params_bytes": 2820,
+      "slot_bytes": 524288,
+      "slot_offset": 13107200,
+      "slot_offset_hex": "0x00C80000",
+      "ddr_address": 13107200,
+      "ddr_address_hex": "0x00C80000",
+      "sha256": {
+        "weights.bin": "c0e458aa9c801e596ae267ecf3bf93df00a3d6706ea8da023d3e5260dc2675c1",
+        "params.bin": "4f63c8955f95ba9554657f3da122b734687ba4b5f2dad266706ad58884189b46",
+        "model.slot.bin": "a351b8daa252e7a2fcd9a283fe6f5a54b1eece66b053de4b57b90071875460ad"
+      }
+    },
+    {
+      "format_version": 2,
+      "model_id": 26,
+      "unit": "valve_id06",
+      "checkpoint": "software/weights/XL_mixed_aug/valve_id06/last.pth",
+      "layer_sizes": [
+        40,
+        768,
+        512,
+        128,
+        2
+      ],
+      "weight_scales": [
+        0.007002861950341172,
+        0.0060038829412985975,
+        0.008127406826169472,
+        0.012178256755738746
+      ],
+      "weights_bytes": 489728,
+      "params_bytes": 2820,
+      "slot_bytes": 524288,
+      "slot_offset": 13631488,
+      "slot_offset_hex": "0x00D00000",
+      "ddr_address": 13631488,
+      "ddr_address_hex": "0x00D00000",
+      "sha256": {
+        "weights.bin": "21292655f7fc3d07fbf9a22fedced92f733a754e07d65781d5e1759478676c5d",
+        "params.bin": "7313b9309baf98e480b0aee5efb470e6f39b0bd122857f0bfc9a0e955cc656e7",
+        "model.slot.bin": "57299170b9f6a7b04fa9f1a3184dfdbc6bf40cdeaaa16333db7a75f77fab66e2"
+      }
+    },
+    {
+      "format_version": 2,
+      "model_id": 27,
+      "unit": "ToyCar_id01",
+      "checkpoint": "software/weights/XL_mixed_aug/ToyCar_id01/last.pth",
+      "layer_sizes": [
+        40,
+        768,
+        512,
+        128,
+        2
+      ],
+      "weight_scales": [
+        0.007591792917627049,
+        0.006800706461658628,
+        0.00798901516621507,
+        0.012750974790317806
+      ],
+      "weights_bytes": 489728,
+      "params_bytes": 2820,
+      "slot_bytes": 524288,
+      "slot_offset": 14155776,
+      "slot_offset_hex": "0x00D80000",
+      "ddr_address": 14155776,
+      "ddr_address_hex": "0x00D80000",
+      "sha256": {
+        "weights.bin": "17156d308bf2edd413725f65bde8ac727664e6c96f59ffb6f0fd771a8878ab13",
+        "params.bin": "0281fab19aa19625fdff9fed28f924978230943f85ec4f4a09c65bdd4c28497e",
+        "model.slot.bin": "1ce054dfe3ee37242a12d7157d7b6e4a383431ee1126ab95ceacecd8319ad139"
+      }
+    },
+    {
+      "format_version": 2,
+      "model_id": 28,
+      "unit": "ToyCar_id02",
+      "checkpoint": "software/weights/XL_mixed_aug/ToyCar_id02/last.pth",
+      "layer_sizes": [
+        40,
+        768,
+        512,
+        128,
+        2
+      ],
+      "weight_scales": [
+        0.007677136443731353,
+        0.006549930478644183,
+        0.00790598261074757,
+        0.012588061685637227
+      ],
+      "weights_bytes": 489728,
+      "params_bytes": 2820,
+      "slot_bytes": 524288,
+      "slot_offset": 14680064,
+      "slot_offset_hex": "0x00E00000",
+      "ddr_address": 14680064,
+      "ddr_address_hex": "0x00E00000",
+      "sha256": {
+        "weights.bin": "8f98a1df9c2f5f31bb523dcd132db631b92e490d663323f59bfd6312050d8e86",
+        "params.bin": "df9aa3fc823f9e37eeb8dcbca40f4ed0467e6abe7b15ab6594b3347846d2aa87",
+        "model.slot.bin": "c6084a710c96ab344c7a806210980521495674923a3bf30995a1de2448380bf4"
+      }
+    },
+    {
+      "format_version": 2,
+      "model_id": 29,
+      "unit": "ToyCar_id03",
+      "checkpoint": "software/weights/XL_mixed_aug/ToyCar_id03/last.pth",
+      "layer_sizes": [
+        40,
+        768,
+        512,
+        128,
+        2
+      ],
+      "weight_scales": [
+        0.007488996494473435,
+        0.006141050594059501,
+        0.008205782710097906,
+        0.013350233318298821
+      ],
+      "weights_bytes": 489728,
+      "params_bytes": 2820,
+      "slot_bytes": 524288,
+      "slot_offset": 15204352,
+      "slot_offset_hex": "0x00E80000",
+      "ddr_address": 15204352,
+      "ddr_address_hex": "0x00E80000",
+      "sha256": {
+        "weights.bin": "0ed6e470588b57404df1dc08f2507e679075e218c013cf2311db2a355a9ed05f",
+        "params.bin": "4cfe09bd50caf6cf949565e648684322e0ec28563fd47de6781d6bb72411ac7b",
+        "model.slot.bin": "077d824cf89bc9b582b280250352a6cd9cb874d95e8d0aa9964f0dfdc2ce805f"
+      }
+    },
+    {
+      "format_version": 2,
+      "model_id": 30,
+      "unit": "ToyCar_id04",
+      "checkpoint": "software/weights/XL_mixed_aug/ToyCar_id04/last.pth",
+      "layer_sizes": [
+        40,
+        768,
+        512,
+        128,
+        2
+      ],
+      "weight_scales": [
+        0.008158355247317336,
+        0.0061654321790680176,
+        0.00822649227352593,
+        0.011193506360992672
+      ],
+      "weights_bytes": 489728,
+      "params_bytes": 2820,
+      "slot_bytes": 524288,
+      "slot_offset": 15728640,
+      "slot_offset_hex": "0x00F00000",
+      "ddr_address": 15728640,
+      "ddr_address_hex": "0x00F00000",
+      "sha256": {
+        "weights.bin": "4bd059b57181a96418c52f9623d28f311f8b78189f99b8c5101955010ba4e15d",
+        "params.bin": "506ae20007eb47c02cf3d400f3f9daf17800954d332a17f2cd31a5e997654b35",
+        "model.slot.bin": "16ba60be89b1a4403a30088aba715f010748e2bd2e556d6d66a78403f1575866"
+      }
+    },
+    {
+      "format_version": 2,
+      "model_id": 31,
+      "unit": "ToyCar_id05",
+      "checkpoint": "software/weights/XL_mixed_aug/ToyCar_id05/last.pth",
+      "layer_sizes": [
+        40,
+        768,
+        512,
+        128,
+        2
+      ],
+      "weight_scales": [
+        0.006594729235791784,
+        0.004761251877612016,
+        0.007842494277503546,
+        0.013088660916005532
+      ],
+      "weights_bytes": 489728,
+      "params_bytes": 2820,
+      "slot_bytes": 524288,
+      "slot_offset": 16252928,
+      "slot_offset_hex": "0x00F80000",
+      "ddr_address": 16252928,
+      "ddr_address_hex": "0x00F80000",
+      "sha256": {
+        "weights.bin": "236487239bd61e80a3a53233c360c8078c6e6ebdbce6a49c78545fb0363a7415",
+        "params.bin": "16b7f4fd4230c52d706fd4b2798c36034616e5532d95a9eededdfb9d04d80add",
+        "model.slot.bin": "1ad3914e8963e24f3dac8d6f641ef942cdbb58fb34992978025ec026e2d833d6"
+      }
+    },
+    {
+      "format_version": 2,
+      "model_id": 32,
+      "unit": "ToyCar_id06",
+      "checkpoint": "software/weights/XL_mixed_aug/ToyCar_id06/last.pth",
+      "layer_sizes": [
+        40,
+        768,
+        512,
+        128,
+        2
+      ],
+      "weight_scales": [
+        0.007054945146004985,
+        0.005479010071341447,
+        0.007454828483851876,
+        0.011983478163171002
+      ],
+      "weights_bytes": 489728,
+      "params_bytes": 2820,
+      "slot_bytes": 524288,
+      "slot_offset": 16777216,
+      "slot_offset_hex": "0x01000000",
+      "ddr_address": 16777216,
+      "ddr_address_hex": "0x01000000",
+      "sha256": {
+        "weights.bin": "a87091d492d350b618ed79332a5ac69a71eb333d03d1b984f1cc4d19a5562407",
+        "params.bin": "3d0e623fe6b9e02cccf01047bb5dc9a6c03208d1c21e166403699d526e4fddbc",
+        "model.slot.bin": "ca3637be9a597fa6086fabfc683462a4e9956dc65e895fb0836c695f75386b4b"
+      }
+    },
+    {
+      "format_version": 2,
+      "model_id": 33,
+      "unit": "ToyCar_id07",
+      "checkpoint": "software/weights/XL_mixed_aug/ToyCar_id07/last.pth",
+      "layer_sizes": [
+        40,
+        768,
+        512,
+        128,
+        2
+      ],
+      "weight_scales": [
+        0.009922869562164066,
+        0.005822960316665529,
+        0.008089849329370213,
+        0.01344805721222885
+      ],
+      "weights_bytes": 489728,
+      "params_bytes": 2820,
+      "slot_bytes": 524288,
+      "slot_offset": 17301504,
+      "slot_offset_hex": "0x01080000",
+      "ddr_address": 17301504,
+      "ddr_address_hex": "0x01080000",
+      "sha256": {
+        "weights.bin": "732c25d37633a5ac38a72dc6d8c758ec49e25ab64d5d471347bc8d4954d06a60",
+        "params.bin": "d2cf615bfeb7712066c830c90ddb7aea41dcf8fd3d420537393441ca978040e7",
+        "model.slot.bin": "29a63fe68cbc693506578d2f48433876f2e108cccce942f0a77db872ad5ce70b"
+      }
+    },
+    {
+      "format_version": 2,
+      "model_id": 34,
+      "unit": "ToyConveyor_id01",
+      "checkpoint": "software/weights/XL_mixed_aug/ToyConveyor_id01/last.pth",
+      "layer_sizes": [
+        40,
+        768,
+        512,
+        128,
+        2
+      ],
+      "weight_scales": [
+        0.008972429853724682,
+        0.005679332834529126,
+        0.007927000053285614,
+        0.011449352024108406
+      ],
+      "weights_bytes": 489728,
+      "params_bytes": 2820,
+      "slot_bytes": 524288,
+      "slot_offset": 17825792,
+      "slot_offset_hex": "0x01100000",
+      "ddr_address": 17825792,
+      "ddr_address_hex": "0x01100000",
+      "sha256": {
+        "weights.bin": "9adf457b160665afd21c554d84abcaa758490e016db98d8f6c04bd8b28916763",
+        "params.bin": "6f12daf29e5253a2c6fbd1aa65443ed13c5cf76b42a719eafd5bd077dcaa1708",
+        "model.slot.bin": "ac148ca1c9841bd85ab13bd49dbca101e986eb1dc9a7c8148c17899e131444d0"
+      }
+    },
+    {
+      "format_version": 2,
+      "model_id": 35,
+      "unit": "ToyConveyor_id02",
+      "checkpoint": "software/weights/XL_mixed_aug/ToyConveyor_id02/last.pth",
+      "layer_sizes": [
+        40,
+        768,
+        512,
+        128,
+        2
+      ],
+      "weight_scales": [
+        0.007851708123064417,
+        0.0051438235861109936,
+        0.00761724973288108,
+        0.012417281706502118
+      ],
+      "weights_bytes": 489728,
+      "params_bytes": 2820,
+      "slot_bytes": 524288,
+      "slot_offset": 18350080,
+      "slot_offset_hex": "0x01180000",
+      "ddr_address": 18350080,
+      "ddr_address_hex": "0x01180000",
+      "sha256": {
+        "weights.bin": "4cfcbe683d2891b8f61add15483c79f551cbdf96cdedf6fe204bbb4d3c731c3d",
+        "params.bin": "4aa767635e21d6bf9d95d847ce3e8ab5baf5924f97671e5358aede29ced3f551",
+        "model.slot.bin": "1338268560a99e446513941f9ac59a7f858a658cddf7d45ed324ed8a52b1c9c3"
+      }
+    },
+    {
+      "format_version": 2,
+      "model_id": 36,
+      "unit": "ToyConveyor_id03",
+      "checkpoint": "software/weights/XL_mixed_aug/ToyConveyor_id03/last.pth",
+      "layer_sizes": [
+        40,
+        768,
+        512,
+        128,
+        2
+      ],
+      "weight_scales": [
+        0.008159373688885547,
+        0.0062495723484069345,
+        0.008262937463174655,
+        0.011577705698689138
+      ],
+      "weights_bytes": 489728,
+      "params_bytes": 2820,
+      "slot_bytes": 524288,
+      "slot_offset": 18874368,
+      "slot_offset_hex": "0x01200000",
+      "ddr_address": 18874368,
+      "ddr_address_hex": "0x01200000",
+      "sha256": {
+        "weights.bin": "4c6ba27aff21fd363ee36cec4b44e5fbbce402eddd829d2e9a2ac64d4ecc66d8",
+        "params.bin": "488038396ba5713df99e13390e3cfbc5be64f8d4b19a2a92f379e2220aa90af1",
+        "model.slot.bin": "2cfae9d8aba0e1bb61f181ffbeff7f46c1e10f3581b3c555503b641ecac942bc"
+      }
+    },
+    {
+      "format_version": 2,
+      "model_id": 37,
+      "unit": "ToyConveyor_id04",
+      "checkpoint": "software/weights/XL_mixed_aug/ToyConveyor_id04/last.pth",
+      "layer_sizes": [
+        40,
+        768,
+        512,
+        128,
+        2
+      ],
+      "weight_scales": [
+        0.00824557608506811,
+        0.007660073558176596,
+        0.009808729014058751,
+        0.011159768254738155
+      ],
+      "weights_bytes": 489728,
+      "params_bytes": 2820,
+      "slot_bytes": 524288,
+      "slot_offset": 19398656,
+      "slot_offset_hex": "0x01280000",
+      "ddr_address": 19398656,
+      "ddr_address_hex": "0x01280000",
+      "sha256": {
+        "weights.bin": "a9d56e8c7d155ce9dc8e74eff0ab5f518949e654229ca0be44d3a24d9570ceb9",
+        "params.bin": "6a3c88bc65118cee9acfa37ca0c739c2ce2ca227ea78ee815434a15d90ebf9f8",
+        "model.slot.bin": "f8ea22bad98eb5098c94b847398d1582db45d1d0a3b06e1d5aa3208f33e913dd"
+      }
+    },
+    {
+      "format_version": 2,
+      "model_id": 38,
+      "unit": "ToyConveyor_id05",
+      "checkpoint": "software/weights/XL_mixed_aug/ToyConveyor_id05/last.pth",
+      "layer_sizes": [
+        40,
+        768,
+        512,
+        128,
+        2
+      ],
+      "weight_scales": [
+        0.0074119267501230315,
+        0.0056415186153622125,
+        0.008265245617843989,
+        0.010778301344143124
+      ],
+      "weights_bytes": 489728,
+      "params_bytes": 2820,
+      "slot_bytes": 524288,
+      "slot_offset": 19922944,
+      "slot_offset_hex": "0x01300000",
+      "ddr_address": 19922944,
+      "ddr_address_hex": "0x01300000",
+      "sha256": {
+        "weights.bin": "4d7ea71f3c8ed457be2015c78e8b152c4d18239a7114b200bcb97e3f674078d8",
+        "params.bin": "916a03b09d12d4d6d6eb2afa745451ac741bc76f4f886aaf3128aebf6b79f113",
+        "model.slot.bin": "316b8766a1a26e0a854cb1363817f2f66108c9b8080d877e3697561697ac6427"
+      }
+    },
+    {
+      "format_version": 2,
+      "model_id": 39,
+      "unit": "ToyConveyor_id06",
+      "checkpoint": "software/weights/XL_mixed_aug/ToyConveyor_id06/last.pth",
+      "layer_sizes": [
+        40,
+        768,
+        512,
+        128,
+        2
+      ],
+      "weight_scales": [
+        0.007212563293186698,
+        0.005638300433872253,
+        0.008080997804957113,
+        0.012455859522181234
+      ],
+      "weights_bytes": 489728,
+      "params_bytes": 2820,
+      "slot_bytes": 524288,
+      "slot_offset": 20447232,
+      "slot_offset_hex": "0x01380000",
+      "ddr_address": 20447232,
+      "ddr_address_hex": "0x01380000",
+      "sha256": {
+        "weights.bin": "f77946fff95d17d12c79e4703c8274a9bed86f72557f9de4cc28b17b11b94bd5",
+        "params.bin": "a5d43fc9955a6ed047465c4b1864e757afe5e76a014bb913aad23a2fd2531f6a",
+        "model.slot.bin": "5a409dc9f45dcc62473ce71d5ef5cc9e547d0f8636ed27d33aeff62e6ed5f086"
+      }
+    }
+  ]
+}

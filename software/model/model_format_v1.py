@@ -1,12 +1,17 @@
 """P1.6/P1.7 INT8 모델 바이너리 형식과 DDR3 슬롯 레이아웃.
 
-모든 오프셋은 모델 슬롯 시작을 기준으로 한다. 가중치는 PyTorch Linear의
+모든 offset은 모델 슬롯 시작을 기준으로 한다. weight는 PyTorch Linear의
 ``[out, in]`` 행 우선(뉴런 우선) 순서다. 모델 ID 순서는 ``dcase_data.UNITS``다.
 """
 
 from pathlib import Path
 
 import numpy as np
+
+FORMAT_VERSION = 1
+WEIGHTS_DIR = "software/weights/L_normal_noaug"
+MODELS_DIR = "hardware/data/models"
+GOLDEN_DIR = "hardware/data/golden"
 
 LAYER_SIZES = (40, 384, 256, 64, 2)
 WEIGHT_SHAPES = tuple((n_out, n_in) for n_in, n_out in zip(LAYER_SIZES[:-1], LAYER_SIZES[1:]))
@@ -27,9 +32,21 @@ assert 2 * sum(NEURON_COUNTS) == PARAM_BYTES
 assert USED_END <= SLOT_SIZE
 
 
+def layout():
+    """manifest에 적는 형식 정보 (P1.6 manifest와 같은 key)"""
+    return {"alignment": ALIGN, "weight_offsets": list(WEIGHT_OFFSETS),
+            "beta_offset": BETA_OFFSET, "vth_offset": VTH_OFFSET}
+
+
+def hex_files(weights, params):
+    """$readmemh용 HEX, 한 줄 = 1 B"""
+    return {name: "".join(f"{value:02x}\n" for value in data)
+            for name, data in (("weights.hex", weights), ("params.hex", params))}
+
+
 def _check_q(q):
     if len(q) != len(WEIGHT_SHAPES):
-        raise ValueError(f"층 수 {len(q)} != {len(WEIGHT_SHAPES)}")
+        raise ValueError(f"layer 수 {len(q)} != {len(WEIGHT_SHAPES)}")
     for i, (layer, shape) in enumerate(zip(q, WEIGHT_SHAPES), 1):
         if layer["W"].shape != shape:
             raise ValueError(f"L{i} W 형상 {layer['W'].shape} != {shape}")
@@ -38,7 +55,7 @@ def _check_q(q):
 
 
 def weights_bytes(q):
-    """층별 W를 붙인 정확히 130,176 B의 INT8 가중치 바이너리."""
+    """layer별 W를 붙인 정확히 130,176 B의 INT8 weight 바이너리."""
     _check_q(q)
     raw = b"".join(np.asarray(layer["W"], dtype=np.int8).reshape(-1).tobytes() for layer in q)
     assert len(raw) == WEIGHT_BYTES
@@ -46,7 +63,7 @@ def weights_bytes(q):
 
 
 def params_bytes(q):
-    """층 순서로 붙인 beta 706 B 뒤에 vth 706 B를 두는 1,412 B 바이너리."""
+    """layer 순서로 붙인 beta 706 B 뒤에 vth 706 B를 두는 1,412 B 바이너리."""
     _check_q(q)
     beta = np.concatenate([np.asarray(layer["beta"], dtype=np.uint8) for layer in q]).tobytes()
     vth = np.concatenate([np.asarray(layer["vth"], dtype=np.uint8) for layer in q]).tobytes()
@@ -77,7 +94,7 @@ def q_from_slot(data, scales=None):
         raise ValueError(f"슬롯 크기 {len(data):,} B != {SLOT_SIZE:,} B")
     scales = [None] * len(WEIGHT_SHAPES) if scales is None else list(scales)
     if len(scales) != len(WEIGHT_SHAPES):
-        raise ValueError("스케일 수가 층 수와 다름")
+        raise ValueError("스케일 수가 layer 수와 다름")
     beta_all = np.frombuffer(data, np.uint8, sum(NEURON_COUNTS), BETA_OFFSET).copy()
     vth_all = np.frombuffer(data, np.uint8, sum(NEURON_COUNTS), VTH_OFFSET).copy()
     q, neuron_at = [], 0
@@ -107,7 +124,7 @@ def q_from_files_bytes(weights, params, scales=None):
     vth_all = np.frombuffer(params[sum(NEURON_COUNTS):], np.uint8)
     scales = [None] * len(WEIGHT_SHAPES) if scales is None else list(scales)
     if len(scales) != len(WEIGHT_SHAPES):
-        raise ValueError("스케일 수가 층 수와 다름")
+        raise ValueError("스케일 수가 layer 수와 다름")
     for shape, scale in zip(WEIGHT_SHAPES, scales):
         count = shape[0] * shape[1]
         w = np.frombuffer(weights, np.int8, count, w_at).copy().reshape(shape)

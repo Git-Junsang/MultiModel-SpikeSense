@@ -1,28 +1,31 @@
-# licensed
+# 라이선스 자료: 논문 원문·원고, 발표 자료, 보드 manual
 documents/papers/*
 !documents/papers/summaries/
-!documents/papers/summaries/**
 documents/presentation/
-documents/manual/
+documents/manual/*
+!documents/manual/ENVIRONMENT.md
 
-#claude
+# Claude 지침과 작업 폴더
 CLAUDE.md
 AGENTS.md
+.claude/
+_workspace/
 
-#system
-*/@eaDir
-@eaDir
+# 큰 data: code만 올린다
+software/dataset/*
+!software/dataset/*.py
 
-#large files
-software/data
+# Vivado·xsim 산출물
+.Xil/
+hardware/vivado/build/
+xsim.dir/
+*.jou
+*.pb
+*.wdb
+webtalk*
 
-#old
-software/src_references
-
-#cache
+# 시스템·cache
+@eaDir/
 .DS_Store
 __pycache__/
 *.pyc
-.Xil/
-.claude/
-hardware/vivado/build/

@@ -4,18 +4,18 @@
 // ui_clk(100 MHz) 도메인. AXI4-Lite 슬레이브(32 bit, 64 KiB)는 XDMA BAR0와
 // JTAG-AXI가 SmartConnect를 거쳐 접근한다. 쓰기는 32 bit 전체만 지원한다.
 //
-// 레지스터 지도 (바이트 오프셋)
+// 레지스터 지도 (바이트 offset)
 //   0x0000 R   ID = 0x4D4D5033 ("MMP3")
 //   0x0004 R   VERSION
 //   0x0008 R   STATUS  [0] init_calib_complete [1] user_lnk_up [2] tgen busy
-//                      [3] tgen done [4] ddr_sel [5] narrow burst 감지(호스트 경로)
+//                      [3] tgen done [4] ddr_sel [5] narrow burst 감지(Host 경로)
 //   0x000C RW  SCRATCH
 //   0x0010 R   TS_LO   64 bit 자유 계수기(ui_clk, 10 ns) 하위. 읽을 때 상위를 TS_HI에 보관
 //   0x0014 R   TS_HI   직전 TS_LO 읽기 시점의 상위
 //   0x0018 W   MARK    쓰면 도착 시각을 MARK_TS에, 값을 MARK_VAL에 남긴다
 //   0x001C R   MARK_TS_LO   0x0020 R MARK_TS_HI   0x0024 R MARK_VAL
 //   0x0040 W   CTRL    [0] start  [1] abort  [2] narrow 플래그 지우기 (쓰기 펄스)
-//   0x0044 RW  DDR_SEL 0 = 트래픽 생성기, 1 = 호스트(XDMA) — 둘 다 쉬고 있을 때만 바꾼다
+//   0x0044 RW  DDR_SEL 0 = 트래픽 생성기, 1 = Host(XDMA) — 둘 다 쉬고 있을 때만 바꾼다
 //   0x0048 RW  OPMODE  [0] write [1] verify [3:2] addr_mode [4] pipelined
 //   0x004C RW  BASE        0x0050 RW XFER_BEATS   0x0054 RW BURST_MAX
 //   0x0058 RW  N_XFERS     0x005C RW MAX_OUTST    0x0060 RW STRIDE
@@ -182,7 +182,7 @@ module p3_core #(
                       wr_d      <= s_wdata;
                       wph       <= 2'd1;
                   end
-            2'd1: begin   // 핸드셰이크가 끝난 사이클 다음: 쓰기 수행
+            2'd1: begin   // 핸드셰이크가 끝난 cycle 다음: 쓰기 수행
                       wph      <= 2'd2;
                       s_bvalid <= 1'b1;
                       case (wr_a[15:2])
@@ -217,7 +217,7 @@ module p3_core #(
     end
 
     // ---------------- AXI-Lite 읽기 ----------------
-    // 0: 대기 → arready 1사이클 → 1: 주소 보관 → 2: 기록 메모리 읽기 대기 → 3: 데이터 → 4: rvalid
+    // 0: 대기 → arready 1 cycle → 1: 주소 보관 → 2: 기록 메모리 읽기 대기 → 3: 데이터 → 4: rvalid
     reg [2:0]  rph;
     reg [63:0] ts_cap;
     reg [31:0] ts_hi_sh;

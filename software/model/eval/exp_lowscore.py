@@ -1,6 +1,6 @@
 """성적이 낮은 장비의 학습 방식 비교(P1.4 보완).
 
-추론·판정(세그먼트 막전위 시간평균 → argmax, 파일 점수 = 세그먼트 확률 평균)은
+추론·판정(세그먼트 membrane potential 시간평균 → argmax, 파일 점수 = 세그먼트 확률 평균)은
 바꾸지 않는다. 학습 쪽만 바꾼다.
 
   base      : 현행. 세그먼트 하나가 표본 하나, 이상 파일의 모든 세그먼트가 이상 라벨
@@ -10,18 +10,21 @@
 """
 
 import os
+import sys
 import csv
 import time
 import numpy as np
 import torch
 
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "dataset"))
 import dcase_data as dd
-import train
+import train_unit
 
 UNITS = [("valve", "01"), ("valve", "06"), ("valve", "00"), ("valve", "03"), ("fan", "00")]
 CONFIGS = {"base": [], "clip": ["--clip_loss"], "hop": ["--hop", "16"],
            "clip_hop": ["--clip_loss", "--hop", "16"]}
-OUT = os.path.join(dd.SOFTWARE_DIR, "runs", "lowscore")
+OUT = os.path.join(dd.SOFTWARE_DIR, "train_result", "train_runs", "lowscore")
 
 
 def main():
@@ -30,7 +33,7 @@ def main():
     for m, i in UNITS:
         for cfg, extra in CONFIGS.items():
             t0 = time.time()
-            res = train.main(["--machine", m, "--mid", i, "--epochs", "60", "--batch_size", "512",
+            res = train_unit.main(["--machine", m, "--mid", i, "--epochs", "60", "--batch_size", "512",
                               "--sched", "cosine", "--out_dir", os.path.join(OUT, f"{dd.unit_name(m, i)}_{cfg}")]
                              + extra)
             b, l = res["best"], res["last"]

@@ -11,12 +11,12 @@
 //   RESET을 누르고 있으면 카운터가 멈추고 캐리어 LED가 모두 꺼진다 → RESET 핀 확인
 //
 // 원격 확인 (LED를 볼 수 없을 때, VIO로 JTAG 읽기):
-//   probe_in0 [31:0] 사이클 카운터 — 두 번 읽은 차이 / Host 시각 차이 = 클럭 주파수
+//   probe_in0 [31:0] cycle 카운터 — 두 번 읽은 차이 / Host 시각 차이 = 클럭 주파수
 //   probe_in1 [31:0] 1^2 + 2^2 + ... + 1000^2 계산 결과 (기대값 333,833,500 = 0x13E5_E51C)
 //   probe_in2 [0]    계산 완료
 //   probe_in3 [4:0]  {led_core, led_n[3:0]} 구동값
 //   probe_in4 [4:0]  {rst_n, key_n[3:0]} 동기화된 버튼 입력
-//   시뮬레이션(SIM 정의)에서는 VIO를 넣지 않는다.
+//   simulation(SIM 정의)에서는 VIO를 넣지 않는다.
 //
 // 빌드 (저장소 루트에서):
 //   vivado -mode batch -source hardware/board_test/p05_blink/build_p05.tcl

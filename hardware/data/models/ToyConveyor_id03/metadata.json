@@ -2,7 +2,7 @@
   "format_version": 1,
   "model_id": 36,
   "unit": "ToyConveyor_id03",
-  "checkpoint": "software/model_weights/ToyConveyor_id03/last.pth",
+  "checkpoint": "software/weights/L_normal_noaug/ToyConveyor_id03/last.pth",
   "layer_sizes": [
     40,
     384,

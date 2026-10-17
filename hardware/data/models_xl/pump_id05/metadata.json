@@ -1,0 +1,31 @@
+{
+  "format_version": 2,
+  "model_id": 11,
+  "unit": "pump_id05",
+  "checkpoint": "software/weights/XL_mixed_aug/pump_id05/last.pth",
+  "layer_sizes": [
+    40,
+    768,
+    512,
+    128,
+    2
+  ],
+  "weight_scales": [
+    0.008066586622102993,
+    0.006525247585116409,
+    0.007720955244199497,
+    0.013418095318351204
+  ],
+  "weights_bytes": 489728,
+  "params_bytes": 2820,
+  "slot_bytes": 524288,
+  "slot_offset": 5767168,
+  "slot_offset_hex": "0x00580000",
+  "ddr_address": 5767168,
+  "ddr_address_hex": "0x00580000",
+  "sha256": {
+    "weights.bin": "941361c5df2927f8af06f531fbf3a2939f1eaceb274d5d90f1e27fbc4035db6d",
+    "params.bin": "a379e1932042ea42c9a3aca76269ddb7be6490e2668245ee8bbf7e2312524750",
+    "model.slot.bin": "517f379a60fe8ceef60bf4b212833694ee54a2f4d30b472e705a169c104c5900"
+  }
+}

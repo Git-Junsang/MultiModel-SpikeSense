@@ -4,7 +4,7 @@
 // MIG AXI 슬레이브(256 bit, ui_clk 100 MHz)에 직접 붙는 마스터다.
 // 한 번의 실행(start)은 "전송(transfer)" n개로 이루어진다. 전송 하나는
 // 연속 주소 xfer_beats × 32 B이며, 4 KiB 경계와 burst_max에서 AXI 버스트로
-// 잘라 보낸다. 전송은 가중치 슬라이스 하나를 가져오는 DMA 요청에 해당한다.
+// 잘라 보낸다. 전송은 weight 슬라이스 하나를 가져오는 DMA 요청에 해당한다.
 //
 // 주소 모드 (cfg_amode):
 //   0 SEQ       전송 i의 시작 = base + (i × 전송 크기) mod wrap  (wrap=0이면 감지 안 함)
@@ -13,17 +13,17 @@
 //   2 RAND_BEAT 시작 = base + (LFSR & addr_mask) × 32 B — 임의 주소 단일 지연
 //   3 SLOT_RR   시작 = base + (i mod slot_cnt) × stride — 결정적 모델 순환
 // 발행 방식 (cfg_pipe):
-//   0 blocking  전송 하나가 끝나고 gap 사이클이 지나야 다음 전송을 시작한다
+//   0 blocking  전송 하나가 끝나고 gap cycle이 지나야 다음 전송을 시작한다
 //               (슬라이스를 하나씩 요청하는 단순 DMA). 전송 안의 버스트는
 //               max_outst개까지 겹쳐 보낸다.
 //   1 pipelined 전송 경계와 무관하게 max_outst개까지 버스트를 계속 보낸다.
 //
-// 지연 정의 (ui_clk 사이클):
-//   lat  = 전송의 첫 버스트를 AR/AW에 올린 사이클 → 마지막 R beat(읽기) 또는
-//          마지막 B 응답(쓰기)을 받은 사이클
+// 지연 정의 (ui_clk cycle):
+//   lat  = 전송의 첫 버스트를 AR/AW에 올린 cycle → 마지막 R beat(읽기) 또는
+//          마지막 B 응답(쓰기)을 받은 cycle
 //   fst  = 첫 버스트 → 첫 R beat (읽기만, 쓰기는 lat와 같게 기록)
-// 결과: 사이클 수, beat 수, 전송 수, lat·fst의 min/max/합, 검증 오류,
-//       주소·W 채널 정체 사이클, 앞쪽 전송의 (fst, lat) 기록 2^LOG_AW개
+// 결과: cycle 수, beat 수, 전송 수, lat·fst의 min/max/합, 검증 오류,
+//       주소·W 채널 정체 cycle, 앞쪽 전송의 (fst, lat) 기록 2^LOG_AW개
 //       (log_mask로 i & log_mask == 0인 전송만 기록해 표본 간격을 둘 수 있다)
 //
 // 데이터 패턴: 32 bit 워드 k(0..7)의 값 = {beat 주소[24:0], k, 4'b0101} ^ rotl(seed, 4k)
@@ -80,7 +80,7 @@ module ddr_tgen #(
     output reg  [31:0]       r_ax_stall,
     output reg  [31:0]       r_w_stall,
     output reg  [LOG_AW:0]   r_log_n,
-    // 기록 읽기 (1사이클 지연)
+    // 기록 읽기 (1 cycle 지연)
     input  wire [LOG_AW-1:0] log_raddr,
     output reg  [63:0]       log_rdata,
     // AXI4 마스터 (256 bit)
@@ -158,7 +158,7 @@ module ddr_tgen #(
 
     // ---------------- 실행 상태 ----------------
     reg         run;          // 발행 단계 (abort 시 0)
-    reg [63:0]  cyc;          // 실행 시작 후 사이클
+    reg [63:0]  cyc;          // 실행 시작 후 cycle
     wire [31:0] now = cyc[31:0];
     reg [31:0]  xf_issued;    // 시작한 전송 수
     reg [31:0]  xf_done;      // 끝난 전송 수
@@ -172,12 +172,12 @@ module ddr_tgen #(
     reg [31:0]   ag_cnt;      // 생성한 시작 주소 수
     reg          xa_vld;
     reg [AW-1:0] xa_addr;
-    reg [AW-1:0] seq_off;     // SEQ: base로부터의 오프셋
+    reg [AW-1:0] seq_off;     // SEQ: base로부터의 offset
     reg [7:0]    rr_slot;     // SLOT_RR
     reg [AW-1:0] rr_base;
     reg          sp_vld;      // SLOT_RAND: 뽑은 slot, 곱셈 대기
     reg [7:0]    sp_slot;
-    wire         xa_take;     // 발행부가 이번 사이클에 가져감
+    wire         xa_take;     // 발행부가 이번 cycle에 가져감
     wire         ag_room = !xa_vld || xa_take;
     wire         ag_more = (ag_cnt != c_n_xfers);
     wire [AW-1:0] xfer_bytes = {1'b0, c_xfer_beats, 5'd0};
@@ -358,7 +358,7 @@ module ddr_tgen #(
 
     wire [31:0] fst_now = (r_beat && rcnt == 8'd0 && rf_first) ? now : t_first;
 
-    // 통계 단계 (1사이클 뒤)
+    // 통계 단계 (1 cycle 뒤)
     reg        s_vld;
     reg [31:0] s_lat, s_fst;
     // 검증 단계

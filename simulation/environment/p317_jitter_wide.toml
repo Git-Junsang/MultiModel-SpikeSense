@@ -1,0 +1,46 @@
+# P3.17 simulation 보강: jitter 10~20 ms까지 늘렸을 때 entry 수별 DDR3 전송량과 응답 시간
+# jitter 32 ms = 주기 전체에 고르게 = offset 배정 없음과 같다
+# L·64 lane, rev 4, 예약 25.5 tile, 입출력 즉시 전송, spike 2개/cycle, Grouping, G.offset-order(offset 순서), 남는 BRAM에 12 bit membrane potential
+# 키 설명은 template.toml
+
+mode = "run"
+model = "L"
+lanes = 64
+mem = "ddr"
+rev = 4
+reserve = 25.5
+ovh = 1.10
+bw_mbps = 3015.0
+spk = 2
+bits = 12
+mem_place = "avg"
+tracks = 1024
+host_ms = 0.0
+result_push = true
+offset = "model"
+jitter_ms = 0.8
+gather_ms = 0.0
+perturb = ""
+tail_us = 0.0
+pre_us = 0.0
+scenarios = ["U", "K", "S", "I", "SK", "R"]
+seeds = 10
+seed0 = 0
+warm = 16
+meas = 64
+storage = "G"
+entries = 4
+storage_attrs = {}
+compute = "all"
+sched = "grouping"
+sched_attrs = {}
+search_key = "tracks"
+search_values = []
+search_step = 16
+tune_attr = ""
+tune_values = []
+tune_conds = []
+
+[sweep]
+jitter_ms = [0.8, 1.6, 3.2, 6.4, 10.0, 15.0, 20.0, 32.0]
+entries = [2, 4, 6, 8, 10]

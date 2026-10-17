@@ -1,0 +1,3 @@
+normal   mel(31, 40) mem=True spk=True 포화=[0, 0, 0] 판정=0
+anomaly  mel(31, 40) mem=True spk=True 포화=[0, 0, 0] 판정=0
+선행 골든 비트 일치: PASS

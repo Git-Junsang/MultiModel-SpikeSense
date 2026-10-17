@@ -1,0 +1,55 @@
+# P3.13 논문 실험(옛 paper_exp.py --part adverse)
+# L·64 lane, membrane potential DDR3, rev 4, 예약 25.5 tile, 입출력 즉시 전송, spike 2개/cycle
+# 표 3: 제안 vs offset 배정 없음(Grouping · LRU 10) × 악조건
+# 키 설명은 template.toml
+
+mode = "run"
+model = "L"
+lanes = 64
+mem = "ddr"
+rev = 4
+reserve = 25.5
+ovh = 1.1
+bw_mbps = 3015.0
+spk = 2
+bits = 0
+mem_place = "avg"
+tracks = 1024
+host_ms = 0.0
+result_push = true
+offset = "model"
+jitter_ms = 0.8
+gather_ms = 0.0
+perturb = ""
+tail_us = 0.0
+pre_us = 0.0
+scenarios = ["U", "K", "S", "I", "SK", "R"]
+seeds = 20
+seed0 = 0
+warm = 16
+meas = 64
+storage = "G"
+entries = 4
+storage_attrs = {}
+compute = "all"
+sched = "grouping"
+sched_attrs = {}
+search_key = "tracks"
+search_values = []
+search_step = 16
+tune_attr = ""
+tune_values = []
+tune_conds = []
+
+[sweep]
+config = [
+  {label = "제안"},
+  {label = "offset 배정 없음", offset = "none", storage = "A", entries = 10},
+]
+cond = [
+  {label = "기준"},
+  {label = "꼬리 +700 µs", tail_us = 700.0},
+  {label = "제어 비용 20 %", ovh = 1.2},
+  {label = "DDR3 2.0 GB/s", bw_mbps = 2000.0},
+  {label = "spike 전부 1 (dense)", spk = 0},
+]

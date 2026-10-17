@@ -1,0 +1,31 @@
+{
+  "format_version": 2,
+  "model_id": 13,
+  "unit": "slider_id00",
+  "checkpoint": "software/weights/L_normal_noaug/slider_id00/last.pth",
+  "layer_sizes": [
+    40,
+    384,
+    256,
+    64,
+    2
+  ],
+  "weight_scales": [
+    0.011761303961746336,
+    0.009361994548106756,
+    0.010289473796454002,
+    0.02143430334376538
+  ],
+  "weights_bytes": 130176,
+  "params_bytes": 1412,
+  "slot_bytes": 262144,
+  "slot_offset": 3407872,
+  "slot_offset_hex": "0x00340000",
+  "ddr_address": 3407872,
+  "ddr_address_hex": "0x00340000",
+  "sha256": {
+    "weights.bin": "67ea7ed5015d5a96046bd8bfd3a54b769d9c9fdb790bd8df6827e19fd643e840",
+    "params.bin": "3560def94149b627a6fad634fcd4f0d7f07e6a2c847d36412c631e61a9bf4dd2",
+    "model.slot.bin": "75df5888684ccd9ff15c7ca193661a00c5646db12c6603c679c6c7b977e6bf1f"
+  }
+}

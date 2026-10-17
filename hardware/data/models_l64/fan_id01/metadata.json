@@ -1,0 +1,31 @@
+{
+  "format_version": 2,
+  "model_id": 0,
+  "unit": "fan_id01",
+  "checkpoint": "software/weights/L_normal_noaug/fan_id01/last.pth",
+  "layer_sizes": [
+    40,
+    384,
+    256,
+    64,
+    2
+  ],
+  "weight_scales": [
+    0.012051648042333407,
+    0.010258007237291712,
+    0.012561195478664609,
+    0.021480000863863726
+  ],
+  "weights_bytes": 130176,
+  "params_bytes": 1412,
+  "slot_bytes": 262144,
+  "slot_offset": 0,
+  "slot_offset_hex": "0x00000000",
+  "ddr_address": 0,
+  "ddr_address_hex": "0x00000000",
+  "sha256": {
+    "weights.bin": "4cd11c16a6eda74e312bdcf92ff00be2e93039dda6ace139e6157687bbe96c4c",
+    "params.bin": "3011b3f9e2549811f0793d187916021574e7bdc9ec553caad6288f49d0eda489",
+    "model.slot.bin": "35ae77eafc6901b674d2b22a278e19a8570e6fd2ee060cb2fcc759a213473ca9"
+  }
+}

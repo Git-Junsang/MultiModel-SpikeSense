@@ -2,7 +2,7 @@
   "format_version": 1,
   "model_id": 12,
   "unit": "pump_id06",
-  "checkpoint": "software/model_weights/pump_id06/last.pth",
+  "checkpoint": "software/weights/L_normal_noaug/pump_id06/last.pth",
   "layer_sizes": [
     40,
     384,

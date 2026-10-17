@@ -1,0 +1,52 @@
+# P3.21 비교: miss 0인 가장 낮은 DDR3 대역폭(search). entry 4, seed 0~2. 조절값 고정
+# L·64 lane, rev 4, 예약 25.5 tile, 즉시 입출력, spike 2개/cycle, 남는 BRAM에 12 bit membrane potential, jitter 0.8 ms
+# 비교군 Dysta Method·DeepRT Method(offset 배정 없음, LRU), ablation offset 배정 없음(Grouping+LRU)·HW만·SW만·SW+HW(제안). 같은 BRAM·trace
+# 키 설명은 template.toml
+
+mode = "search"
+model = "L"
+lanes = 64
+mem = "ddr"
+rev = 4
+reserve = 25.5
+ovh = 1.10
+bw_mbps = 3015.0
+spk = 2
+bits = 12
+mem_place = "avg"
+tracks = 1024
+host_ms = 0.0
+result_push = true
+offset = "model"
+jitter_ms = 0.8
+gather_ms = 0.0
+perturb = ""
+tail_us = 0.0
+pre_us = 0.0
+scenarios = ["U", "K", "S", "I", "SK", "R"]
+seeds = 3
+seed0 = 0
+warm = 16
+meas = 64
+storage = "G"
+entries = 4
+storage_attrs = {}
+compute = "all"
+sched = "grouping"
+sched_attrs = {}
+search_key = "bw_mbps"
+search_values = [3015.0, 2500.0, 2000.0, 1500.0, 1200.0, 1000.0, 800.0, 600.0, 500.0, 400.0, 300.0, 250.0, 200.0, 150.0, 100.0]
+search_step = 16
+tune_attr = ""
+tune_values = []
+tune_conds = []
+
+[sweep]
+method = [
+  {label = "Grouping(offset 배정 없음)", offset = "none", storage = "A", sched = "grouping"},
+  {label = "Dysta Method", offset = "none", storage = "A", sched = "dysta", sched_attrs = {eta = 0.0001}},
+  {label = "DeepRT Method", offset = "none", storage = "A", sched = "deeprt", sched_attrs = {cfg = [14900.0, false]}},
+  {label = "HW만: offset-order cache", offset = "none", storage = "G", sched = "grouping"},
+  {label = "SW만: Host offset 배정", offset = "model", storage = "A", sched = "grouping"},
+  {label = "SW+HW: 제안", offset = "model", storage = "G", sched = "grouping"},
+]

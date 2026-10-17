@@ -10,7 +10,7 @@
 #                XDMA M_AXI_LITE(BAR0 64 KiB)와 JTAG-AXI만 접근
 #   0x0001_0000  BRAM 64 KiB (axi_aclk, PCIe DMA 지연 시험용)
 #   0x8000_0000  DDR3 1 GiB  (외부 포트 M_AXI_DDR → p3_top의 정적 MUX → MIG)
-#                BRAM·DDR3는 XDMA M_AXI(H2C/C2H 오프셋)와 JTAG-AXI가 접근
+#                BRAM·DDR3는 XDMA M_AXI(H2C/C2H offset)와 JTAG-AXI가 접근
 # ============================================================
 
 create_bd_design p3_bd

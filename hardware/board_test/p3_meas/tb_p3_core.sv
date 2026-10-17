@@ -63,7 +63,7 @@ module tb_p3_core;
 
     // ---------------- 메모리 모델 ----------------
     bit [255:0] mem [bit [24:0]];
-    int rd_lat = 20;            // AR 수락 → 첫 R beat 최소 사이클
+    int rd_lat = 20;            // AR 수락 → 첫 R beat 최소 cycle
     int ready_pct = 70;
     int max_seen_outst = 0;
     int n_iss = 0, n_cmp = 0;
