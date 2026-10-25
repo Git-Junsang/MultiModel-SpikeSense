@@ -97,7 +97,7 @@ def ddr_summary(recs):
     for t in tags:
         L += [f'## 슬라이스 크기별 읽기 ({t})', '',
               '모델 전환 = 매 슬라이스 40개 모델 slot 중 무작위 slot의 시작 주소. 같은 모델 = 연속 주소. '
-              'blocking = 앞 슬라이스가 끝나야 다음 요청, pipelined = 연속 요청. '
+              'blocking = 앞 슬라이스가 끝나야 다음 전송, pipelined = 연속 전송. '
               '`가정 시간` = 크기 / 2.0 GB/s.', '',
               '| 크기 B | 가정 시간 | 전환·blk GB/s | 전환·blk 지연 평균 / p99 / 최대 | 첫 데이터 평균 | '
               '전환·pipe GB/s | 연속·blk GB/s | 연속·pipe GB/s |',

@@ -4,7 +4,7 @@
 // MIG AXI 슬레이브(256 bit, ui_clk 100 MHz)에 직접 붙는 마스터다.
 // 한 번의 실행(start)은 "전송(transfer)" n개로 이루어진다. 전송 하나는
 // 연속 주소 xfer_beats × 32 B이며, 4 KiB 경계와 burst_max에서 AXI 버스트로
-// 잘라 보낸다. 전송은 weight 슬라이스 하나를 가져오는 DMA 요청에 해당한다.
+// 잘라 보낸다. 전송은 weight 슬라이스 하나를 가져오는 DMA 전송에 해당한다.
 //
 // 주소 모드 (cfg_amode):
 //   0 SEQ       전송 i의 시작 = base + (i × 전송 크기) mod wrap  (wrap=0이면 감지 안 함)
@@ -14,7 +14,7 @@
 //   3 SLOT_RR   시작 = base + (i mod slot_cnt) × stride — 결정적 모델 순환
 // 발행 방식 (cfg_pipe):
 //   0 blocking  전송 하나가 끝나고 gap cycle이 지나야 다음 전송을 시작한다
-//               (슬라이스를 하나씩 요청하는 단순 DMA). 전송 안의 버스트는
+//               (슬라이스를 하나씩 읽는 단순 DMA). 전송 안의 버스트는
 //               max_outst개까지 겹쳐 보낸다.
 //   1 pipelined 전송 경계와 무관하게 max_outst개까지 버스트를 계속 보낸다.
 //

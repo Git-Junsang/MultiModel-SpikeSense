@@ -1,0 +1,14 @@
+run   1) MIG 보정 전: 정보·STATUS 읽기, DDR3 창 status 2, 오류 0, cycle 3322
+run   2) 모델 2개 Ethernet 적재·확인(나머지 38개 backdoor), 제어 packet 521, DDR3 beat 쓰기 8228·읽기 8228, 오류 0, 2341391 cycle
+run   3) 설정·PNU 표 쓰기와 읽기, SOFT_RESET, RUN = 1, RUN 중 설정·DDR3 쓰기 무시, 오류 0
+run      t0: 결과 80, 누적 오류 0, cycle 2637940
+run      t30: 결과 2480, 누적 오류 0, cycle 9266629
+run   4) 추론 요청 2480, 결과 2480 (DDR3 트랙 20), out 불일치 0, 필드 불일치 0, batch_n 1: 2·2: 2478, LATE 0, 오류 0, 6858551 cycle
+run   counter: REQ_IN 2480, REQ_DROP 0, RES_OUT 2480, LATE 0, MAX_PENDING 80, BATCHES 1241, MODEL_LOADS 1177, SAT_COUNT 0
+run   counter: WEIGHT_BYTES 154949696, STATE_BYTES 1327360, CMP_BUSY 1331594, CMP_STALL 5385595; DDR3 beat weight 4842178, membrane potential 읽기 20400·쓰기 21080
+run   5) IDLE 뒤 RUN = 0, counter, DDR3 트랙 20개 membrane potential DDR3 창 읽기 불일치 0, 오류 0
+run   5b) SOFT_RESET 뒤(모델 7·26 slot 맞바꿈, DEADLINE 1 µs): 결과 80, out 불일치 0, LATE 80, MODEL_LOADS 40, BATCHES 40, CMP_STALL 190092, 오류 0
+run   6) 오류: model 45 → 3·트랙 5, 100 B datagram은 첫 오류 유지, ERR_CLEAR, 100 B → 7·100, 오류 0
+run   끝: cycle 10883627 (적재 2341391, 추론 6858551), 제어 packet 911, AXI 위반 0, 오류 0, FULL 0, NT 31
+PASS
+- /mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/testbench/tb_sys.sv:1028: Verilog $finish

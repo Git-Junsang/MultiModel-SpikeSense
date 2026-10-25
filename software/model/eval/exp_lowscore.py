@@ -17,9 +17,10 @@ import numpy as np
 import torch
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "train"))
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "dataset"))
 import dcase_data as dd
-import train_unit
+import train_1unit
 
 UNITS = [("valve", "01"), ("valve", "06"), ("valve", "00"), ("valve", "03"), ("fan", "00")]
 CONFIGS = {"base": [], "clip": ["--clip_loss"], "hop": ["--hop", "16"],
@@ -33,7 +34,7 @@ def main():
     for m, i in UNITS:
         for cfg, extra in CONFIGS.items():
             t0 = time.time()
-            res = train_unit.main(["--machine", m, "--mid", i, "--epochs", "60", "--batch_size", "512",
+            res = train_1unit.main(["--machine", m, "--mid", i, "--epochs", "60", "--batch_size", "512",
                               "--sched", "cosine", "--out_dir", os.path.join(OUT, f"{dd.unit_name(m, i)}_{cfg}")]
                              + extra)
             b, l = res["best"], res["last"]

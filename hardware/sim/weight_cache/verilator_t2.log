@@ -1,0 +1,5 @@
+run   entry 경로: entry 6개, 불일치 0
+run   재생 t2: 도착 81920, 계획 69866 (hit 66691, 빈 entry 6, 내보냄 3169)
+run   결정 불일치 0, 연산 중 entry를 내보냄 0
+PASS
+- hardware/testbench/tb_weight_cache.sv:176: Verilog $finish

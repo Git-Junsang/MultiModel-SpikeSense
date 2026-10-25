@@ -12,6 +12,7 @@
   layer 2~4           cur   = Σ spike · W_q                               spike 조건부 누산
   membrane potential  mem   = sat16(((beta_q · mem) >> 8) + cur)          누설 내림, 16 bit 포화 가산
                       spike = mem >= vth_q ;  mem -= spike · vth_q
+  저장                mem_s = clip(mem, -2^(n-1), 2^(n-1) - 1)          store_bits = n (기본 16), 다음 timestep으로 넘길 때만
   판정                출력 layer membrane potential 시간 평균의 argmax (0 = 정상, 1 = 이상)
 
 선행 RTL은 16 bit에서 넘치면 값이 되감긴다(wrap). layer 2 누산의 이론 최대는 384 × 128 = 49,152로
@@ -53,26 +54,30 @@ def quantize(layers):
     return q
 
 
-def forward(q, x_q, stats=None, trace=None):
+def forward(q, x_q, stats=None, trace=None, store_bits=16):
     """x_q: int [B, T, 40] (0~127) → 출력 membrane potential int64 [B, T, 2].
 
     stats에 dict를 넘기면 layer별 누산 |최대|(acc), 포화 전 membrane potential |최대|(mem),
-    포화 횟수(sat), layer별 spike 기록(spk, int8 [B, T, N])을 채운다.
+    포화 횟수(sat), 저장 때 값이 바뀐 횟수(clip), layer별 spike 기록(spk, int8 [B, T, N])을 채운다.
+
+    store_bits < 16이면 다음 timestep으로 넘기는 membrane potential만 그 bit로 포화한다(P3.13).
+    출력(판정용)은 저장 전 값이다.
 
     trace에 dict를 넘기면 RTL 대조용 layer별 레코드를 [B,T,N]으로 채운다.
     ``cur``는 L1 시프트 후 전류, ``mem_pre``는 포화 후·발화 전,
-    ``spk``는 발화, ``mem``은 soft reset 후 저장 membrane potential이다.
+    ``spk``는 발화, ``mem``은 soft reset 후 store_bits로 저장한 membrane potential이다.
     """
     x_q = np.asarray(x_q)
     B, T, _ = x_q.shape
     Wt = [l["W"].astype(np.float64).T for l in q]
     beta = [l["beta"].astype(np.int64) for l in q]
     vth = [l["vth"].astype(np.int64) for l in q]
+    lo, hi = -(1 << (store_bits - 1)), (1 << (store_bits - 1)) - 1
     mems = [np.zeros((B, l["W"].shape[0]), np.int64) for l in q]
     out = np.zeros((B, T, q[-1]["W"].shape[0]), np.int64)
     if stats is not None:
         n = len(q)
-        stats.update(acc=[0] * n, mem=[0] * n, sat=[0] * n,
+        stats.update(acc=[0] * n, mem=[0] * n, sat=[0] * n, clip=[0] * n,
                      spk=[np.zeros((B, T, l["W"].shape[0]), np.int8) for l in q])
     if trace is not None:
         trace.clear()
@@ -95,8 +100,10 @@ def forward(q, x_q, stats=None, trace=None):
                 stats["sat"][i] += int(((mem < MEM_MIN) | (mem > MEM_MAX)).sum())
             mem = np.clip(mem, MEM_MIN, MEM_MAX)
             spk = (mem >= vth[i]).astype(np.int64)
-            mems[i] = mem - spk * vth[i]
+            post = mem - spk * vth[i]
+            mems[i] = np.clip(post, lo, hi)
             if stats is not None:
+                stats["clip"][i] += int((mems[i] != post).sum())
                 stats["spk"][i][:, t] = spk
             if trace is not None:
                 trace["cur"][i][:, t] = cur
@@ -104,7 +111,7 @@ def forward(q, x_q, stats=None, trace=None):
                 trace["spk"][i][:, t] = spk
                 trace["mem"][i][:, t] = mems[i]
             h = spk.astype(np.float64)
-        out[:, t] = mems[-1]
+        out[:, t] = post
     return out
 
 

@@ -1,0 +1,5 @@
+M3: 1024트랙, 9375 epoch(300 s), thread 1, pin 없음, load8, 음성 /home/junsang/mmss_jobs/p325/software/dataset/dcase/fan/train/normal_id_01_00000000.wav
+  깨어남 지연(t_compute_start − t_frame): p50 56.3 µs, p99 57.6 µs, p99.9 7458.7 µs, 최대 14335.0 µs
+  계산(t_ready − t_compute_start): p50 535.6 µs, p99 569.3 µs, p99.9 1166.9 µs, 최대 3810.5 µs
+  준비 지연(t_ready − t_frame): p50 592.0 µs, p99 721.2 µs, p99.9 8255.7 µs, 최대 15131.6 µs
+m3/m3_pin-none_load8.csv.gz

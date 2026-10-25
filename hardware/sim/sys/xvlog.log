@@ -1,0 +1,114 @@
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/rtl/arp_cache.v" into library work
+INFO: [VRFC 10-311] analyzing module arp_cache
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/rtl/arp_eth_rx.v" into library work
+INFO: [VRFC 10-311] analyzing module arp_eth_rx
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/rtl/arp_eth_tx.v" into library work
+INFO: [VRFC 10-311] analyzing module arp_eth_tx
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/rtl/arp.v" into library work
+INFO: [VRFC 10-311] analyzing module arp
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/rtl/axis_gmii_rx.v" into library work
+INFO: [VRFC 10-311] analyzing module axis_gmii_rx
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/rtl/axis_gmii_tx.v" into library work
+INFO: [VRFC 10-311] analyzing module axis_gmii_tx
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/rtl/eth_arb_mux.v" into library work
+INFO: [VRFC 10-311] analyzing module eth_arb_mux
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/rtl/eth_axis_rx.v" into library work
+INFO: [VRFC 10-311] analyzing module eth_axis_rx
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/rtl/eth_axis_tx.v" into library work
+INFO: [VRFC 10-311] analyzing module eth_axis_tx
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/rtl/eth_mac_1g_rgmii_fifo.v" into library work
+INFO: [VRFC 10-311] analyzing module eth_mac_1g_rgmii_fifo
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/rtl/eth_mac_1g_rgmii.v" into library work
+INFO: [VRFC 10-311] analyzing module eth_mac_1g_rgmii
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/rtl/eth_mac_1g.v" into library work
+INFO: [VRFC 10-311] analyzing module eth_mac_1g
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/rtl/iddr.v" into library work
+INFO: [VRFC 10-311] analyzing module iddr
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/rtl/ip_arb_mux.v" into library work
+INFO: [VRFC 10-311] analyzing module ip_arb_mux
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/rtl/ip_complete.v" into library work
+INFO: [VRFC 10-311] analyzing module ip_complete
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/rtl/ip_eth_rx.v" into library work
+INFO: [VRFC 10-311] analyzing module ip_eth_rx
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/rtl/ip_eth_tx.v" into library work
+INFO: [VRFC 10-311] analyzing module ip_eth_tx
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/rtl/ip.v" into library work
+INFO: [VRFC 10-311] analyzing module ip
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/rtl/lfsr.v" into library work
+INFO: [VRFC 10-311] analyzing module lfsr
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/rtl/oddr.v" into library work
+INFO: [VRFC 10-311] analyzing module oddr
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/rtl/rgmii_phy_if.v" into library work
+INFO: [VRFC 10-311] analyzing module rgmii_phy_if
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/rtl/ssio_ddr_in.v" into library work
+INFO: [VRFC 10-311] analyzing module ssio_ddr_in
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/rtl/ssio_ddr_out.v" into library work
+INFO: [VRFC 10-311] analyzing module ssio_ddr_out
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/rtl/udp_checksum_gen.v" into library work
+INFO: [VRFC 10-311] analyzing module udp_checksum_gen
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/rtl/udp_complete.v" into library work
+INFO: [VRFC 10-311] analyzing module udp_complete
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/rtl/udp_ip_rx.v" into library work
+INFO: [VRFC 10-311] analyzing module udp_ip_rx
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/rtl/udp_ip_tx.v" into library work
+INFO: [VRFC 10-311] analyzing module udp_ip_tx
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/rtl/udp.v" into library work
+INFO: [VRFC 10-311] analyzing module udp
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/lib/axis/rtl/arbiter.v" into library work
+INFO: [VRFC 10-311] analyzing module arbiter
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/lib/axis/rtl/axis_async_fifo_adapter.v" into library work
+INFO: [VRFC 10-311] analyzing module axis_async_fifo_adapter
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/lib/axis/rtl/axis_async_fifo.v" into library work
+INFO: [VRFC 10-311] analyzing module axis_async_fifo
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/lib/axis/rtl/axis_fifo.v" into library work
+INFO: [VRFC 10-311] analyzing module axis_fifo
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/lib/axis/rtl/priority_encoder.v" into library work
+INFO: [VRFC 10-311] analyzing module priority_encoder
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/lib/axis/rtl/sync_reset.v" into library work
+INFO: [VRFC 10-311] analyzing module sync_reset
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/src/plift_core.v" into library work
+INFO: [VRFC 10-311] analyzing module plift_core
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/src/plif_array.v" into library work
+INFO: [VRFC 10-311] analyzing module plif_array
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/src/mac_unit.v" into library work
+INFO: [VRFC 10-311] analyzing module mac_unit
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/src/spike_list.v" into library work
+INFO: [VRFC 10-311] analyzing module spike_list
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/src/weight_entry.v" into library work
+INFO: [VRFC 10-311] analyzing module weight_entry
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/src/compute_array.v" into library work
+INFO: [VRFC 10-311] analyzing module compute_array
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/src/membrane_bank.v" into library work
+INFO: [VRFC 10-311] analyzing module membrane_bank
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/src/membrane_buf.v" into library work
+INFO: [VRFC 10-311] analyzing module membrane_buf
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/src/membrane_storage.v" into library work
+INFO: [VRFC 10-311] analyzing module membrane_storage
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/src/next_use_predictor.v" into library work
+INFO: [VRFC 10-311] analyzing module next_use_predictor
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/src/weight_cache.v" into library work
+INFO: [VRFC 10-311] analyzing module weight_cache
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/src/dma.v" into library work
+INFO: [VRFC 10-311] analyzing module dma
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/src/accel_core.v" into library work
+INFO: [VRFC 10-311] analyzing module accel_core
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/src/ingest.v" into library work
+INFO: [VRFC 10-311] analyzing module ingest
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/src/req_table.v" into library work
+INFO: [VRFC 10-311] analyzing module req_table
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/src/track_scheduler.v" into library work
+INFO: [VRFC 10-311] analyzing module track_scheduler
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/src/result.v" into library work
+INFO: [VRFC 10-311] analyzing module result
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/src/frontend.v" into library work
+INFO: [VRFC 10-311] analyzing module frontend
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/src/regs.v" into library work
+INFO: [VRFC 10-311] analyzing module regs
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/src/ctrl.v" into library work
+INFO: [VRFC 10-311] analyzing module ctrl
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/src/eth_link.v" into library work
+INFO: [VRFC 10-311] analyzing module eth_link
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/src/accel_sys.v" into library work
+INFO: [VRFC 10-311] analyzing module accel_sys
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/testbench/tb_sys.sv" into library work
+INFO: [VRFC 10-311] analyzing module tb_sys

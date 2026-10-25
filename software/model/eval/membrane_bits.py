@@ -22,6 +22,7 @@ import numpy as np
 HERE = os.path.dirname(os.path.abspath(__file__))
 SOFTWARE = os.path.dirname(os.path.dirname(HERE))
 sys.path.insert(0, os.path.join(SOFTWARE, "model"))
+sys.path.insert(0, os.path.join(SOFTWARE, "train"))
 sys.path.insert(0, os.path.join(SOFTWARE, "dataset"))
 sys.path.insert(0, HERE)
 
@@ -74,10 +75,10 @@ def forward(q, x_q, store):
 def run_unit(unit):
     machine, mid = next((m, i) for m, i in dd.UNITS if dd.unit_name(m, i) == unit)
     import torch
-    import train_unit
+    import train_1unit
     pth = os.path.join(cq.WEIGHTS, unit, "last.pth")
     a = torch.load(pth, map_location="cpu", weights_only=False)["args"]
-    data = train_unit.prepare(machine, mid, a["method"], a["val_frac"], a["seed"], "cpu", a.get("hop"))
+    data = train_1unit.prepare(machine, mid, a["method"], a["val_frac"], a["seed"], "cpu", a.get("hop"))
     x = si.quantize_input(data["test_seg"].numpy())
     y, f, b = data["test_label"], data["test_file"], data["bal_idx"]
     q = si.quantize(sn.load_params(pth))

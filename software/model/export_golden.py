@@ -5,8 +5,9 @@
 fan_id01 정상 벡터는 $readmemh용 HEX로도 생성한다.
 
 프로젝트 루트에서:
-  python3 software/model/export_golden.py                # v1, L
+  python3 software/model/export_golden.py                # 1lane, L
   python3 software/model/export_golden.py --format l64   # L, 64 lane → hardware/data/golden_l64
+  python3 software/model/export_golden.py --format l64 --mem-bits 12   # 12 bit 저장 → golden_l64_m12
 """
 
 import argparse
@@ -18,19 +19,20 @@ import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "dataset"))  # dcase_data는 software/dataset
 import dcase_data as dd  # noqa: E402
-import model_format_v1
-import model_format_v2
+import model_format_1lane
+import model_format_64lane
 import snn_int8 as si
 
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_CACHE = ROOT / "software" / "dataset" / "mel_dcase"
-FORMATS = {"v1": model_format_v1, "l64": model_format_v2.L64, "xl": model_format_v2.XL}
-mf = model_format_v1                   # main()이 --format으로 바꾼다
+FORMATS = {"1lane": model_format_1lane, "l64": model_format_64lane.L64, "xl": model_format_64lane.XL}
+mf = model_format_1lane                   # main()이 --format으로 바꾼다
+mem_bits = 16                          # main()이 --mem-bits로 바꾼다
 
 
 def trace_arrays(x_q, q):
     stats, trace = {}, {}
-    out = si.forward(q, x_q[None], stats=stats, trace=trace)[0]
+    out = si.forward(q, x_q[None], stats=stats, trace=trace, store_bits=mem_bits)[0]
     arrays = {"input": x_q.astype(np.uint8), "output_mem": out.astype(np.int16)}
     for i in range(len(q)):
         arrays[f"cur_l{i + 1}"] = trace["cur"][i][0]
@@ -79,7 +81,7 @@ def real_vectors(models_dir, cache_dir, out_dir, hex_unit):
                     "model_id": model_id, "unit": unit, "tag": tag, "label": label,
                     "cache": str(cache_path.relative_to(ROOT)), "segment_index": index,
                     "timesteps": int(x_q.shape[0]), "prediction": int(si.predict(arrays["output_mem"][None])[0]),
-                    "saturation_counts": stats["sat"],
+                    "saturation_counts": stats["sat"], "store_clip_counts": stats["clip"],
                 }
                 records.append(record)
                 if unit == hex_unit and tag == "normal":
@@ -98,7 +100,7 @@ def stress_vectors(out_dir):
                       "vth": np.full(shape[0], 255, np.uint8)})
         x_q = np.full((31, mf.LAYER_SIZES[0]), 127, np.int64)
         arrays, stats = trace_arrays(x_q, q)
-        if sum(stats["sat"]) == 0:
+        if sum(stats["sat"]) + sum(stats["clip"]) == 0:   # 12 bit 저장이면 negative는 16 bit 포화 대신 저장 포화만 탄다
             raise RuntimeError(f"stress_{tag}가 포화 경로를 실행하지 않음")
         target = out_dir / "stress" / tag
         target.mkdir(parents=True, exist_ok=True)
@@ -106,27 +108,28 @@ def stress_vectors(out_dir):
         np.savez_compressed(target / "vector.npz", **arrays)
         save_rtl_hex(target / "rtl_hex", arrays)
         records.append({"tag": f"stress_{tag}", "timesteps": 31,
-                        "saturation_counts": stats["sat"]})
+                        "saturation_counts": stats["sat"], "store_clip_counts": stats["clip"]})
         print(f"stress_{tag}: saturation={stats['sat']}")
     return records
 
 
 def main():
-    global mf
+    global mf, mem_bits
     ap = argparse.ArgumentParser()
-    ap.add_argument("--format", choices=FORMATS, default="v1")
+    ap.add_argument("--format", choices=FORMATS, default="1lane")
     ap.add_argument("--models", type=Path, help="모델 폴더 (기본: 형식별)")
     ap.add_argument("--cache", type=Path, default=DEFAULT_CACHE)
     ap.add_argument("--out", type=Path, help="출력 폴더 (기본: 형식별)")
     ap.add_argument("--hex-unit", default="fan_id01")
+    ap.add_argument("--mem-bits", type=int, default=16, help="다음 timestep으로 넘기는 membrane potential 저장 bit")
     args = ap.parse_args()
-    mf = FORMATS[args.format]
+    mf, mem_bits = FORMATS[args.format], args.mem_bits
     args.models = args.models or ROOT / mf.MODELS_DIR
-    args.out = args.out or ROOT / mf.GOLDEN_DIR
+    args.out = args.out or ROOT / (mf.GOLDEN_DIR + (f"_m{mem_bits}" if mem_bits != 16 else ""))
     args.out.mkdir(parents=True, exist_ok=True)
     records = real_vectors(args.models, args.cache, args.out, args.hex_unit)
     stress = stress_vectors(args.out)
-    manifest = {"format_version": 1, "integer_reference": "software/model/snn_int8.py",
+    manifest = {"format_version": 1, "integer_reference": "software/model/snn_int8.py", "mem_store_bits": mem_bits,
                 "real_vector_count": len(records), "records": records, "stress": stress}
     (args.out / "manifest.json").write_text(
         json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")

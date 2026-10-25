@@ -1,0 +1,23 @@
+
+****** xsim v2026.1 (64-bit)
+  **** SW Build 6511674 on Tue Jun 16 11:01:26 MDT 2026
+  **** IP Build 6504888 on Tue Jun 09 09:05:25 MDT 2026
+  **** SharedData Build 6501428 on Mon Jun 08 17:34:18 MDT 2026
+  **** Start of session at: Sun Oct 25 16:35:26 2026
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+    ** Copyright 2022-2026 Advanced Micro Devices, Inc. All Rights Reserved.
+
+source hardware/sim/eth/xsim.dir/tb_eth/xsim_script.tcl
+# xsim {tb_eth} -autoloadwcfg -xsimdir hardware/sim/eth/xsim.dir -runall
+Time resolution is 1 ps
+run -all
+run   요청·결과: 요청 575, 결과 575, len_err 7, 오류 0
+run   FCS: 틀린 frame 1개 버림, 오류 0
+run   받는 곳: 요청 749, 결과 749, ARP 받음 2·보냄 2, 오류 0
+run   제어: 요청 35개, DDR3 beat 쓰기 67·읽기 100, 결과·응답 동시 대기 20, ARP 받음 3·보냄 3, 오류 0
+run   끝: 요청 795, 결과 795, phy_reset_n 50 cycle, 오류 0, 172791 cycle
+PASS
+$finish called at time : 1727907869 ps : File "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/testbench/tb_eth.sv" Line 910
+exit
+INFO: xsimkernel Simulation Memory Usage: 157456 KB (Peak: 214280 KB), Simulation CPU Usage: 3450 ms
+INFO: [Common 17-206] Exiting xsim at Sun Oct 25 16:35:31 2026...

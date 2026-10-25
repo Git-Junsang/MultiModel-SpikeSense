@@ -1,6 +1,6 @@
 """P1.6/P1.7·P3.10 산출물의 크기·레이아웃·비트 일치를 전수 검증한다.
 
-  python3 software/model/verify_export.py                # v1, L
+  python3 software/model/verify_export.py                # 1lane, L
   python3 software/model/verify_export.py --format l64   # L, 64 lane (xl: XL_mixed_aug, 256 lane)
 """
 
@@ -14,14 +14,14 @@ import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "dataset"))  # dcase_data는 software/dataset
 import dcase_data as dd  # noqa: E402
-import model_format_v1
-import model_format_v2
+import model_format_1lane
+import model_format_64lane
 import snn_int8 as si
 import snn_fp32 as sn
 
 ROOT = Path(__file__).resolve().parents[2]
-FORMATS = {"v1": model_format_v1, "l64": model_format_v2.L64, "xl": model_format_v2.XL}
-mf = model_format_v1                   # main()이 --format으로 바꾼다
+FORMATS = {"1lane": model_format_1lane, "l64": model_format_64lane.L64, "xl": model_format_64lane.XL}
+mf = model_format_1lane                   # main()이 --format으로 바꾼다
 
 
 def digest(data):
@@ -62,14 +62,14 @@ def verify_models(models_dir, weights_dir):
     return manifest
 
 
-# design_references/02_MODEL.md §6에 적은 값. model_format_v2가 계산한 값과 따로 둔다
-SPEC_V2 = {"l64": dict(lanes=64, offs=(0x005C0, 0x041C0, 0x1C1C0, 0x201C0), words=2034),
+# design_references/02_MODEL.md §6에 적은 값. model_format_64lane이 계산한 값과 따로 둔다
+SPEC_LANE = {"l64": dict(lanes=64, offs=(0x005C0, 0x041C0, 0x1C1C0, 0x201C0), words=2034),
            "xl": dict(lanes=256, offs=(0x00B40, 0x08340, 0x68340, 0x78340), words=2169)}
 
 
-def verify_v2_layout(fmt, models_dir, weights_dir, unit="fan_id01"):
-    """02_MODEL.md §6 주소식으로 byte를 직접 찾아 checkpoint 양자화 값과 비교한다(model_format_v2 변환과 독립)."""
-    spec = SPEC_V2[fmt]
+def verify_lane_layout(fmt, models_dir, weights_dir, unit="fan_id01"):
+    """02_MODEL.md §6 주소식으로 byte를 직접 찾아 checkpoint 양자화 값과 비교한다(model_format_64lane 변환과 독립)."""
+    spec = SPEC_LANE[fmt]
     lanes = spec["lanes"]
     q = si.quantize(sn.load_params(weights_dir / unit / "last.pth"))
     ws = [layer["W"] for layer in q]
@@ -180,7 +180,7 @@ def verify_integer_matmul(models_dir, golden_dir):
 def main():
     global mf
     ap = argparse.ArgumentParser()
-    ap.add_argument("--format", choices=FORMATS, default="v1")
+    ap.add_argument("--format", choices=FORMATS, default="1lane")
     ap.add_argument("--models", type=Path, help="기본: 형식별")
     ap.add_argument("--golden", type=Path, help="기본: 형식별")
     ap.add_argument("--weights", type=Path, help="기본: 형식별")
@@ -190,8 +190,8 @@ def main():
     args.golden = args.golden or ROOT / mf.GOLDEN_DIR
     args.weights = args.weights or ROOT / mf.WEIGHTS_DIR
     verify_models(args.models, args.weights)
-    if args.format in SPEC_V2:
-        verify_v2_layout(args.format, args.models, args.weights)
+    if args.format in SPEC_LANE:
+        verify_lane_layout(args.format, args.models, args.weights)
     golden = verify_golden(args.models, args.golden)
     verify_integer_matmul(args.models, args.golden)
     saturation = [item["saturation_counts"] for item in golden["stress"]]

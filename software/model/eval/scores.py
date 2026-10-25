@@ -1,6 +1,6 @@
 """논문 그림의 원자료를 모은다(GPU 필요).
 
-평가 분할은 train_unit.prepare와 동일하다(학습에 쓴 이상 파일 절반 제외). 따라서 여기서
+평가 분할은 train_1unit.prepare와 동일하다(학습에 쓴 이상 파일 절반 제외). 따라서 여기서
 계산한 AUC는 train_result/L_normal_noaug/results.csv의 test_auc와 같아야 한다.
 
 학습된 40대 모델로 test 세그먼트를 추론해
@@ -19,10 +19,11 @@ import torch
 
 SW = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, os.path.join(SW, "model"))
+sys.path.insert(0, os.path.join(SW, "train"))
 sys.path.insert(0, os.path.join(SW, "dataset"))
 import dcase_data as dd
 import snn_torch as sm
-import train_unit as tr
+import train_1unit as tr
 
 OUT = os.path.join(SW, "train_result", "eval", "scores")
 DEV = "cuda" if torch.cuda.is_available() else "cpu"

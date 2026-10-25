@@ -1,0 +1,22 @@
+
+****** xsim v2026.1 (64-bit)
+  **** SW Build 6511674 on Tue Jun 16 11:01:26 MDT 2026
+  **** IP Build 6504888 on Tue Jun 09 09:05:25 MDT 2026
+  **** SharedData Build 6501428 on Mon Jun 08 17:34:18 MDT 2026
+  **** Start of session at: Sun Oct 25 16:35:05 2026
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+    ** Copyright 2022-2026 Advanced Micro Devices, Inc. All Rights Reserved.
+
+source xsim.dir/tb_regs/xsim_script.tcl
+# xsim {tb_regs} -autoloadwcfg -runall
+Time resolution is 1 ps
+run -all
+run   cycle 3235046, 쓰기 94, 읽기 226, 비교 315
+run   쓰기 순서: 같은 cycle 21, AW 먼저 37, W 먼저 38; bready 지연 cycle 138, rready 지연 cycle 342, AR 막힘 6, AW 막힘 6, AXI 규칙 위반 0
+run   SOFT_RESET 6번(core_rst 4 cycle 위반 0), CNT_CLEAR 6번(1 cycle 위반 0), cfg_we 12
+run   시각 불일치 cycle 0, phase 넘침 2번
+PASS
+$finish called at time : 32350460 ns : File "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/testbench/tb_regs.sv" Line 662
+exit
+INFO: xsimkernel Simulation Memory Usage: 155308 KB (Peak: 212132 KB), Simulation CPU Usage: 2790 ms
+INFO: [Common 17-206] Exiting xsim at Sun Oct 25 16:35:09 2026...

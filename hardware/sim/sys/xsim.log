@@ -1,0 +1,31 @@
+
+****** xsim v2026.1 (64-bit)
+  **** SW Build 6511674 on Tue Jun 16 11:01:26 MDT 2026
+  **** IP Build 6504888 on Tue Jun 09 09:05:25 MDT 2026
+  **** SharedData Build 6501428 on Mon Jun 08 17:34:18 MDT 2026
+  **** Start of session at: Sun Oct 25 16:37:49 2026
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+    ** Copyright 2022-2026 Advanced Micro Devices, Inc. All Rights Reserved.
+
+source hardware/sim/sys/xsim.dir/tb_sys/xsim_script.tcl
+# xsim {tb_sys} -autoloadwcfg -xsimdir hardware/sim/sys/xsim.dir -runall
+Time resolution is 1 ps
+run -all
+run   1) MIG 보정 전: 정보·STATUS 읽기, DDR3 창 status 2, 오류 0, cycle 3322
+run   2) 모델 2개 Ethernet 적재·확인(나머지 38개 backdoor), 제어 packet 521, DDR3 beat 쓰기 8228·읽기 8228, 오류 0, 2340809 cycle
+run   3) 설정·PNU 표 쓰기와 읽기, SOFT_RESET, RUN = 1, RUN 중 설정·DDR3 쓰기 무시, 오류 0
+run      t0: 결과 80, 누적 오류 0, cycle 2631136
+run      t30: 결과 2480, 누적 오류 0, cycle 9105182
+run   4) 추론 요청 2480, 결과 2480 (DDR3 트랙 20), out 불일치 0, 필드 불일치 0, batch_n 1: 14·2: 2466, LATE 0, 오류 0, 6697684 cycle
+run   counter: REQ_IN 2480, REQ_DROP 0, RES_OUT 2480, LATE 0, MAX_PENDING 80, BATCHES 1247, MODEL_LOADS 1179, SAT_COUNT 0
+run   counter: WEIGHT_BYTES 155212992, STATE_BYTES 1327360, CMP_BUSY 1331594, CMP_STALL 5224718; DDR3 beat weight 4850406, membrane potential 읽기 20400·쓰기 21080
+run   5) IDLE 뒤 RUN = 0, counter, DDR3 트랙 20개 membrane potential DDR3 창 읽기 불일치 0, 오류 0
+run   5b) SOFT_RESET 뒤(모델 8·4 slot 맞바꿈, DEADLINE 1 µs): 결과 80, out 불일치 0, LATE 80, MODEL_LOADS 40, BATCHES 40, CMP_STALL 184167, 오류 0
+run   6) 오류: model 45 → 3·트랙 5, 100 B datagram은 첫 오류 유지, ERR_CLEAR, 100 B → 7·100, 오류 0
+run   끝: cycle 10715873 (적재 2340809, 추론 6697684), 제어 packet 911, AXI 위반 0, 오류 0, FULL 0, NT 31
+PASS
+$finish called at time : 107158730987 ps : File "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/testbench/tb_sys.sv" Line 1028
+run: Time (s): cpu = 00:00:00.01 ; elapsed = 00:03:21 . Memory (MB): peak = 1415.332 ; gain = 0.000 ; free physical = 11247 ; free virtual = 19102
+exit
+INFO: xsimkernel Simulation Memory Usage: 295684 KB (Peak: 361220 KB), Simulation CPU Usage: 201690 ms
+INFO: [Common 17-206] Exiting xsim at Sun Oct 25 16:41:12 2026...

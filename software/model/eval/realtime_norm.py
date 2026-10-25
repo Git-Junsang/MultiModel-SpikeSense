@@ -9,6 +9,9 @@ test 특징만 바꿔 INT8 모델(snn_int8.forward, membrane potential 16 bit)�
   unit       장비별 고정값: 학습 파일 200개의 파일 최대·최소 dB 중앙값으로 늘인다. DC 제거 없음
   seg        segment(31 frame) 안에서 지금 frame까지의 최대·최소. segment마다 새로 시작(RESET_STATE와 같은 단위)
   frame      frame마다 그 frame의 최대·최소
+  track_*    트랙마다 기준(최대·최소)을 판정 주기가 바뀌어도 이어 간다. frame의 최대·최소가 기준을 넘으면 바로 받고,
+             아니면 기준이 그 값 쪽으로 시간 상수 τ로 돌아간다(지난 frame만 쓴다). τ = 2, 5, 10 s, inf(잊지 않음).
+             파일은 독립 녹음이라 파일 첫 frame에서 새로 시작한다. 그래서 첫 판정 주기는 seg와 같다
 최대·최소는 dB(ref = 1)의 값이고 최소는 최대 − 80 dB 아래로 내려가지 않는다(top_db 80과 같음).
 
     python3 model/eval/realtime_norm.py [--units fan_id01 ...] [--jobs 11]
@@ -26,6 +29,7 @@ import numpy as np
 HERE = os.path.dirname(os.path.abspath(__file__))
 SOFTWARE = os.path.dirname(os.path.dirname(HERE))
 sys.path.insert(0, os.path.join(SOFTWARE, "model"))
+sys.path.insert(0, os.path.join(SOFTWARE, "train"))
 sys.path.insert(0, os.path.join(SOFTWARE, "dataset"))
 sys.path.insert(0, HERE)
 
@@ -35,7 +39,8 @@ import snn_int8 as si  # noqa: E402
 import snn_fp32 as sn  # noqa: E402
 
 OUT = os.path.join(SOFTWARE, "train_result", "eval", "realtime_norm")
-METHODS = ["file", "file_nodc", "unit", "seg", "frame"]
+TAUS = {"track_2s": 2.0, "track_5s": 5.0, "track_10s": 10.0, "track_inf": np.inf}   # 잊는 시간 τ (s)
+METHODS = ["file", "file_nodc", "unit", "seg", "frame", *TAUS]
 CKPTS = ["L_normal_noaug", "L_mixed_aug"]
 N_CAL = 200                       # 장비별 고정값을 정하는 학습 파일 수
 
@@ -59,10 +64,23 @@ def scale(a, hi, lo):
     return np.clip((a - lo) / np.maximum(hi - lo, 1e-8), 0, 1).astype(np.float32)
 
 
+def track_ref(a, tau):
+    """track: frame마다 (최대, 최소) [frames, 1]. 기준은 frame 값 쪽으로 frame마다 1 − e^(−32 ms / τ)만큼 돌아간다"""
+    keep = np.exp(-dd.HOP / dd.SR / tau)
+    m, n = a.max(1), a.min(1)
+    hi, lo = m.copy(), n.copy()
+    for t in range(1, len(m)):
+        hi[t] = max(m[t], keep * hi[t - 1] + (1 - keep) * m[t])
+        lo[t] = min(n[t], keep * lo[t - 1] + (1 - keep) * n[t])
+    return hi[:, None], np.maximum(lo, hi - dd.TOP_DB)[:, None]
+
+
 def segments(a, method, cal):
     """dB [frames, 40] → 정규화 세그먼트 [S, 31, 40] (dd._segments와 같은 분할)"""
     if method in ("file", "file_nodc"):
         return dd._segments(scale(a, *span(a)))
+    if method in TAUS:
+        return dd._segments(scale(a, *track_ref(a, TAUS[method])))
     if method == "unit":
         return dd._segments(scale(a, *cal))
     if method == "frame":
@@ -76,7 +94,7 @@ def segments(a, method, cal):
 def run_unit(unit):
     machine, mid = next((m, i) for m, i in dd.UNITS if dd.unit_name(m, i) == unit)
     import torch
-    import train_unit
+    import train_1unit
     tr, _ = dd.list_files(machine, mid, "train")
     pick = np.random.default_rng(0).choice(len(tr), min(N_CAL, len(tr)), replace=False)
     cal = np.median([span(db(tr[i], False)) for i in pick], axis=0)    # (최대, 최소)
@@ -89,7 +107,7 @@ def run_unit(unit):
     for ck in CKPTS:
         pth = os.path.join(SOFTWARE, "weights", ck, unit, "last.pth")
         arg = torch.load(pth, map_location="cpu", weights_only=False)["args"]
-        data = train_unit.prepare(machine, mid, arg["method"], arg["val_frac"], arg["seed"], "cpu", arg.get("hop"))
+        data = train_1unit.prepare(machine, mid, arg["method"], arg["val_frac"], arg["seed"], "cpu", arg.get("hop"))
         keep, y, f, b = data["test_keep"], data["test_label"], data["test_file"], data["bal_idx"]
         assert np.abs(feats["file"][keep] - data["test_seg"].numpy()).max() < 1e-5, "file 방법이 학습 특징과 다름"
         q = si.quantize(sn.load_params(pth))
@@ -123,6 +141,14 @@ def main():
             rs = [r for r in rows if r["ckpt"] == ck and r["method"] == m]
             print(f"{ck:15s} {m:9s} AUC {np.mean([r['auc'] for r in rs]):.4f} 평균 ΔAUC {np.mean([r['d_auc'] for r in rs]):+.4f} "
                   f"최저 ΔAUC {min(r['d_auc'] for r in rs):+.4f} 판정 일치 {np.mean([r['pred_agree'] for r in rs]):.4f}")
+    kinds = list(dd.MACHINE_IDS)
+    for ck in CKPTS:                                                  # 장비 종류별 평균 AUC와 최저 모델
+        print(f"{ck:15s} {'':9s} " + " ".join(f"{k:>11s}" for k in kinds) + "  최저 모델")
+        for m in METHODS:
+            rs = [r for r in rows if r["ckpt"] == ck and r["method"] == m]
+            low = min(rs, key=lambda r: r["auc"])
+            print(f"{'':15s} {m:9s} " + " ".join(f"{np.mean([r['auc'] for r in rs if r['unit'].rsplit('_id', 1)[0] == k]):11.4f}"
+                                                 for k in kinds) + f"  {low['unit']} {low['auc']:.3f}")
     print(os.path.relpath(path, SOFTWARE))
 
 

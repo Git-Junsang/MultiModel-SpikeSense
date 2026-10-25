@@ -2,91 +2,104 @@
 
 ## 1. 요약
 
-architecture simulator는 Host 요청, scheduler, DMA, weight cache, membrane storage, compute array를 event 단위로 흉내 낸다. 설계 결정의 근거는 대부분 이 simulator다. DDR3 전송 비용과 입출력 지연에만 보드 실측값을 쓴다. 결과는 보드 성능 실측이 아니며 RTL을 만든 뒤 보드 동작과 대조한다.
+event simulator가 Host 추론 요청, scheduler, DMA, weight cache, membrane storage, compute array의 동작을 모델링한다. DDR3 비용은 보드 실측 회귀식, 연산 cycle은 compute array RTL의 식을 쓴다. Host 처리 지연은 Xeon에서 잰 모델 묶음 지연을 재생하고 추론 요청별 지연을 합성해 더한다. 결과는 보드 실측이 아니다.
 
 ## 2. 구성
 
 | 구성 | 위치 |
 |---|---|
-| 엔진 | [engine.py](../../simulation/engine/engine.py) 한 파일. BRAM 계산, simulator 본체(가정 판 rev 4), 부품(저장 정책·연산 방식·scheduler), 실행기가 들어 있다. 환경 파일 하나(실험 하나)를 읽어 돌린다 |
+| 엔진 | `simulation/engine/`. 실행기 [engine.py](../../simulation/engine/engine.py)가 환경 파일 하나(실험 하나)를 읽어 돌리고, 부품(하드웨어 조건, 추론 요청열, Host 처리 지연 분포, 시뮬레이터, cache 정책, scheduler, 연산, deadline 분석, 결과 CSV)은 `part_*.py`에 있다. deadline 분석(조건부 응답 시간, adversarial search)도 mode 하나씩이다. 구조·식·환경 키·CSV 형식은 [simulation_engine.md](simulation_engine.md) |
 | 환경 | `simulation/environment/*.toml`. 제안 구성은 `template.toml`이다 |
 | 결과 | `simulation/result/<환경 이름>.csv`(점별), `_runs.csv.gz`(실행별) |
 
 실행 방법, 파일 이름 규칙, CSV 형식은 [README](../../README.md#simulation)에 있다.
 
-## 3. 비용 모델
+## 3. 비용과 지연 모델
 
-| 대상 | 흉내 내는 방법 | 근거 |
+| 대상 | 모델링 방법 | 근거 |
 |---|---|---|
-| DDR3 전송 | DMA 하나가 순서대로 처리. read 한 번 = 0.244 µs + byte ÷ 3.015 GB/s. write는 2.768 GB/s | P3.1 보드 실측 회귀 |
-| weight 적재 | 131,588 B (weight 130,176 B + 누설 계수·threshold 1,412 B). DDR3 slot의 32 B 정렬 padding은 빼고 센다 | 계산 |
-| membrane potential | 추론마다 읽기 + 쓰기. 16 bit면 1,412 B, 12 bit면 1,059 B씩. layer마다 bit를 따로 줄 수 있다. on-chip 트랙은 비율만큼 요청당 평균으로 빼거나(`mem_place = avg`), 트랙별로 정한다(`id`, `offset`). 트랙별이면 DDR3 자리가 이어진 트랙끼리 읽기·쓰기 DMA를 한 번씩 하고 DMA마다 0.244 µs를 더한다 | 계산 |
-| 연산 | 추론마다 spike 수에 따른 cycle ÷ 100 MHz. batch 안의 추론은 차례로 처리 | test 입력 80개의 spike 수, [03_ARCHITECTURE.md](03_ARCHITECTURE.md) §4 |
-| 제어 비용 | dense word의 10% (203 cycle) | 가정 |
-| 입출력 지연 | 64 B 전송 실측 표본에서 뽑는다 | P3.3 PCIe 실측. Ethernet은 미측정 |
-| prefetch | 지금 batch를 연산하는 동안 다음 batch의 weight를 빈 entry로 받는다. 한 batch 앞만 본다 | 설계 |
-| cache | entry 수와 교체 규칙(LRU, offset-order)을 그대로 따라간다 | 설계 |
-| scheduler | compute array가 빌 때마다 정책 코드가 모델과 batch를 고른다 | `engine.py` 부품 |
-| 측정 | 16주기를 버리고 다음 64주기(2.048 s)를 잰다 | |
+| DDR3 | DMA 하나가 순서대로 처리. `T_read = 0.244 µs + B ÷ 3.015 GB/s`, `T_write = B ÷ 2.768 GB/s` | P3.1 보드 실측 |
+| weight 적재 | parameter와 정렬을 포함한 131,648 B를 DMA 한 번으로 | slot 형식 |
+| membrane potential | 12 bit. DDR3 트랙은 추론마다 1,059 B 읽기와 쓰기. on-chip 트랙은 그 비율만큼 추론 요청당 평균으로 뺀다. RTL은 beat 34개(1,088 B)를 전송해 DDR3 전송량이 약 0.2 % 크다 | 계산 |
+| 연산 | test 입력의 spike 수로 `240 + 4⌈n1/2⌉ + ⌈n2/2⌉ + 2 + 67` cycle, 100 MHz. 모든 spike 발생은 1,205 cycle | P4.1 RTL |
+| prefetch | 지금 batch를 연산하는 동안 다음 batch의 모델 전체를 빈 entry로 적재한다. 한 batch 앞만 본다 | 설계 |
+| cache | entry 수와 교체 정책(LRU, offset-only, PNU-timeout, PNU-count, Oracle MIN). 실행마다 Belady 하한을 따로 낸다 | 설계 |
+| Host 처리 지연 | 측정한 모델·주기별 묶음 지연 G + 추론 요청별 지연 j ~ Uniform(0, J) | Xeon 측정, 합성 |
+| 링크 지연 | 입력과 결과에 PCIe 64 B 전송 실측 표본을 한 번씩 더한다 | P3.3. Ethernet 미측정 |
+| 송신 | 즉시 송신. 모아 보내기는 비교 구성 | 설계 |
+| 같은 트랙 순서 | 준비 순서가 뒤집히면 앞 주기의 준비 시각보다 이르지 않게 맞춘다. adversarial search는 넣은 지연을 맞추지 않고 그대로 쓴다(G + J > 32 ms면 순서가 뒤집혀 drop이 늘 수 있다) | Host 동작 |
+| drop | 같은 트랙의 이전 추론 요청이 FPGA 연산을 마치기 전에 도착한 추론 요청은 버리고 deadline miss로 센다 | [06_HOST_INTERFACE.md](06_HOST_INTERFACE.md) §4.3 |
+| 측정 | 16주기 예열 뒤 64주기(2.048 s)를 잰다 | |
 
-흉내 내지 않는 것: DDR3 refresh와 bank 충돌(회귀식의 평균으로만 들어감), RTL pipeline의 세부 정지(제어 비용으로 뭉뚱그림), Host CPU 시간, Ethernet 지연, 전력.
+simulator는 `t_host`, `t_ready`, `t_send`, `t_arr`, `t_done`, `t_recv`를 따로 둔다([01_OVERVIEW.md](01_OVERVIEW.md) §4).
+
+Host 처리 지연 재생 규칙:
+
+- 측정 원자료(조건마다 9,375주기)에서 처음 0.5 s를 빼고 모델·주기마다 G 하나를 뽑는다. 측정에서 모델 m은 트랙 번호를 40으로 나눈 나머지다.
+- 앞 절반 4,679주기는 PNU가 쓰는 묶음 지연 분포로, 뒤 절반 4,680주기는 재생에 쓴다. seed s는 뒤 절반의 s × 80번째 주기부터 예열과 측정을 합친 80주기를 쓴다. seed 30개가 겹치지 않는다.
+- j는 추론 요청·주기마다 새로 뽑는다.
+- 모든 방법에 같은 모델·주기별 G를 넣는다. FPGA 쪽만 비교하려는 단순화다([05_SCHEDULING.md](05_SCHEDULING.md) §7).
+
+모델링하지 않는 것: DDR3 refresh와 bank 충돌(회귀식의 평균으로만 들어감), control overhead 밖의 RTL pipeline 정지, scheduler 결정 시간과 회로, Ethernet, 전력.
 
 ## 4. Workload
 
-트랙 1,024개가 각자 offset + 32 ms × k에 frame을 끝낸다. 이 시각이 수음 시각 `t_gen`이고 deadline의 기준이다. 외부 지연(`pre_us`, 오디오 buffer·전처리. 기본 0)과 입력 지연을 더해 FPGA에 도착한다. 시나리오가 offset, 모델 배정, 요청을 빠뜨리는 비율을 정한다.
+트랙 1,024개, 모델 40개, 주기 32 ms다. 시나리오가 모델 배정, offset, 추론 요청 빈도를 정한다.
 
-| 시나리오 | offset | 모델 배정 | 요청 |
+| 시나리오 | 모델 배정 | offset | 추론 요청 |
 |---|---|---|---|
-| U | 트랙마다 무작위 | 균등 무작위 | 매 주기 |
-| K | 무작위 | 편중: 모델 k의 트랙 비율 ∝ 1/(k+1), 상위 5개 53% | 매 주기 |
-| S | 모두 0 (동시 시작) | 균등 | 매 주기 |
-| SK | 모두 0 | 편중 | 매 주기 |
-| I | 무작위 | 균등 | 주기마다 25% (간헐 요청) |
-| R | 무작위 | 균등 | 주기마다 켜진 트랙 비율 25~100% 무작위 (활성 트랙 변화) |
+| uniform | 균등 | 트랙마다 무작위 | 매 주기 |
+| skewed | 편중: 모델 k의 트랙 비율 ∝ 1/(k+1) | 무작위 | 매 주기 |
+| synchronized | 균등 | 동시 시작 | 매 주기 |
+| skewed-synchronized | 편중 | 동시 시작 | 매 주기 |
+| intermittent | 균등 | 무작위 | 주기마다 25 %(간헐 추론 요청) |
+| fluctuating | 균등 | 무작위 | 주기마다 켜진 트랙 비율 25~100 % 무작위(활성 트랙 변화) |
 
-| 도착 패턴 | offset |
+| 도착 조건 | offset |
 |---|---|
-| offset 배정 없음 | 시나리오의 offset 그대로 |
-| Model-Grouped Offset Assignment | 모델 m의 트랙은 m × 0.8 ms + [0, jitter) 균등 무작위. S·SK에도 적용 |
-| offset 간격 비례 | offset 간격을 모델의 트랙 수에 비례하게 둔다(`offset = "model_w"`) |
-| 고르게 나눈 offset | 모델과 상관없이 트랙의 offset을 주기 안에 고르게 나눈다 |
-| 교대 | offset 배정 + 트랙 30%는 측정 중간에 합류, 30%는 중간에 이탈 |
-| 지연 1·5% | offset 배정 + 요청의 1·5%가 0~16 ms 늦게 도착(생성 시각과 deadline은 그대로) |
+| Unaligned | 시나리오의 offset 그대로 |
+| Model-grouped (제안) | 모델 m의 트랙은 `O_m = m × 0.8 ms`. synchronized·skewed-synchronized에도 적용 |
+| Global alignment | 모든 트랙의 nominal offset 0 |
 
-Host offset 단위 모아 보내기(`gather_ms` = 대기 D)는 모델·주기마다 요청이 다 준비되거나 offset + D가 되면 한꺼번에 보낸다. 그 뒤에 준비된 요청은 준비되는 대로 보낸다.
+| 실험 | J | seed |
+|---|---|---|
+| 방법 비교 | 0, 0.8, 3.2 ms | 시나리오 6개 × 30 |
+| cache 정책 비교, entry 수 | 0, 0.8, 1.6, 3.2 ms | 시나리오 6개 × 30 |
+| 비교군 조정 | 추론 요청별 합성 지연 | 100~109 (평가 seed와 겹치지 않음) |
+| 합성 민감도: 교차점 (G = 0) | 0.8~20 ms | 시나리오 6개 × 30 |
+| 합성 민감도: DDR3 대역폭·트랙 수 (G = 0) | 0.8 ms | 시나리오 6개 × 10 |
 
-| 악조건 | 바꾸는 것 |
-|---|---|
-| 전송 꼬리 +700 µs | 모든 입출력에 700 µs |
-| 제어 비용 +20% | 제어 배수 1.1 → 1.2 |
-| DDR3 2.0 GB/s | 실행 대역폭만 낮춤 |
-| 모든 input spike | dense와 같은 연산 시간 |
-| 악조건 겹침 | 모든 input spike + 제어 비용 +20% + DDR3 2.0 GB/s |
-
-방법 비교는 시나리오 6개 × seed 10, ablation은 seed 20으로 돌린다. 기본 jitter는 0.8 ms다.
+합성 민감도 실험은 묶음 지연 없이 추론 요청별 지연만 넣었고 drop 규칙을 쓰지 않았다.
 
 ## 5. 검증
 
-| 확인 | 방법 | 결과 |
-|---|---|---|
-| simulator 본체 | [test_engine.py](../../simulation/engine/test_engine.py) 1부: 1트랙 적재·hit 시간, 동시 도착 전송량, 비교군 정책 동작, 모아 보내기·offset 간격·트랙별 membrane potential·layer별 bit를 손계산과 비교 | 통과 |
-| 환경 파일 | test_engine 2부: 환경 파일을 모두 읽고 첫 점을 한 번 돌린다 | 통과 |
-| 결과 CSV | test_engine 3부: 쓰고 다시 읽은 값이 같다 | 통과 |
-| engine = 옛 실험 스크립트 | 같은 조건을 engine과 옛 스크립트로 돌려 실행별 결과(응답 시간 배열 포함)를 비교했고 환경 파일 21개 결과도 옛 결과와 맞춰 봤다(2026-10-15, 옛 스크립트는 그 뒤 삭제) | offset 배정 없음의 난수 차이와 대역폭 하한의 조절값 차이를 빼면 같음 |
+| 확인 | 방법 |
+|---|---|
+| simulator 본체 | [test_engine.py](../../simulation/engine/test_engine.py) 1부: 적재·hit 시간, 전송량, 비교군 정책 동작, 모아 보내기를 손계산과 비교 |
+| 미래 정보 | 미래 추론 요청의 지연만 바꿔도 그 전 시각의 PNU-count·PNU-timeout 결정이 같다. Oracle MIN은 바뀐다 |
+| 묶음 지연 | 같은 모델·주기 추론 요청이 같은 G를 받는다. 묶음 지연을 넣은 PNU 예측이 손계산과 같다 |
+| drop | 앞 추론 요청이 늦게 끝나면 다음 추론 요청을 버리고 miss와 drop으로 센다 |
+| 연산 cycle | rtl67 cycle이 P4.1 식과 같고 모든 spike 발생이 1,205 cycle이다 |
+| BRAM | entry 4와 entry 0(예산에 들어가는 최대)에서 entry + 준비 버퍼 + on-chip membrane potential이 예산 안이다. entry 4면 on-chip 768트랙 |
+| deadline 분석 | packet 분할 도착 시각, R_single 손계산과 05 §6.1의 14.41 ms·R_cond 24.22 ms, 지연 꼴 값, 작은 사례에서 adversarial search가 끝까지 돌고 고른 꼴이 가장 나쁜지 |
+| Belady 하한 | 작은 예에서 전수 탐색 최솟값과 같다 |
+| 환경 파일 | test_engine 3부: 환경 파일을 모두 읽고 첫 점을 한 번 돌린다 |
+| 결과 CSV | test_engine 4부: 쓰고 다시 읽은 값이 같다 |
+| 결과 재현 | test_engine이 p326_final_compare의 Dysta Method·DeepRT Method·제안 점을 다시 돌려 결과 CSV의 weight byte와 최대 응답 시간이 같은지 본다 |
 
-옛 결과와의 차이는 [P3.14 보고서](<../reports/P3.14 Research Report.md>)에 정리했다.
+방법 비교는 계산 서버 두 대에서 한 번씩 돌려 값이 같았다(P3.26).
 
 ## 6. 추가할 것
 
-측정값이 있어야 넣을 수 있다.
-
 | 항목 | 이유 |
 |---|---|
-| jitter 분포 입력 | 지금은 균등분포 폭 하나다. M1·M3·M4 측정값을 그대로 넣는다 |
-| Ethernet 지연 표본 | 지금은 PCIe 64 B 표본이다. M4 측정 뒤 바꾼다 |
+| 목표 Host의 묶음 지연 표 | 지금은 Xeon 측정이다. 라즈베리파이 5 측정값으로 바꾼다 |
+| 추론 요청별 퍼짐 측정값 | 지금 j는 합성이다. UDP 송신까지 포함한 측정 분포로 바꾼다 |
+| Ethernet 지연과 packet 간격 | 지금은 PCIe 64 B 표본이고 packet 분할은 adversarial search의 모아 보내기에만 넣었다 |
 
 ## 7. 관련 문서
 
 - [08_EVALUATION.md](08_EVALUATION.md): 지표와 실험 목록
-- [P3.13 보고서](<../reports/P3.13 Research Report.md>) §1.1: 실험 조건
-- [P3.21 보고서](<../reports/P3.21 Research Report.md>): 모아 보내기, 트랙별 membrane potential, offset 간격 비례 추가
+- [P3.26 보고서](<../reports/P3.26 Research Report.md>) §2: 묶음 지연, PNU 예측, drop 규칙
+- [P3.25 보고서](<../reports/P3.25 Research Report.md>) §3: 추론 요청 시각 분리, 지연 분포, 교체 정책, rtl67
+- [P3.14 보고서](<../reports/P3.14 Research Report.md>): 옛 실험 script와 engine의 차이

@@ -16,7 +16,7 @@
   용도      normal(일반) | mixed(섞인 소리 추론용)
   학습방법  noaug(겹침 증강 없음) | aug(겹침 증강 --aug)[-변형]. 예: aug-easy(쉬운 증강), aug-easy-b300(+입력 대역 고르기)
 
-사용: nohup python3 train_all.py --name L_normal_noaug > ../train_result/L_normal_noaug/train_all.log 2>&1 &
+사용: nohup python3 train_40unit.py --name L_normal_noaug > ../train_result/L_normal_noaug/train_40unit.log 2>&1 &
 
 산출물: 기록·표는 train_result/<학습 이름>/, 체크포인트는 weights/<학습 이름>/<장비>/
 """
@@ -30,8 +30,9 @@ import numpy as np
 import torch
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "dataset"))  # dcase_data는 software/dataset
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "model"))    # snn_torch는 software/model
 import dcase_data as dd  # noqa: E402
-import train_unit
+import train_1unit
 from snn_torch import ARCHS
 
 OUT_ROOT = os.path.join(dd.SOFTWARE_DIR, "train_result")
@@ -57,7 +58,7 @@ def run_unit(machine, mid, out_root, args):
         argv += ["--aug", args.aug, "--aug_p", str(args.aug_p)]
     if args.bands:
         argv += ["--bands", args.bands]
-    res = train_unit.main(argv)
+    res = train_1unit.main(argv)
     m = res["last"]                      # 채택 체크포인트 = 마지막 에포크
     row = {"unit": res["unit"], "epochs": args.epochs, "sec": round(time.time() - t0, 1),
            **{k: round(m[k], 4) for k in COLS[3:-1]}}
@@ -92,9 +93,9 @@ def main():
     ap.add_argument("--shard", type=int, default=0, help="이 프로세스가 맡을 조각 번호(0부터)")
     ap.add_argument("--units", nargs="*", default=None, help="이 장비들만 학습(예: pump_id03). --nshard보다 우선")
     ap.add_argument("--res_name", default=None, help="결과 csv 이름(기본: 조각 번호로 정함)")
-    ap.add_argument("--aug", default=None, help="겹침 증강 데이터 경로(train_unit.py --aug). 예: ../dataset/dcase_augmented, ../dataset/dcase_augmented_easy")
+    ap.add_argument("--aug", default=None, help="겹침 증강 데이터 경로(train_1unit.py --aug). 예: ../dataset/dcase_augmented, ../dataset/dcase_augmented_easy")
     ap.add_argument("--aug_p", type=float, default=0.5)
-    ap.add_argument("--bands", default=None, help="mel 대역 lo:hi만 사용(train_unit.py --bands)")
+    ap.add_argument("--bands", default=None, help="mel 대역 lo:hi만 사용(train_1unit.py --bands)")
     ap.add_argument("--name", default="L_normal_noaug",
                     help="학습 이름 <크기>_<용도>_<학습방법>. 기록은 train_result/<이름>/, 체크포인트는 weights/<이름>/")
     args = ap.parse_args()

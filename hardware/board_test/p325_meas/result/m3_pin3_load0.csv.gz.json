@@ -1,0 +1,37 @@
+{
+ "test": "M3",
+ "tracks": 1024,
+ "epochs": 9375,
+ "workers": 1,
+ "pin": [
+  3
+ ],
+ "load": 0,
+ "audio": "/home/junsang/mmss_jobs/p325/software/dataset/dcase/fan/train/normal_id_01_00000000.wav",
+ "t0_ns": 819180144655210,
+ "note": "M3 측정, sub1(sdsl-llm, Xeon W-2255, 다른 서비스 동작 중), simulation 끝난 뒤",
+ "blas_threads": "1",
+ "numpy": "2.5.4",
+ "host": "sdsl-llm",
+ "kernel": "6.8.0-142-generic",
+ "python": "3.12.15",
+ "cpu": "Intel(R) Xeon(R) W-2255 CPU @ 3.70GHz",
+ "cpus": 20,
+ "loadavg": [
+  0.9150390625,
+  1.02783203125,
+  5.6640625
+ ],
+ "argv": [
+  "hardware/board_test/host/p325_mel_load.py",
+  "--seconds",
+  "300",
+  "--pin",
+  "3",
+  "--note",
+  "M3 측정, sub1(sdsl-llm, Xeon W-2255, 다른 서비스 동작 중), simulation 끝난 뒤",
+  "--out",
+  "m3/m3_pin3_load0.csv.gz"
+ ],
+ "wall": "2026-10-17T17:09:50+0000"
+}

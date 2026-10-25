@@ -24,9 +24,10 @@ import torch
 
 SW = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, os.path.join(SW, "model"))
+sys.path.insert(0, os.path.join(SW, "train"))
 sys.path.insert(0, os.path.join(SW, "dataset"))
 import dcase_data as dd
-import train_unit
+import train_1unit
 import snn_fp32 as sn
 from sklearn.metrics import roc_auc_score, f1_score
 
@@ -102,7 +103,7 @@ def run_unit(machine, mid, cfg_names):
     unit = dd.unit_name(machine, mid)
     pth = os.path.join(SW, "weights", "L_normal_noaug", unit, "last.pth")
     a = torch.load(pth, map_location="cpu", weights_only=False)["args"]
-    d = train_unit.prepare(machine, mid, a["method"], a["val_frac"], a["seed"], "cpu", a.get("hop"))
+    d = train_1unit.prepare(machine, mid, a["method"], a["val_frac"], a["seed"], "cpu", a.get("hop"))
     x = d["test_seg"].numpy()
     y, f, b = d["test_label"], d["test_file"], d["bal_idx"]
     layers = sn.load_params(pth)

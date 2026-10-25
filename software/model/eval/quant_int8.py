@@ -4,7 +4,7 @@
    넣어 선행 golden vector(출력 membrane potential·spike)와 비트 단위로 비교한다. 선행 RTL과 같은 정수
    규칙인지 확인하는 용도다. 선행 golden은 넘침이 없어 포화 추가와 무관하게 같아야 한다.
 2) 40대 비교: `weights/L_normal_noaug/<장비>/last.pth`를 `snn_int8.quantize`로 변환해 DCASE test 평가 세트
-   (train_unit.prepare의 supervised 분할, 학습과 같은 seed)에서 FP32(`snn_fp32`)와 비교한다.
+   (train_1unit.prepare의 supervised 분할, 학습과 같은 seed)에서 FP32(`snn_fp32`)와 비교한다.
    지표: 파일 단위 AUC·pAUC, 균형 F1·정확도, 세그먼트 판정 일치율, layer별 spike 불일치율,
    layer별 누산·membrane potential |최대|와 16 bit 포화 횟수, 파라미터 범위.
    INT8 점수는 출력 membrane potential 평균 × 출력 layer 스케일에 softmax를 씌운 P(이상)이다(FP와 같은 식).
@@ -24,13 +24,14 @@ import numpy as np
 HERE = os.path.dirname(os.path.abspath(__file__))
 SOFTWARE = os.path.dirname(os.path.dirname(HERE))
 sys.path.insert(0, os.path.join(SOFTWARE, "model"))
+sys.path.insert(0, os.path.join(SOFTWARE, "train"))
 sys.path.insert(0, os.path.join(SOFTWARE, "dataset"))
 
 import torch
 from sklearn.metrics import roc_auc_score, f1_score
 
 import dcase_data as dd
-import train_unit
+import train_1unit
 import snn_fp32 as sn
 import snn_int8 as si
 
@@ -84,7 +85,7 @@ def run_unit(machine, mid):
     unit = dd.unit_name(machine, mid)
     pth = os.path.join(WEIGHTS, unit, "last.pth")
     a = torch.load(pth, map_location="cpu", weights_only=False)["args"]
-    data = train_unit.prepare(machine, mid, a["method"], a["val_frac"], a["seed"], "cpu", a.get("hop"))
+    data = train_1unit.prepare(machine, mid, a["method"], a["val_frac"], a["seed"], "cpu", a.get("hop"))
     x = data["test_seg"].numpy()
     y, f, b = data["test_label"], data["test_file"], data["bal_idx"]
 

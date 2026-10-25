@@ -4,7 +4,7 @@
   T0     깨끗한 원본 test (지금까지의 평가)
   T1     학습과 같은 분포의 무작위 겹침 (평가 bank = test 폴더 정상 녹음, 학습 때 쓰지 않은 녹음)
   T2_p6 / T2_0 / T2_m6   강한 겹침 1대 SNR +6 / 0 / −6 dB + 약한 겹침 3대
-평가 세트(정상 전체 + 학습에 쓰지 않은 이상 절반)는 train_unit.prepare와 같은 분할이다.
+평가 세트(정상 전체 + 학습에 쓰지 않은 이상 절반)는 train_1unit.prepare와 같은 분할이다.
 
   L_normal_noaug  = weights/L_normal_noaug/<장비>/last.pth    깨끗한 학습
   XL_normal_noaug = weights/XL_normal_noaug/<장비>/last.pth
@@ -30,13 +30,14 @@ import numpy as np
 HERE = os.path.dirname(os.path.abspath(__file__))
 SW = os.path.dirname(os.path.dirname(HERE))
 sys.path.insert(0, os.path.join(SW, "model"))
+sys.path.insert(0, os.path.join(SW, "train"))
 sys.path.insert(0, os.path.join(SW, "dataset"))
 sys.path.insert(0, HERE)
 import torch  # noqa: E402
 from scipy.stats import t as tdist, wilcoxon  # noqa: E402
 import dcase_data as dd  # noqa: E402
 import snn_fp32 as sn  # noqa: E402
-import train_unit  # noqa: E402
+import train_1unit  # noqa: E402
 from size_sweep import fake_quant, file_auc  # noqa: E402
 
 AUG = os.path.join(SW, "dataset", "dcase_augmented")
@@ -63,7 +64,7 @@ def eval_unit(job):
         return [dict(unit=unit, tag=t, **done[t]) for t in tags if t in done]
     tags = todo
     ar = torch.load(ckpt(tags[0], unit), map_location="cpu", weights_only=False)["args"]
-    data = train_unit.prepare(m, i, ar["method"], ar["val_frac"], ar["seed"], "cpu", ar.get("hop"))
+    data = train_1unit.prepare(m, i, ar["method"], ar["val_frac"], ar["seed"], "cpu", ar.get("hop"))
     y, f, keep = data["test_label"], data["test_file"], data["test_keep"]
     b = np.load(dd.aug_path(AUG, unit, "test.npz"))
     off, ev = b["off"], b["eval"]

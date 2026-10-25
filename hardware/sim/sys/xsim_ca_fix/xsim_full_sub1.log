@@ -1,0 +1,30 @@
+
+****** xsim v2026.1 (64-bit)
+  **** SW Build 6511674 on Tue Jun 16 11:01:26 MDT 2026
+  **** IP Build 6504888 on Tue Jun 09 09:05:25 MDT 2026
+  **** SharedData Build 6501428 on Mon Jun 08 17:34:18 MDT 2026
+  **** Start of session at: Sat Oct 24 13:56:55 2026
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+    ** Copyright 2022-2026 Advanced Micro Devices, Inc. All Rights Reserved.
+
+source /home/junsang/mmss_jobs/p410_sys_xsim/hardware/sim/sys_full/xsim.dir/tb_sys/xsim_script.tcl
+# xsim {tb_sys} -testplusarg FULL=1 -autoloadwcfg -xsimdir /home/junsang/mmss_jobs/p410_sys_xsim/hardware/sim/sys_full/xsim.dir -runall
+Time resolution is 1 ps
+run -all
+run   1) MIG 보정 전: 정보·STATUS 읽기, DDR3 창 status 2, 오류 0, cycle 3322
+run   2) 모델 40개 Ethernet 적재·확인(나머지 0개 backdoor), 제어 packet 10325, DDR3 beat 쓰기 164560·읽기 164560, 오류 0, 46814287 cycle
+run   3) 설정·PNU 표 쓰기와 읽기, SOFT_RESET, RUN = 1, RUN 중 설정·DDR3 쓰기 무시, 오류 0
+run      t0: 결과 80, 누적 오류 0, cycle 47075526
+run      t30: 결과 2480, 누적 오류 0, cycle 53548431
+run   4) 추론 요청 2480, 결과 2480 (DDR3 트랙 20), out 불일치 0, 필드 불일치 0, batch_n 1: 14·2: 2466, LATE 0, 오류 0, 6696811 cycle
+run   counter: REQ_IN 2480, REQ_DROP 0, RES_OUT 2480, LATE 0, MAX_PENDING 80, BATCHES 1247, MODEL_LOADS 1179, SAT_COUNT 0
+run   counter: WEIGHT_BYTES 155212992, STATE_BYTES 1327360, CMP_BUSY 1331594, CMP_STALL 5223846; DDR3 beat weight 4850406, membrane potential 읽기 20400·쓰기 21080
+run   5) IDLE 뒤 RUN = 0, counter, DDR3 트랙 20개 membrane potential DDR3 창 읽기 불일치 0, 오류 0
+run   6) 오류: model 45 → 3·트랙 5, 100 B datagram은 첫 오류 유지, ERR_CLEAR, 100 B → 7·100, 오류 0
+run   끝: cycle 53655963 (적재 46814287, 추론 6696811), 제어 packet 10434, AXI 위반 0, X padding beat 20, 오류 0, FULL 1, NT 31
+PASS
+$finish called at time : 536559630381 ps : File "/home/junsang/mmss_jobs/p410_sys_xsim/hardware/testbench/tb_sys.sv" Line 905
+run: Time (s): cpu = 00:00:00.25 ; elapsed = 00:24:47 . Memory (MB): peak = 1425.043 ; gain = 0.000 ; free physical = 79620 ; free virtual = 131611
+exit
+INFO: xsimkernel Simulation Memory Usage: 340776 KB (Peak: 357136 KB), Simulation CPU Usage: 1488380 ms
+INFO: [Common 17-206] Exiting xsim at Sat Oct 24 14:21:45 2026...

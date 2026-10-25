@@ -1,0 +1,30 @@
+Vivado Simulator v2026.1
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+Copyright 2022-2026 Advanced Micro Devices, Inc. All Rights Reserved.
+Running: /tools/Xilinx/2026.1/Vivado/bin/unwrapped/lnx64.o/xelab --nolog -debug off tb_dma -generic_top MODE=2 -s tb_m2 
+Multi-threading is on. Using 18 slave threads.
+WARNING: [XSIM 43-3431] One or more environment variables have been detected which affect the operation of the C compiler. These are typically not set in standard installations and are not tested by AMD, however they may be appropriate for your system, so the flow will attempt to continue.  If errors occur, try running xelab with the "-mt off -v 1" switches to see more information from the C compiler. The following environment variables have been detected:
+    LIBRARY_PATH
+Starting static elaboration
+Pass Through NonSizing Optimizer
+WARNING: [VRFC 10-3645] port 'sat16' remains unconnected for this instance [/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/testbench/tb_dma.sv:78]
+Completed static elaboration
+Starting simulation data flow analysis
+Completed simulation data flow analysis
+Time Resolution for simulation is 1ps
+Compiling module work.weight_entry
+Compiling module work.next_use_predictor(N_MODELS=42)
+Compiling module work.weight_cache(N_MODELS=42)
+Compiling module work.spike_list_default
+Compiling module work.spike_list(DEPTH=16,IW=8)
+Compiling module work.mac_unit
+Compiling module work.plift_core_default
+Compiling module work.plif_array_default
+Compiling module work.compute_array_default
+Compiling module work.membrane_bank(AW=16)
+Compiling module work.membrane_buf
+Compiling module work.membrane_storage_default
+Compiling module work.dma_default
+Compiling module work.accel_core(N_MODELS=42)
+Compiling module work.tb_dma(MODE=2)
+Built simulation snapshot tb_m2

@@ -1,0 +1,65 @@
+# P3.26 E6 deadline 분석의 adversarial search(sim_mode = "adversarial", 05 §6.2). 모든 입력 spike(compute_input = dense, 1,205 cycle)
+# Host 처리 지연 = 모델 묶음 지연 G(측정 표의 범위 [0, G_max)) + 추론 요청별 지연([0, J)). 탐색은 표를 재생하지 않고 지연 꼴을 직접 넣는다.
+# host_group_trace는 PNU가 아는 묶음 지연 분포와 G_max를 준다. 같은 트랙의 이전 추론 요청이 안 끝났으면 새 추론 요청을 버린다(fpga_drop_busy).
+# L·64 lane @100 MHz, 1,024트랙, rtl67, DDR3 3,015 MB/s, 남는 BRAM에 12 bit membrane potential, Grouping + PNU-count, 시나리오 U·K
+# cache 초기 상태: steady(예열 4주기) | empty(예열 0). 송신: 즉시 | 모아 보내기(D = G_max + J) | 모아 보내기 + packet 분할(간격 0.1·1 ms)
+# 조건부 응답 시간만 볼 때는 p326_deadline_bound(sim_mode = "bound")
+
+sim_mode = "adversarial"
+sim_scenarios = ["U", "K"]
+sim_seeds = 1
+sim_seed0 = 0
+sim_warm_periods = 4
+sim_meas_periods = 16
+model_size = "L"
+model_count = 40
+compute_lanes = 64
+compute_input = "dense"
+compute_spikes_per_cycle = 2
+compute_ctrl_scale = 1.0
+membrane_place = "split"
+membrane_bits = 12
+bram_reserve_tiles = 25.5
+ddr_bw_mbps = 3015.0
+track_count = 1024
+host_offset = "model"
+host_jitter_ms = 0.8
+host_jitter_dist = "uniform"
+host_jitter_trace = ""
+host_group_trace = "hardware/board_test/p325_meas/result/m3_group_pin3_load0.csv.gz"
+host_gather_ms = 0.0
+host_gather_to_max = false
+host_packet_gap_us = 0.0
+host_fixed_delay_us = 0.0
+fpga_drop_busy = true
+cache_policy = "pnu_count"
+cache_entries = 4
+cache_attrs = {}
+scheduler = "grouping"
+scheduler_attrs = {}
+search_key = "track_count"
+search_values = []
+search_step = 16
+tune_attr = ""
+tune_values = []
+tune_conds = []
+
+[sweep]
+host = [
+  {label = "M3 CPU 고정·부하 8", host_group_trace = "hardware/board_test/p325_meas/result/m3_group_pin3_load8.csv.gz"},
+  {label = "M3 CPU 고정·부하 없음", host_group_trace = "hardware/board_test/p325_meas/result/m3_group_pin3_load0.csv.gz"},
+  {label = "M3 CPU 고정 없음·부하 8", host_group_trace = "hardware/board_test/p325_meas/result/m3_group_pin-none_load8.csv.gz"},
+  {label = "M3 CPU 고정 없음·부하 없음", host_group_trace = "hardware/board_test/p325_meas/result/m3_group_pin-none_load0.csv.gz"},
+]
+host_jitter_ms = [0.0, 0.8, 3.2]
+cache_entries = [2, 4]
+init = [
+  {label = "steady", sim_warm_periods = 4},
+  {label = "empty", sim_warm_periods = 0},
+]
+send = [
+  {label = "즉시 송신"},
+  {label = "모아 보내기", host_gather_to_max = true},
+  {label = "모아 보내기, packet 0.1 ms", host_gather_to_max = true, host_packet_gap_us = 100.0},
+  {label = "모아 보내기, packet 1 ms", host_gather_to_max = true, host_packet_gap_us = 1000.0},
+]

@@ -44,7 +44,7 @@ MobileNetV2/Zedboard에서는 AutoWS가 325.9 ms, sequential layer 방식이 8.3
 차이:
 
 - AutoWS는 단일 모델과 정적 layer schedule을 쓴다.
-- 우리는 비동기 다중 모델 요청과 deadline을 다룬다.
+- 우리는 비동기 다중 모델 추론 요청과 deadline을 다룬다.
 - 어느 모델을 먼저 실행할지는 AutoWS 범위 밖이다.
 
 부분 상주와 prefetch 자체를 신규성으로 주장하지 않는다. 같은 BRAM에서 transfer byte, 시작 시각, 완료 시각을 비교하는 방법을 참고한다.

@@ -1,0 +1,335 @@
+[
+ {
+  "rx": 1,
+  "tx": -224,
+  "set": false,
+  "sent": 300,
+  "ok": 0,
+  "tx_err": 0,
+  "rx_err": 300
+ },
+ {
+  "rx": 1,
+  "tx": -216,
+  "set": false,
+  "sent": 300,
+  "ok": 0,
+  "tx_err": 0,
+  "rx_err": 300
+ },
+ {
+  "rx": 1,
+  "tx": -208,
+  "set": false,
+  "sent": 300,
+  "ok": 0,
+  "tx_err": 0,
+  "rx_err": 300
+ },
+ {
+  "rx": 1,
+  "tx": -200,
+  "set": false,
+  "sent": 300,
+  "ok": 0,
+  "tx_err": 0,
+  "rx_err": 300
+ },
+ {
+  "rx": 1,
+  "tx": -192,
+  "set": false,
+  "sent": 300,
+  "ok": 0,
+  "tx_err": 0,
+  "rx_err": 300
+ },
+ {
+  "rx": 1,
+  "tx": -184,
+  "set": false,
+  "sent": 300,
+  "ok": 0,
+  "tx_err": 0,
+  "rx_err": 300
+ },
+ {
+  "rx": 1,
+  "tx": -176,
+  "set": false,
+  "sent": 300,
+  "ok": 0,
+  "tx_err": 30,
+  "rx_err": 270
+ },
+ {
+  "rx": 1,
+  "tx": -168,
+  "set": true,
+  "sent": 300,
+  "ok": 50,
+  "tx_err": 119,
+  "rx_err": 131
+ },
+ {
+  "rx": 1,
+  "tx": -160,
+  "set": true,
+  "sent": 300,
+  "ok": 169,
+  "tx_err": 115,
+  "rx_err": 16
+ },
+ {
+  "rx": 1,
+  "tx": -152,
+  "set": true,
+  "sent": 300,
+  "ok": 271,
+  "tx_err": 29,
+  "rx_err": 0
+ },
+ {
+  "rx": 1,
+  "tx": -144,
+  "set": true,
+  "sent": 300,
+  "ok": 300,
+  "tx_err": 0,
+  "rx_err": 0
+ },
+ {
+  "rx": 1,
+  "tx": -136,
+  "set": true,
+  "sent": 300,
+  "ok": 300,
+  "tx_err": 0,
+  "rx_err": 0
+ },
+ {
+  "rx": 1,
+  "tx": -128,
+  "set": true,
+  "sent": 300,
+  "ok": 300,
+  "tx_err": 0,
+  "rx_err": 0
+ },
+ {
+  "rx": 1,
+  "tx": -120,
+  "set": true,
+  "sent": 300,
+  "ok": 300,
+  "tx_err": 0,
+  "rx_err": 0
+ },
+ {
+  "rx": 1,
+  "tx": -112,
+  "set": true,
+  "sent": 300,
+  "ok": 300,
+  "tx_err": 0,
+  "rx_err": 0
+ },
+ {
+  "rx": 1,
+  "tx": -104,
+  "set": true,
+  "sent": 300,
+  "ok": 300,
+  "tx_err": 0,
+  "rx_err": 0
+ },
+ {
+  "rx": 1,
+  "tx": -96,
+  "set": true,
+  "sent": 300,
+  "ok": 300,
+  "tx_err": 0,
+  "rx_err": 0
+ },
+ {
+  "rx": 1,
+  "tx": -88,
+  "set": true,
+  "sent": 300,
+  "ok": 300,
+  "tx_err": 0,
+  "rx_err": 0
+ },
+ {
+  "rx": 1,
+  "tx": -80,
+  "set": true,
+  "sent": 300,
+  "ok": 300,
+  "tx_err": 0,
+  "rx_err": 0
+ },
+ {
+  "rx": 1,
+  "tx": -72,
+  "set": true,
+  "sent": 300,
+  "ok": 300,
+  "tx_err": 0,
+  "rx_err": 0
+ },
+ {
+  "rx": 1,
+  "tx": -64,
+  "set": true,
+  "sent": 300,
+  "ok": 300,
+  "tx_err": 0,
+  "rx_err": 0
+ },
+ {
+  "rx": 1,
+  "tx": -56,
+  "set": true,
+  "sent": 300,
+  "ok": 300,
+  "tx_err": 0,
+  "rx_err": 0
+ },
+ {
+  "rx": 1,
+  "tx": -48,
+  "set": true,
+  "sent": 300,
+  "ok": 300,
+  "tx_err": 0,
+  "rx_err": 0
+ },
+ {
+  "rx": 1,
+  "tx": -40,
+  "set": true,
+  "sent": 300,
+  "ok": 300,
+  "tx_err": 0,
+  "rx_err": 0
+ },
+ {
+  "rx": 1,
+  "tx": -32,
+  "set": true,
+  "sent": 300,
+  "ok": 300,
+  "tx_err": 0,
+  "rx_err": 0
+ },
+ {
+  "rx": 1,
+  "tx": -24,
+  "set": true,
+  "sent": 300,
+  "ok": 300,
+  "tx_err": 0,
+  "rx_err": 0
+ },
+ {
+  "rx": 1,
+  "tx": -16,
+  "set": true,
+  "sent": 300,
+  "ok": 298,
+  "tx_err": 2,
+  "rx_err": 0
+ },
+ {
+  "rx": 1,
+  "tx": -8,
+  "set": true,
+  "sent": 300,
+  "ok": 267,
+  "tx_err": 30,
+  "rx_err": 3
+ },
+ {
+  "rx": 1,
+  "tx": 0,
+  "set": true,
+  "sent": 300,
+  "ok": 190,
+  "tx_err": 23,
+  "rx_err": 87
+ },
+ {
+  "rx": 1,
+  "tx": 8,
+  "set": true,
+  "sent": 300,
+  "ok": 140,
+  "tx_err": 25,
+  "rx_err": 135
+ },
+ {
+  "rx": 1,
+  "tx": 16,
+  "set": true,
+  "sent": 300,
+  "ok": 33,
+  "tx_err": 12,
+  "rx_err": 255
+ },
+ {
+  "rx": 1,
+  "tx": 24,
+  "set": false,
+  "sent": 300,
+  "ok": 0,
+  "tx_err": 0,
+  "rx_err": 300
+ },
+ {
+  "rx": 1,
+  "tx": 32,
+  "set": false,
+  "sent": 300,
+  "ok": 0,
+  "tx_err": 0,
+  "rx_err": 300
+ },
+ {
+  "rx": 1,
+  "tx": 40,
+  "set": false,
+  "sent": 300,
+  "ok": 0,
+  "tx_err": 0,
+  "rx_err": 300
+ },
+ {
+  "rx": 1,
+  "tx": 48,
+  "set": false,
+  "sent": 300,
+  "ok": 0,
+  "tx_err": 0,
+  "rx_err": 300
+ },
+ {
+  "rx": 1,
+  "tx": 56,
+  "set": false,
+  "sent": 300,
+  "ok": 0,
+  "tx_err": 0,
+  "rx_err": 300
+ },
+ {
+  "rx": 1,
+  "tx": 64,
+  "set": false,
+  "sent": 300,
+  "ok": 0,
+  "tx_err": 0,
+  "rx_err": 300
+ }
+]

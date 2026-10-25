@@ -4,10 +4,10 @@
 파일 단위 AUC를 비교한다. weight 외(입력·β·vth·membrane potential)는 FP32 그대로 두는 1차 선별이다.
 채택 후보는 P2.5와 같은 정수 파이프라인으로 다시 확인한다.
 
-  학습 이름(tag)별 weights/<이름>/<장비>/last.pth (train_all.py --name). 기준은 L_normal_noaug(P2.4, `40→384→256→64→2`)
+  학습 이름(tag)별 weights/<이름>/<장비>/last.pth (train_40unit.py --name). 기준은 L_normal_noaug(P2.4, `40→384→256→64→2`)
   옛 결과 파일의 tag L·M·S·P·XS가 차례로 L_normal_noaug·M_normal_noaug·S_normal_noaug·P_normal_noaug·XS_normal_noaug다
 
-평가 세트는 train_unit.prepare의 supervised 분할(학습과 같은 seed)의 test이며 quant_int8.py와 같다.
+평가 세트는 train_1unit.prepare의 supervised 분할(학습과 같은 seed)의 test이며 quant_int8.py와 같다.
 점수 = 출력 membrane potential 시간 평균에 softmax를 씌운 P(이상)의 파일 평균.
 
 결과: train_result/eval/size_sweep/{results.csv, summary.md}
@@ -23,11 +23,12 @@ import numpy as np
 HERE = os.path.dirname(os.path.abspath(__file__))
 SW = os.path.dirname(os.path.dirname(HERE))
 sys.path.insert(0, os.path.join(SW, "model"))
+sys.path.insert(0, os.path.join(SW, "train"))
 sys.path.insert(0, os.path.join(SW, "dataset"))
 import torch  # noqa: E402
 from sklearn.metrics import roc_auc_score  # noqa: E402
 import dcase_data as dd  # noqa: E402
-import train_unit  # noqa: E402
+import train_1unit  # noqa: E402
 import snn_fp32 as sn  # noqa: E402
 
 OUT = os.path.join(SW, "train_result", "eval", "size_sweep")
@@ -63,7 +64,7 @@ def file_auc(mem_out, y, f):
 
 
 def done_units(tag):
-    """학습이 끝난 장비. train_all.py가 장비마다 갱신하는 train_result/<이름>/results*.csv 기준"""
+    """학습이 끝난 장비. train_40unit.py가 장비마다 갱신하는 train_result/<이름>/results*.csv 기준"""
     d = os.path.join(SW, "train_result", tag)
     out = set()
     for fn in (os.listdir(d) if os.path.isdir(d) else []):
@@ -94,7 +95,7 @@ def main():
             p = ckpt(tag, u)
             if data is None:
                 ar = torch.load(p, map_location="cpu", weights_only=False)["args"]
-                data = train_unit.prepare(m, i, ar["method"], ar["val_frac"], ar["seed"], "cpu", ar.get("hop"))
+                data = train_1unit.prepare(m, i, ar["method"], ar["val_frac"], ar["seed"], "cpu", ar.get("hop"))
                 x = data["test_seg"].numpy()
                 y, f = data["test_label"], data["test_file"]
             layers = sn.load_params(p)

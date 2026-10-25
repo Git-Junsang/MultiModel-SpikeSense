@@ -4,7 +4,7 @@
    저장소의 weight HEX로 돌려 선행 golden vector(membrane potential·spike)와 비트 단위로 비교한다.
    선행 저장소는 읽기만 한다.
 2) FP 일치: 학습한 40대 모델(`weights/L_normal_noaug/<장비>/last.pth`)마다 DCASE test 평가 세트
-   (train_unit.prepare의 supervised 분할, 학습과 같은 seed)를 PyTorch(CPU FP32)와
+   (train_1unit.prepare의 supervised 분할, 학습과 같은 seed)를 PyTorch(CPU FP32)와
    `snn_fp32`(FP32)로 순전파해 layer별 spike·출력 membrane potential·판정·파일 단위 AUC를 비교한다.
    spike가 다르면 처음 달라진 지점의 |mem - thr|를 기록해 반올림 차이인지 확인한다.
 
@@ -21,13 +21,14 @@ import numpy as np
 HERE = os.path.dirname(os.path.abspath(__file__))
 SOFTWARE = os.path.dirname(os.path.dirname(HERE))
 sys.path.insert(0, os.path.join(SOFTWARE, "model"))
+sys.path.insert(0, os.path.join(SOFTWARE, "train"))
 sys.path.insert(0, os.path.join(SOFTWARE, "dataset"))
 
 import torch
 from sklearn.metrics import roc_auc_score
 
 import dcase_data as dd
-import train_unit
+import train_1unit
 import snn_fp32 as sn
 from snn_torch import AnomalySNN
 
@@ -104,7 +105,7 @@ def check_unit(machine, mid, ref_auc):
     pth = os.path.join(SOFTWARE, "weights", "L_normal_noaug", unit, "last.pth")
     ckpt = torch.load(pth, map_location="cpu", weights_only=False)
     a = ckpt["args"]
-    data = train_unit.prepare(machine, mid, a["method"], a["val_frac"], a["seed"], "cpu", a.get("hop"))
+    data = train_1unit.prepare(machine, mid, a["method"], a["val_frac"], a["seed"], "cpu", a.get("hop"))
     x = data["test_seg"]
     y, f = data["test_label"], data["test_file"]
 

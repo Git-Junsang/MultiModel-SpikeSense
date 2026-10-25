@@ -12,7 +12,7 @@ hardware/board_test/host/analyze_p3.py가 한다.
   burst    순차 접근, 버스트 길이 1~128 beat × 쓰기/읽기, 64 MiB, pipelined, outst 16
   outst    순차 읽기, 버스트 16/128에서 동시 버스트 수 1~16
   slice    슬라이스 크기별 읽기: 모델 전환(SLOT_RAND 40슬롯)과 같은 모델 연속(SEQ),
-           blocking(한 번에 하나)과 pipelined(연속 요청)
+           blocking(한 번에 하나)과 pipelined(연속 전송)
   model    모델 단위·layer 단위 가져오기: 전체 weight 130,176 B, 슬롯 135,168 B, L1/L2/L3,
            β·threshold 포함 구간, SLOT_RAND / SLOT_RR
   single   단일 beat 지연: 임의 주소(1 GiB) blocking, 순차 blocking

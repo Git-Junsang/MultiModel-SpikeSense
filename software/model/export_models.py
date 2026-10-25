@@ -1,7 +1,7 @@
 """P1.6·P3.10: 40개 INT8 모델을 바이너리·HEX와 DDR3 이미지로 내보낸다.
 
 프로젝트 루트에서:
-  python3 software/model/export_models.py                # v1, L → hardware/data/models
+  python3 software/model/export_models.py                # 1lane, L → hardware/data/models
   python3 software/model/export_models.py --format l64   # L, 64 lane → hardware/data/models_l64 (P3.9 구현 기준)
 """
 
@@ -15,14 +15,14 @@ import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "dataset"))  # dcase_data는 software/dataset
 import dcase_data as dd  # noqa: E402
-import model_format_v1
-import model_format_v2
+import model_format_1lane
+import model_format_64lane
 import snn_int8 as si
 import snn_fp32 as sn
 
 ROOT = Path(__file__).resolve().parents[2]
-FORMATS = {"v1": model_format_v1, "l64": model_format_v2.L64, "xl": model_format_v2.XL}
-mf = model_format_v1                   # main()이 --format으로 바꾼다
+FORMATS = {"1lane": model_format_1lane, "l64": model_format_64lane.L64, "xl": model_format_64lane.XL}
+mf = model_format_1lane                   # main()이 --format으로 바꾼다
 
 
 def sha256(data):
@@ -82,7 +82,7 @@ def export_one(model_id, unit, checkpoint, out_dir, ddr_base):
 def main():
     global mf
     ap = argparse.ArgumentParser()
-    ap.add_argument("--format", choices=FORMATS, default="v1", help="v1: L row-major, l64: L 64 lane, xl: XL 256 lane")
+    ap.add_argument("--format", choices=FORMATS, default="1lane", help="1lane: L row-major, l64: L 64 lane, xl: XL 256 lane")
     ap.add_argument("--weights", type=Path, help="checkpoint 폴더 (기본: 형식별)")
     ap.add_argument("--out", type=Path, help="출력 폴더 (기본: 형식별)")
     ap.add_argument("--ddr-base", type=lambda x: int(x, 0), default=0,

@@ -13,7 +13,7 @@
 //   레인                32개, INT8 weight × 7 bit 입력 누산(layer 1 형태)
 //   membrane potential  layer별 bank 16 bit: 512트랙 × 384 / 256 / 64 / 2 뉴런, 읽기-수정-쓰기
 //   β·vth               BV_ALL40=1: 40모델 × 706뉴런 × 16 bit 상주, 0: entry별 1,024 × 16 bit
-//   요청 queue          512 × 512 bit (64 B/요청). Q_BRAM=0이면 분산 RAM(LUTRAM)
+//   추론 요청 queue          512 × 512 bit (64 B/추론 요청). Q_BRAM=0이면 분산 RAM(LUTRAM)
 //   트랙 메타           512 × 64 bit
 // ============================================================
 `timescale 1ns / 1ps
@@ -92,7 +92,7 @@ module mem_fit #(
         w_word   <= e_rd[c_src_d2];
     end
 
-    // ---------------- 요청 queue ----------------
+    // ---------------- 추론 요청 queue ----------------
     reg [255:0] fill_prev;
     reg [8:0]   q_wa, q_ra;
     reg [511:0] q_rd;

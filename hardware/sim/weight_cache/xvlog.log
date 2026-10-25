@@ -1,0 +1,8 @@
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/src/weight_entry.v" into library work
+INFO: [VRFC 10-311] analyzing module weight_entry
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/src/next_use_predictor.v" into library work
+INFO: [VRFC 10-311] analyzing module next_use_predictor
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/src/weight_cache.v" into library work
+INFO: [VRFC 10-311] analyzing module weight_cache
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/testbench/tb_weight_cache.sv" into library work
+INFO: [VRFC 10-311] analyzing module tb_weight_cache

@@ -33,6 +33,7 @@ import torch.nn as nn
 from sklearn.metrics import roc_auc_score, f1_score
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "dataset"))  # dcase_data는 software/dataset
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "model"))    # snn_torch는 software/model
 import dcase_data as dd  # noqa: E402
 from snn_torch import AnomalySNN, LAYER_SIZES, default_betas
 

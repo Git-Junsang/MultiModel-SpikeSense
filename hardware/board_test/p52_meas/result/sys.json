@@ -1,0 +1,41 @@
+{
+ "nt": 31,
+ "seed": 1,
+ "link": "",
+ "load_s": 2.0,
+ "infer_s": 0.07,
+ "nreq": 2480,
+ "n_res": 2480,
+ "err_out": 0,
+ "err_fld": 0,
+ "batch_n": [
+  108,
+  2372
+ ],
+ "late": 0,
+ "t_done_minus_t_in_us": {
+  "min": 6,
+  "p50": 847,
+  "max": 1726
+ },
+ "counters": {
+  "REQ_IN": 2480,
+  "REQ_DROP": 0,
+  "RES_OUT": 2480,
+  "LATE": 0,
+  "MAX_PENDING": 78,
+  "BATCHES": 1294,
+  "MODEL_LOADS": 1221,
+  "SAT_COUNT": 0,
+  "WEIGHT_BYTES": 160742208,
+  "STATE_BYTES": 1327360,
+  "CMP_BUSY": 1331594,
+  "CMP_STALL": 4237525
+ },
+ "state_mismatch": 0,
+ "ctl_packets": 15600,
+ "errors": 0,
+ "first_errors": [],
+ "total_s": 3.7,
+ "result": "PASS"
+}

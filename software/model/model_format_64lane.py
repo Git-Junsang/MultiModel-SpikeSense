@@ -1,4 +1,4 @@
-"""P3.10 lane-interleaved INT8 모델 slot (v2). 기준: documents/design_references/02_MODEL.md §6, 04_MEMORY.md §3.
+"""P3.10 lane-interleaved INT8 모델 slot (64lane). 기준: documents/design_references/02_MODEL.md §6, 04_MEMORY.md §3.
 
 word = LANES × INT8. 은닉 layer는 뉴런 그룹 g(LANES개)마다 입력 i 순서로 word를 둔다. Lane j는 출력 뉴런 LANES·g + j다.
 
@@ -7,7 +7,7 @@ word = LANES × INT8. 은닉 layer는 뉴런 그룹 g(LANES개)마다 입력 i �
               i × n + j                    = W[j][i]                뉴런 수 n < LANES (lane 0~n−1만)
   출력 layer  [out, in] row-major. on-chip word로는 LANES byte씩 자른다
 
-두 형식을 둔다. 함수 이름과 반환 형식은 model_format_v1.py(v1)와 같다.
+두 형식을 둔다. 함수 이름과 반환 형식은 model_format_1lane.py와 같다.
   L64   L `40→384→256→64→2`, 64 lane, slot 256 KiB  (P3.9 구현 기준)
   XL    XL `40→768→512→128→2`, 256 lane, slot 512 KiB (모델 비교용)
 """
@@ -58,7 +58,7 @@ class LaneFormat:
     def _last(self, i):
         return i == len(self.WEIGHT_SHAPES) - 1
 
-    def _to_v2(self, w, last):
+    def _to_lane(self, w, last):
         n, k = w.shape
         if last:
             return w.reshape(-1)
@@ -66,7 +66,7 @@ class LaneFormat:
             return w.T.reshape(-1)
         return w.reshape(n // self.LANES, self.LANES, k).transpose(0, 2, 1).reshape(-1)
 
-    def _from_v2(self, flat, shape, last):
+    def _from_lane(self, flat, shape, last):
         n, k = shape
         if last:
             return flat.reshape(n, k)
@@ -76,7 +76,7 @@ class LaneFormat:
 
     def weights_bytes(self, q):
         self._check_q(q)
-        raw = b"".join(self._to_v2(np.asarray(l["W"], np.int8), self._last(i)).tobytes() for i, l in enumerate(q))
+        raw = b"".join(self._to_lane(np.asarray(l["W"], np.int8), self._last(i)).tobytes() for i, l in enumerate(q))
         assert len(raw) == self.WEIGHT_BYTES
         return raw
 
@@ -106,7 +106,7 @@ class LaneFormat:
         q, w_at, n_at = [], 0, 0
         for i, (shape, scale) in enumerate(zip(self.WEIGHT_SHAPES, scales)):
             count = shape[0] * shape[1]
-            w = self._from_v2(np.frombuffer(weights, np.int8, count, w_at), shape, self._last(i)).copy()
+            w = self._from_lane(np.frombuffer(weights, np.int8, count, w_at), shape, self._last(i)).copy()
             stop = n_at + shape[0]
             q.append({"W": w, "beta": bv[n_at:stop, 0].copy(), "vth": bv[n_at:stop, 1].copy(), "scale": scale})
             w_at, n_at = w_at + count, stop
@@ -126,7 +126,7 @@ class LaneFormat:
                                        data[self.PARAM_OFFSET:self.PARAM_OFFSET + self.PARAM_BYTES], scales)
 
     def entry_words(self, weights):
-        """v2 weights → on-chip entry image uint8 [ENTRY_WORDS, LANES]. 뉴런 수 < LANES인 layer는 위쪽 lane을 0으로 채운다"""
+        """64lane weights → on-chip entry image uint8 [ENTRY_WORDS, LANES]. 뉴런 수 < LANES인 layer는 위쪽 lane을 0으로 채운다"""
         w = np.frombuffer(weights, np.uint8)
         out, at = [], 0
         for i, (n, k) in enumerate(self.WEIGHT_SHAPES):

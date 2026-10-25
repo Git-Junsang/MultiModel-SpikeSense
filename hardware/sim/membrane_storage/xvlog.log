@@ -1,0 +1,20 @@
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/src/plift_core.v" into library work
+INFO: [VRFC 10-311] analyzing module plift_core
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/src/plif_array.v" into library work
+INFO: [VRFC 10-311] analyzing module plif_array
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/src/mac_unit.v" into library work
+INFO: [VRFC 10-311] analyzing module mac_unit
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/src/spike_list.v" into library work
+INFO: [VRFC 10-311] analyzing module spike_list
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/src/weight_entry.v" into library work
+INFO: [VRFC 10-311] analyzing module weight_entry
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/src/compute_array.v" into library work
+INFO: [VRFC 10-311] analyzing module compute_array
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/src/membrane_bank.v" into library work
+INFO: [VRFC 10-311] analyzing module membrane_bank
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/src/membrane_buf.v" into library work
+INFO: [VRFC 10-311] analyzing module membrane_buf
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/src/membrane_storage.v" into library work
+INFO: [VRFC 10-311] analyzing module membrane_storage
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/testbench/tb_membrane_storage.sv" into library work
+INFO: [VRFC 10-311] analyzing module tb_membrane_storage

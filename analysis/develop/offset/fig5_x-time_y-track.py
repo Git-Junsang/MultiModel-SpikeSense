@@ -1,7 +1,11 @@
-"""논문용 offset 배정 개념도 (analysis/discards/develop/alignment/fig3의 사본: 영문, 그림 안 제목 없음, 단 폭 3.5 in, 흰 배경, 마이크 입력 단 생략). simulation 결과를 쓰지 않는다
+"""논문용 offset 배정 개념도 (analysis/discards/develop/alignment/fig3의 사본: 영문, 그림 안 제목 없음, 단 폭 3.5 in, 흰 배경, mic 입력 단 생략). simulation 결과를 쓰지 않는다
 
-트랙마다 64 ms mel 창이 32 ms(T)마다 끝나고, 창이 끝나는 시각에 요청이 나간다. 이웃 창은 반씩 겹치므로 두 줄로 엇갈려 그린다.
+트랙마다 64 ms mel 창이 32 ms(T)마다 끝나고, 창이 끝나는 시각에 추론 요청이 나간다. 이웃 창은 반씩 겹치므로 두 줄로 엇갈려 그린다.
 계속 돌고 있는 stream의 한 구간이라 0 ms 앞의 오디오도 창에 들어간다(버리는 오디오 없음)
+(c)는 (b)의 추론 요청이 FPGA에 도착하는 시각이다(P3.26 §2.1). frame 끝은 O_m에 그대로 있고, Host 처리 지연이 두 부분으로 붙는다.
+모델·주기 묶음 지연 G는 그 모델의 모든 트랙에 같이 붙고 주기마다 바뀐다. 그 위에 추론 요청별 지연 j(0 ≤ j < J)가 붙고, jitter J는 이 퍼짐이다.
+주기 하나만 그린다. 이 주기에 모델 C는 묶음 전체가 5 ms 늦다(jitter는 그대로 작다). 고정 seed의 설명용 예시이고 simulation 값이 아니다.
+교체 전 그림은 analysis/discards/figure/offset/fig5_x-time_y-track*.*에 있다(_p325 = 추론 요청별 지연만 그린 P3.25 판, _3period = 주기 3개를 겹친 판)
 """
 import os
 import sys
@@ -29,8 +33,8 @@ RAND_OFS = 1.6 + 3.2 * _r.permutation(N) + _r.uniform(-0.6, 0.6, N)
 
 
 def track_axis(ax, order, title, top, req_y):
-    """req_y: 요청 줄의 y. 같은 시각 요청을 쌓을 자리만큼 아래로 둔다"""
-    ax.set_xlim(-5.5, END + 4.5)           # 막대 앞뒤 ⋯ 자리. 0 ms 요청 글자도 왼쪽 이름과 겹치지 않는다
+    """req_y: 추론 요청 줄의 y. 같은 시각 추론 요청을 쌓을 자리만큼 아래로 둔다"""
+    ax.set_xlim(-5.5, END + 4.5)           # 막대 앞뒤 ⋯ 자리. 0 ms 추론 요청 글자도 왼쪽 이름과 겹치지 않는다
     ax.set_ylim(req_y + 0.5, top)
     ax.set_yticks([*range(N), req_y], [*(f"$t_{{{t}}}$ ({TRACKS[t]})" for t in order), "requests"])
     ax.req_y = req_y
@@ -48,7 +52,7 @@ def track_axis(ax, order, title, top, req_y):
 
 
 def windows(ax, row, t, first):
-    """first + kT에 끝나는 64 ms 창. k의 홀짝으로 위·아래 줄을 나눠 겹침을 보이고, 끝(요청 시각)을 굵게 긋는다. [0, END] 밖은 자른다"""
+    """first + kT에 끝나는 64 ms 창. k의 홀짝으로 위·아래 줄을 나눠 겹침을 보이고, 끝(추론 요청 시각)을 굵게 긋는다. [0, END] 밖은 자른다"""
     c = COLOR[TRACKS[t]]
     for k in range(-2, 6):
         e = first + k * T
@@ -65,7 +69,7 @@ def windows(ax, row, t, first):
 
 
 def requests(ax, times):
-    """요청(frame 끝) 시각을 모델 글자로 찍고 같은 시각이면 쌓는다. 한 주기 안의 모델 전환 횟수를 오른쪽 위에 적는다"""
+    """추론 요청(frame 끝) 시각을 모델 글자로 찍고 같은 시각이면 쌓는다. 한 주기 안의 모델 전환 횟수를 오른쪽 위에 적는다"""
     seen = []
     for x, t in sorted(times):
         k = sum(abs(x - s) < 1.0 for s in seen)
@@ -77,7 +81,7 @@ def requests(ax, times):
     ax.set_title(f"{n} model switches per period", loc="right", fontsize=7, fontweight="normal", color=cm.MUTED, pad=2)
 
 
-fig, (ax_a, ax_b) = plt.subplots(2, 1, figsize=(3.5, 4.2), gridspec_kw={"height_ratios": [N + 1.1, N + 4.95]})
+fig, (ax_a, ax_b, ax_c) = plt.subplots(3, 1, figsize=(3.5, 5.85), gridspec_kw={"height_ratios": [N + 1.1, N + 4.95, N + 2.6]})
 raw = list(range(N))
 
 # (a) 무작위 offset
@@ -103,7 +107,7 @@ for i, m in enumerate("ABCDE"):
 ax_b.annotate("", (0, -2.35), (T / M, -2.35), arrowprops=dict(arrowstyle="<->", color=cm.MUTED, linewidth=0.6,
                                                              shrinkA=0, shrinkB=0, mutation_scale=6))
 ax_b.text(T / M + 0.6, -2.35, f"$T/M$ = {T / M:g} ms", fontsize=7, color=cm.MUTED, ha="left", va="center")
-# 요청 ①(64 ms, 모델 A)과 ②(76.8 ms, 모델 C)가 쓰는 창을 방향이 다른 빗금으로 겹쳐 그린다. 같은 모델 트랙이 한 batch로 처리된다
+# 추론 요청 ①(64 ms, 모델 A)과 ②(76.8 ms, 모델 C)가 쓰는 창을 방향이 다른 빗금으로 겹쳐 그린다. 같은 모델 트랙이 한 batch로 처리된다
 MARK = [("①", 2 * T, "A", "////"), ("②", 2 * T + 2 * T / M, "C", "\\\\\\\\")]
 for num, e, m, hatch in MARK:
     for row, t in enumerate(order):
@@ -119,11 +123,46 @@ ax_b.set_xticks([0, 32, 64, MARK[1][1], 96], ["0", "32", "64", f"{MARK[1][1]:g}"
 ax_b.tick_params(axis="x", pad=1)
 ax_b.set_xlabel("Time (ms)", labelpad=1)
 
+# (c) 실제 도착: frame 끝 O_m + kT 뒤에 묶음 지연 G(모델·주기마다 하나) + 추론 요청별 지연 j(0 ≤ j < J)
+J, LATE = 0.8, ("C", 5.0)                   # 이 주기에 모델 C 묶음 전체가 5 ms 늦다
+rg = np.random.default_rng(11)
+G = rg.uniform(0.4, 1.6, M)
+G["ABCDE".index(LATE[0])] = LATE[1]
+delay = G[["ABCDE".index(TRACKS[t]) for t in range(N)]] + rg.uniform(0, J, N)
+ax_c.set_xlim(-1.2, T + 0.4)
+ax_c.set_ylim(N - 0.45, -1.3)
+ax_c.set_yticks(range(N), [f"$t_{{{t}}}$ ({TRACKS[t]})" for t in order])
+for lab, t in zip(ax_c.get_yticklabels(), order):
+    lab.set_color(COLOR[TRACKS[t]])
+ax_c.grid(False)
+cm.clean(ax_c)
+ax_c.tick_params(axis="y", pad=1.5)
+for i, m in enumerate("ABCDE"):
+    o = T / M * i
+    ax_c.vlines(o, -0.6, N - 0.5, color=COLOR[m], linewidth=0.6, linestyle=":", zorder=1)
+    ax_c.text(o, -0.95, f"$O_{m}$", color=COLOR[m], fontsize=7, ha="center", va="center")
+rows_c = [row for row, t in enumerate(order) if TRACKS[t] == LATE[0]]
+x_late = T / M * "ABCDE".index(LATE[0]) + LATE[1]
+ax_c.annotate(f"model {LATE[0]}: the whole group\nis {LATE[1]:g} ms late ($G$), spread stays < $J$", (x_late + J / 2, min(rows_c) - 0.3),
+              xytext=(T, 1.3), ha="right", va="center", fontsize=6.3, color=COLOR[LATE[0]],
+              bbox=dict(facecolor="white", edgecolor="none", pad=0.6),   # 위를 지나는 O_m 점선이 글자를 가르지 않게
+              arrowprops=dict(arrowstyle="->", color=COLOR[LATE[0]], linewidth=0.6, shrinkA=0, shrinkB=1, mutation_scale=6))
+for row, t in enumerate(order):
+    o = T / M * "ABCDE".index(TRACKS[t])
+    ax_c.hlines(row, o, o + delay[t], color=COLOR[TRACKS[t]], linewidth=0.4, zorder=1)
+    ax_c.plot(o + delay[t], row, marker="o", markersize=3.2, color=COLOR[TRACKS[t]], linestyle="none", zorder=3)
+ax_c.set_xticks([T / M * i for i in range(M)] + [T], [f"{T / M * i:g}" for i in range(M)] + [f"{T:g}"])
+ax_c.tick_params(axis="x", pad=1)
+ax_c.set_xlabel("Time after the period start (ms)", labelpad=1)
+ax_c.set_title(f"(c) Arrival at the FPGA: group delay $G$ and jitter $J$ = {J:g} ms", loc="left", fontsize=7.5, fontweight="bold", pad=2)
+ax_c.text(0.5, -0.2, "arrival = $O_m + kT + G_{m,k}$ (same for a model's tracks) $+\\,j$ ($0 \\leq j < J$)",
+          transform=ax_c.transAxes, ha="center", va="top", fontsize=6.5)
+
 fig.legend(handles=[Patch(facecolor=cm.GRAY + "55", edgecolor=cm.MUTED, linewidth=0.5,
                           label="64 ms frame; a request at each frame end, every $T$ = 32 ms")],
            loc="upper center", ncol=1, frameon=False, fontsize=7, bbox_to_anchor=(0.5, 1.0), borderaxespad=0,
            handlelength=1.6, columnspacing=1.2)
-fig.tight_layout(pad=0.2, h_pad=1.8, rect=(0, 0, 1, 0.96))
+fig.tight_layout(pad=0.2, h_pad=0.6, rect=(0, 0, 1, 0.97))
 # ①·②를 x축 숫자 64·76.8 바로 앞에 붙인다. 숫자 폭과 높이를 그린 뒤 재서 맞춘다
 fig.canvas.draw()
 pt = 72 / fig.dpi

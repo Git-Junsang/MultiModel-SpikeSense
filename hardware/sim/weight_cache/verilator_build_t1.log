@@ -1,0 +1,31 @@
+%Warning-TIMESCALEMOD: hardware/src/weight_entry.v:14:8: Timescale missing on this module as other modules have it (IEEE 1800-2017 3.14.2.3)
+   14 | module weight_entry (
+      |        ^~~~~~~~~~~~
+                       hardware/testbench/tb_weight_cache.sv:14:8: ... Location of module with timescale
+   14 | module tb_weight_cache #(
+      |        ^~~~~~~~~~~~~~~
+                       ... For warning description see https://verilator.org/warn/TIMESCALEMOD?v=5.020
+                       ... Use "/* verilator lint_off TIMESCALEMOD */" and lint_on around source to disable this message.
+%Warning-TIMESCALEMOD: hardware/src/next_use_predictor.v:23:8: Timescale missing on this module as other modules have it (IEEE 1800-2017 3.14.2.3)
+   23 | module next_use_predictor #(
+      |        ^~~~~~~~~~~~~~~~~~
+                       hardware/testbench/tb_weight_cache.sv:14:8: ... Location of module with timescale
+   14 | module tb_weight_cache #(
+      |        ^~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: hardware/src/weight_cache.v:12:8: Timescale missing on this module as other modules have it (IEEE 1800-2017 3.14.2.3)
+   12 | module weight_cache #(
+      |        ^~~~~~~~~~~~
+                       hardware/testbench/tb_weight_cache.sv:14:8: ... Location of module with timescale
+   14 | module tb_weight_cache #(
+      |        ^~~~~~~~~~~~~~~
+make: Entering directory '/root/mmss_build/verilator_weight_cache_t1'
+g++ -Os  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-overloaded-virtual -Wno-shadow -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable     -DVL_TIME_CONTEXT   -fcoroutines -c -o verilated.o /usr/share/verilator/include/verilated.cpp
+g++ -Os  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-overloaded-virtual -Wno-shadow -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable     -DVL_TIME_CONTEXT   -fcoroutines -c -o verilated_timing.o /usr/share/verilator/include/verilated_timing.cpp
+g++ -Os  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-overloaded-virtual -Wno-shadow -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable     -DVL_TIME_CONTEXT   -fcoroutines -c -o verilated_threads.o /usr/share/verilator/include/verilated_threads.cpp
+/usr/bin/python3 /usr/share/verilator/bin/verilator_includer -DVL_INCLUDE_OPT=include Vtb_weight_cache.cpp Vtb_weight_cache___024root__DepSet_h9e95d8b7__0.cpp Vtb_weight_cache___024root__DepSet_h5e51ae3f__0.cpp Vtb_weight_cache__main.cpp Vtb_weight_cache__ConstPool_0.cpp Vtb_weight_cache___024root__Slow.cpp Vtb_weight_cache___024root__DepSet_h9e95d8b7__0__Slow.cpp Vtb_weight_cache___024root__DepSet_h5e51ae3f__0__Slow.cpp Vtb_weight_cache__Syms.cpp > Vtb_weight_cache__ALL.cpp
+echo "" > Vtb_weight_cache__ALL.verilator_deplist.tmp
+g++ -Os  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-overloaded-virtual -Wno-shadow -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable     -DVL_TIME_CONTEXT   -fcoroutines -c -o Vtb_weight_cache__ALL.o Vtb_weight_cache__ALL.cpp
+Archive ar -rcs Vtb_weight_cache__ALL.a Vtb_weight_cache__ALL.o
+g++     verilated.o verilated_timing.o verilated_threads.o Vtb_weight_cache__ALL.a    -pthread -lpthread -latomic   -o Vtb_weight_cache
+rm Vtb_weight_cache__ALL.verilator_deplist.tmp
+make: Leaving directory '/root/mmss_build/verilator_weight_cache_t1'

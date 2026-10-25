@@ -1,0 +1,10 @@
+run   재생 t4: 사건 73728, batch 1800(시작 이벤트 1800), 추론 시작 24576, 결과 24576, 계획 1800(miss 1346), drop 0(기대 0)
+run   불일치: 계획 모델 0, q_ne 0, go 0, pf 0, 도착 알림 0, 결과 0, pending_n 0, 기타 0; LATE 23153, 포화 3511, idle 1
+run   사건 출력: req_in 24576(기대 24576), res_out 24576(24576), late 23153(23153), sat 3511(3511), load 1346(1346)
+run   지정 시험 1: 검사 오류 1~5, run 0, 결과 뒤 다시 받기. 불일치 0
+run   지정 시험 2: 결과 backpressure. 불일치 0
+run   지정 시험 3: batch 시작 cycle의 같은 모델 도착. 불일치 0
+run   지정 시험 4: 연산 뒤 결과 전 같은 트랙 drop. 불일치 0
+run   지정 시험 5: DDR3 결과가 wb_done을 기다림. 불일치 0
+PASS
+- hardware/testbench/tb_frontend.sv:512: Verilog $finish

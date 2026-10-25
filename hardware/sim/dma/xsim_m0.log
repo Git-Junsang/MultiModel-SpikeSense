@@ -1,0 +1,26 @@
+
+****** xsim v2026.1 (64-bit)
+  **** SW Build 6511674 on Tue Jun 16 11:01:26 MDT 2026
+  **** IP Build 6504888 on Tue Jun 09 09:05:25 MDT 2026
+  **** SharedData Build 6501428 on Mon Jun 08 17:34:18 MDT 2026
+  **** Start of session at: Sun Oct 25 04:18:51 2026
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+    ** Copyright 2022-2026 Advanced Micro Devices, Inc. All Rights Reserved.
+
+source hardware/sim/dma/xsim.dir/tb_m0/xsim_script.tcl
+# xsim {tb_m0} -autoloadwcfg -xsimdir hardware/sim/dma/xsim.dir -runall
+Time resolution is 1 ps
+run -all
+run   MODE 0: cycle 3673272, 추론 2542 (batch 1272, DDR3 트랙 22), row 불일치 0, 출력 불일치 0, DDR3 최종값 불일치 0
+run   적재 672 (miss 672 / 계획 1272), entry 내용 불일치 0, weight beat 2764608 (기대 2764608)
+run   membrane potential beat 읽기 22440 (기대 22440), 쓰기 23188 (기대 23188)
+run   적재 cycle 평균 4168.4, 최소 4145, 최대 4688; membrane potential 읽기 평균 68.3·최대 92, 쓰기 평균 41.0·최대 41
+run   정지 cycle: stall_cyc 2290005, testbench 2290005; weight 대기 첫 적재 4143, 앞 timestep(그 뒤) 0, 뒤 timestep 2283612; membrane potential 대기 앞 2250, 뒤 0
+run   AXI 규칙 위반 0, 우선순위 위반 0, 적재 중 entry로 시작 0, 오류 응답 주입 0·보고 0·불일치 0, dma_idle 1
+run   16 bit 포화가 난 추론 31, sat16 불일치 0
+PASS
+$finish called at time : 36732720 ns : File "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/testbench/tb_dma.sv" Line 564
+run: Time (s): cpu = 00:00:00 ; elapsed = 00:01:04 . Memory (MB): peak = 1415.332 ; gain = 0.000 ; free physical = 13045 ; free virtual = 20499
+exit
+INFO: xsimkernel Simulation Memory Usage: 223552 KB (Peak: 223552 KB), Simulation CPU Usage: 64200 ms
+INFO: [Common 17-206] Exiting xsim at Sun Oct 25 04:19:56 2026...

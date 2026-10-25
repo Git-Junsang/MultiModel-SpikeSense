@@ -1,0 +1,9 @@
+run   MODE 0: cycle 3673273, 추론 2542 (batch 1272, DDR3 트랙 22), row 불일치 0, 출력 불일치 0, DDR3 최종값 불일치 0
+run   적재 672 (miss 672 / 계획 1272), entry 내용 불일치 0, weight beat 2764608 (기대 2764608)
+run   membrane potential beat 읽기 22440 (기대 22440), 쓰기 23188 (기대 23188)
+run   적재 cycle 평균 4168.4, 최소 4145, 최대 4688; membrane potential 읽기 평균 68.3·최대 92, 쓰기 평균 41.0·최대 41
+run   정지 cycle: stall_cyc 2290005, testbench 2290005; weight 대기 첫 적재 4143, 앞 timestep(그 뒤) 0, 뒤 timestep 2283612; membrane potential 대기 앞 2250, 뒤 0
+run   AXI 규칙 위반 0, 우선순위 위반 0, 적재 중 entry로 시작 0, 오류 응답 주입 0·보고 0·불일치 0, dma_idle 1
+run   16 bit 포화가 난 추론 31, sat16 불일치 0
+PASS
+- hardware/testbench/tb_dma.sv:564: Verilog $finish

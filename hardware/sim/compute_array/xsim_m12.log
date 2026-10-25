@@ -1,0 +1,23 @@
+
+****** xsim v2026.1 (64-bit)
+  **** SW Build 6511674 on Tue Jun 16 11:01:26 MDT 2026
+  **** IP Build 6504888 on Tue Jun 09 09:05:25 MDT 2026
+  **** SharedData Build 6501428 on Mon Jun 08 17:34:18 MDT 2026
+  **** Start of session at: Sun Oct 25 04:16:23 2026
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+    ** Copyright 2022-2026 Advanced Micro Devices, Inc. All Rights Reserved.
+
+source hardware/sim/compute_array/xsim.dir/tb_m12/xsim_script.tcl
+# xsim {tb_m12} -autoloadwcfg -xsimdir hardware/sim/compute_array/xsim.dir -runall
+Time resolution is 1 ps
+run -all
+run   저장 12 bit, vector 82, 추론 2542, row 114390개 대조
+run   불일치 layer1 0, layer2 0, layer3 0, layer4 0, 틀린 vector 0
+run   cycle 최소 329, 평균 541.6, 최대 1205
+run   control overhead 최소 67, 평균 67.2, 최대 87 (가정 203)
+PASS
+$finish called at time : 14672260 ns : File "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/testbench/tb_compute_array.sv" Line 226
+run: Time (s): cpu = 00:00:00 ; elapsed = 00:00:42 . Memory (MB): peak = 1479.332 ; gain = 0.000 ; free physical = 12737 ; free virtual = 19769
+exit
+INFO: xsimkernel Simulation Memory Usage: 156832 KB (Peak: 213656 KB), Simulation CPU Usage: 42340 ms
+INFO: [Common 17-206] Exiting xsim at Sun Oct 25 04:17:06 2026...

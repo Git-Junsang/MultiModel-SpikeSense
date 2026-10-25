@@ -1,0 +1,109 @@
+Vivado Simulator v2026.1
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+Copyright 2022-2026 Advanced Micro Devices, Inc. All Rights Reserved.
+Running: /tools/Xilinx/2026.1/Vivado/bin/unwrapped/lnx64.o/xelab --nolog -debug off tb_sys -s tb_sys 
+Multi-threading is on. Using 18 slave threads.
+WARNING: [XSIM 43-3431] One or more environment variables have been detected which affect the operation of the C compiler. These are typically not set in standard installations and are not tested by AMD, however they may be appropriate for your system, so the flow will attempt to continue.  If errors occur, try running xelab with the "-mt off -v 1" switches to see more information from the C compiler. The following environment variables have been detected:
+    LIBRARY_PATH
+Starting static elaboration
+Pass Through NonSizing Optimizer
+WARNING: [VRFC 10-9543] actual bit length 32 differs from formal bit length 8 for port 's_axis_tid' [/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/rtl/eth_mac_1g_rgmii_fifo.v:282]
+WARNING: [VRFC 10-9543] actual bit length 32 differs from formal bit length 8 for port 's_axis_tdest' [/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/rtl/eth_mac_1g_rgmii_fifo.v:283]
+WARNING: [VRFC 10-9543] actual bit length 32 differs from formal bit length 1 for port 's_axis_tkeep' [/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/rtl/eth_mac_1g_rgmii_fifo.v:329]
+WARNING: [VRFC 10-9543] actual bit length 32 differs from formal bit length 8 for port 's_axis_tid' [/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/rtl/eth_mac_1g_rgmii_fifo.v:333]
+WARNING: [VRFC 10-9543] actual bit length 32 differs from formal bit length 8 for port 's_axis_tdest' [/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/rtl/eth_mac_1g_rgmii_fifo.v:334]
+WARNING: [VRFC 10-9543] actual bit length 32 differs from formal bit length 96 for port 's_eth_dest_mac' [/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/rtl/udp_complete.v:375]
+WARNING: [VRFC 10-9543] actual bit length 32 differs from formal bit length 96 for port 's_eth_src_mac' [/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/rtl/udp_complete.v:376]
+WARNING: [VRFC 10-9543] actual bit length 32 differs from formal bit length 8 for port 's_ip_version' [/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/rtl/udp_complete.v:378]
+WARNING: [VRFC 10-9543] actual bit length 32 differs from formal bit length 8 for port 's_ip_ihl' [/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/rtl/udp_complete.v:379]
+WARNING: [VRFC 10-9543] actual bit length 32 differs from formal bit length 6 for port 's_ip_flags' [/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/rtl/udp_complete.v:384]
+WARNING: [VRFC 10-9543] actual bit length 32 differs from formal bit length 26 for port 's_ip_fragment_offset' [/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/rtl/udp_complete.v:385]
+WARNING: [VRFC 10-9543] actual bit length 32 differs from formal bit length 2 for port 's_ip_payload_axis_tkeep' [/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/rtl/udp_complete.v:392]
+WARNING: [VRFC 10-9543] actual bit length 32 differs from formal bit length 16 for port 's_ip_payload_axis_tid' [/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/rtl/udp_complete.v:396]
+WARNING: [VRFC 10-9543] actual bit length 32 differs from formal bit length 16 for port 's_ip_payload_axis_tdest' [/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/rtl/udp_complete.v:397]
+WARNING: [VRFC 10-9543] actual bit length 32 differs from formal bit length 2 for port 's_eth_payload_axis_tkeep' [/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/rtl/ip_complete.v:279]
+WARNING: [VRFC 10-9543] actual bit length 32 differs from formal bit length 16 for port 's_eth_payload_axis_tid' [/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/rtl/ip_complete.v:283]
+WARNING: [VRFC 10-9543] actual bit length 32 differs from formal bit length 16 for port 's_eth_payload_axis_tdest' [/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/rtl/ip_complete.v:284]
+WARNING: [VRFC 10-9543] actual bit length 32 differs from formal bit length 1 for port 's_axis_tkeep' [/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/rtl/udp_checksum_gen.v:219]
+WARNING: [VRFC 10-9543] actual bit length 32 differs from formal bit length 8 for port 's_axis_tid' [/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/rtl/udp_checksum_gen.v:223]
+WARNING: [VRFC 10-9543] actual bit length 32 differs from formal bit length 8 for port 's_axis_tdest' [/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/rtl/udp_checksum_gen.v:224]
+WARNING: [VRFC 10-5021] port 's_pause_req' is not connected on this instance [/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/rtl/eth_mac_1g_rgmii_fifo.v:254]
+WARNING: [VRFC 10-3645] port 's_pause_ack' remains unconnected for this instance [/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/rtl/eth_mac_1g_rgmii_fifo.v:254]
+WARNING: [VRFC 10-5021] port 's_pause_req' is not connected on this instance [/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/rtl/eth_mac_1g_rgmii_fifo.v:305]
+WARNING: [VRFC 10-3645] port 's_pause_ack' remains unconnected for this instance [/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/rtl/eth_mac_1g_rgmii_fifo.v:305]
+WARNING: [VRFC 10-5021] port 'tx_ptp_ts' is not connected on this instance [/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/rtl/eth_mac_1g_rgmii.v:218]
+WARNING: [VRFC 10-3645] port 'tx_axis_ptp_ts' remains unconnected for this instance [/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/rtl/eth_mac_1g_rgmii.v:218]
+WARNING: [VRFC 10-5021] port 's_eth_payload_axis_tkeep' is not connected on this instance [/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/rtl/ip_complete.v:395]
+WARNING: [VRFC 10-3645] port 'm_eth_payload_axis_tkeep' remains unconnected for this instance [/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/rtl/ip_complete.v:395]
+WARNING: [VRFC 10-3645] port 'pause_req' remains unconnected for this instance [/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/ip/verilog-ethernet/rtl/udp_checksum_gen.v:203]
+Completed static elaboration
+Starting simulation data flow analysis
+Completed simulation data flow analysis
+Time Resolution for simulation is 1ps
+Compiling module work.sync_reset(N=4)
+Compiling module work.iddr(IODDR_STYLE="IODDR",WIDTH=5...
+Compiling module work.ssio_ddr_in(IODDR_STYLE="IODDR",...
+Compiling module work.oddr(IODDR_STYLE="IODDR")
+Compiling module work.oddr(IODDR_STYLE="IODDR",WIDTH=5...
+Compiling module work.rgmii_phy_if(IODDR_STYLE="IODDR"...
+Compiling module work.lfsr(LFSR_WIDTH=32,LFSR_CONFIG="...
+Compiling module work.axis_gmii_rx(USER_WIDTH=1)
+Compiling module work.axis_gmii_tx(PTP_TAG_ENABLE=0,US...
+Compiling module work.eth_mac_1g_default
+Compiling module work.eth_mac_1g_rgmii(IODDR_STYLE="IO...
+Compiling module work.axis_async_fifo(KEEP_ENABLE=32'b...
+Compiling module work.axis_async_fifo_adapter(S_KEEP_E...
+Compiling module work.axis_async_fifo(DEPTH=8192,KEEP_...
+Compiling module work.axis_async_fifo_adapter(DEPTH=81...
+Compiling module work.eth_mac_1g_rgmii_fifo(IODDR_STYL...
+Compiling module work.eth_axis_rx_default
+Compiling module work.eth_axis_tx_default
+Compiling module work.priority_encoder(WIDTH=2,LSB_HIG...
+Compiling module work.arbiter(PORTS=2,ARB_BLOCK=1,ARB_...
+Compiling module work.ip_arb_mux(S_COUNT=2,KEEP_ENABLE...
+Compiling module work.eth_arb_mux(S_COUNT=2,KEEP_ENABL...
+Compiling module work.ip_eth_rx
+Compiling module work.ip_eth_tx
+Compiling module work.ip
+Compiling module work.arp_eth_rx(KEEP_ENABLE=1'b0,KEEP...
+Compiling module work.arp_eth_tx(KEEP_ENABLE=1'b0,KEEP...
+Compiling module work.lfsr(LFSR_WIDTH=32,LFSR_CONFIG="...
+Compiling module work.arp_cache(CACHE_ADDR_WIDTH=4)
+Compiling module work.arp(CACHE_ADDR_WIDTH=4,REQUEST_R...
+Compiling module work.ip_complete(ARP_CACHE_ADDR_WIDTH...
+Compiling module work.udp_ip_rx
+Compiling module work.udp_ip_tx
+Compiling module work.udp(CHECKSUM_GEN_ENABLE=0)
+Compiling module work.udp_complete(ARP_CACHE_ADDR_WIDT...
+Compiling module work.eth_link(PHY_RST_CYC=50)
+Compiling module work.ctrl
+Compiling module work.regs(LINK_TUNE0=32'b0)
+Compiling module work.ingest
+Compiling module work.req_table_default
+Compiling module work.track_scheduler
+Compiling module work.result_default
+Compiling module work.frontend
+Compiling module work.weight_entry
+Compiling module work.next_use_predictor
+Compiling module work.weight_cache_default
+Compiling module work.spike_list_default
+Compiling module work.spike_list(DEPTH=16,IW=8)
+Compiling module work.mac_unit
+Compiling module work.plift_core_default
+Compiling module work.plif_array_default
+Compiling module work.compute_array_default
+Compiling module work.membrane_bank(AW=16)
+Compiling module work.membrane_buf
+Compiling module work.membrane_storage_default
+Compiling module work.dma_default
+Compiling module work.accel_core_default
+Compiling module work.accel_sys(PHY_RST_CYC=50)
+Compiling module work.arp_cache
+Compiling module work.arp(REQUEST_RETRY_INTERVAL=12500...
+Compiling module work.ip_complete(ARP_REQUEST_RETRY_IN...
+Compiling module work.axis_fifo(DEPTH=2048,KEEP_ENABLE...
+Compiling module work.udp_checksum_gen_default
+Compiling module work.udp_default
+Compiling module work.udp_complete(ARP_REQUEST_RETRY_I...
+Compiling module work.tb_sys
+Built simulation snapshot tb_sys

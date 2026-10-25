@@ -1,0 +1,61 @@
+# P3.26 E1 재실험: cache 교체 정책. Host 처리 지연 = 모델 묶음 지연(M3 Xeon 측정 재생) + 추론 요청별 지연 U(0, J)
+# 정책 6개(PNU-count는 묶음 지연을 넣은 식과 무시한 P3.25 식 둘) × entry 2·4 × M3 조건 2개 × J 4개(1.6 ms는 그림용으로 뒤에 더함). Oracle MIN은 미래 도착을 아는 기준선
+# (하한 아님), 하한은 belady_kib. 같은 트랙의 이전 추론 요청이 안 끝났으면 새 추론 요청을 버린다(fpga_drop_busy, 06 §4.3).
+# 나머지 조건: L·64 lane @100 MHz, 1,024트랙, 모델 40개, rtl67, DDR3 3,015 MB/s, 12 bit membrane potential,
+# Model-Grouped Offset Assignment, Grouping, 즉시 송신. 시나리오 6개 × seed 30
+# 키 설명은 template.toml
+
+sim_mode = "run"
+sim_scenarios = ["U", "K", "S", "I", "SK", "R"]
+sim_seeds = 30
+sim_seed0 = 0
+sim_warm_periods = 16
+sim_meas_periods = 64
+model_size = "L"
+model_count = 40
+compute_lanes = 64
+compute_input = "golden"
+compute_spikes_per_cycle = 2
+compute_ctrl_scale = 1.0
+membrane_place = "split"
+membrane_bits = 12
+bram_reserve_tiles = 25.5
+ddr_bw_mbps = 3015.0
+track_count = 1024
+host_offset = "model"
+host_jitter_ms = 0.8
+host_jitter_dist = "uniform"
+host_jitter_trace = ""
+host_group_trace = "hardware/board_test/p325_meas/result/m3_group_pin3_load0.csv.gz"
+host_gather_ms = 0.0
+host_gather_to_max = false
+host_packet_gap_us = 0.0
+host_fixed_delay_us = 0.0
+fpga_drop_busy = true
+cache_policy = "pnu_count"
+cache_entries = 4
+cache_attrs = {}
+scheduler = "grouping"
+scheduler_attrs = {}
+search_key = "track_count"
+search_values = []
+search_step = 16
+tune_attr = ""
+tune_values = []
+tune_conds = []
+
+[sweep]
+policy = [
+  {label = "LRU", cache_policy = "lru"},
+  {label = "offset-only", cache_policy = "offset_only"},
+  {label = "PNU-timeout", cache_policy = "pnu_timeout"},
+  {label = "PNU-count", cache_policy = "pnu_count"},
+  {label = "PNU-count, 묶음 지연 모름(P3.25 식)", cache_policy = "pnu_count", cache_attrs = {group_aware = false}},
+  {label = "Oracle MIN", cache_policy = "oracle"},
+]
+cache_entries = [2, 4]
+host = [
+  {label = "M3 CPU 고정·부하 없음", host_group_trace = "hardware/board_test/p325_meas/result/m3_group_pin3_load0.csv.gz"},
+  {label = "M3 CPU 고정 없음·부하 없음", host_group_trace = "hardware/board_test/p325_meas/result/m3_group_pin-none_load0.csv.gz"},
+]
+host_jitter_ms = [0.0, 0.8, 1.6, 3.2]

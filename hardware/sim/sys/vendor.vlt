@@ -1,0 +1,4 @@
+`verilator_config
+lint_off -file "*/verilog-ethernet/*"
+lint_off -rule SELRANGE -file "*/verilog-ethernet/*"
+lint_off -rule MULTIDRIVEN -file "*/verilog-ethernet/*"

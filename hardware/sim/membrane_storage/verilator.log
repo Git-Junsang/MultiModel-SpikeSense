@@ -1,0 +1,4 @@
+run   추론 2542 (트랙 82, DDR3 트랙 22), row 불일치 0, 출력 불일치 0, DDR3 최종값 불일치 0
+run   DDR3 읽은 beat 22440 (기대 22440), 쓴 beat 23188 (기대 23188)
+PASS
+- hardware/testbench/tb_membrane_storage.sv:318: Verilog $finish

@@ -1,0 +1,7 @@
+run   요청·결과: 요청 611, 결과 611, len_err 7, 오류 0
+run   FCS: 틀린 frame 1개 버림, 오류 0
+run   받는 곳: 요청 779, 결과 779, ARP 받음 2·보냄 2, 오류 0
+run   제어: 요청 35개, DDR3 beat 쓰기 67·읽기 100, 결과·응답 동시 대기 25, ARP 받음 3·보냄 3, 오류 0
+run   끝: 요청 825, 결과 825, phy_reset_n 50 cycle, 오류 0, 174270 cycle
+PASS
+- hardware/testbench/tb_eth.sv:910: Verilog $finish

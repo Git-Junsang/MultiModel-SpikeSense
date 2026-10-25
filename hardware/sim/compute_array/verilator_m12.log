@@ -1,0 +1,6 @@
+run   저장 12 bit, vector 82, 추론 2542, row 114390개 대조
+run   불일치 layer1 0, layer2 0, layer3 0, layer4 0, 틀린 vector 0
+run   cycle 최소 329, 평균 541.6, 최대 1205
+run   control overhead 최소 67, 평균 67.2, 최대 87 (가정 203)
+PASS
+- hardware/testbench/tb_compute_array.sv:226: Verilog $finish
