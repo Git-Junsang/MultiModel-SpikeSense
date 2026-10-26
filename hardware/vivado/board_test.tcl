@@ -112,7 +112,7 @@ foreach x [split $opt(xdc) ","] {
     puts "INFO: XDC 추가 → ax7a200b_$x.xdc"
 }
 
-# ---- 시뮬레이션 소스 ----
+# ---- Simulation 소스 ----
 #   프로젝트 내 xsim은 <proj>.sim/sim_1/behav/xsim에서 실행된다. $readmemh를
 #   저장소 루트 기준 상대경로로 쓰는 testbench는 저장소 루트에서 xvlog/xelab/xsim을
 #   직접 실행해 검증한다(AGENTS.md 규칙).
@@ -132,7 +132,7 @@ if { $n_tb > 0 } { update_compile_order -fileset sim_1 }
 
 puts "INFO: 프로젝트 생성 완료 → $opt(proj_dir)/$opt(name).xpr"
 
-# ---- 선택: 합성/구현/비트스트림 실행 ----
+# ---- 선택: 합성/구현/bitstream 실행 ----
 if { $opt(run) ne "" } {
     launch_runs synth_1 -jobs $opt(jobs)
     wait_on_run synth_1

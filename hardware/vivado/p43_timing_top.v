@@ -3,7 +3,7 @@
 // ============================================================
 // compute_array + weight_cache(entry 4개, next_use_predictor) + membrane_storage(on-chip 768트랙).
 // p42_timing_top의 entry 4개·출력 mux를 weight_cache로 바꿨다. predictor 설정·도착·queue·교체 계획과
-// dma port(weight 쓰기, membrane potential)는 밖으로 낸다. scheduler·dma·ingest는 없다(P4.4~P4.6).
+// DMA port(weight 쓰기, membrane potential)는 밖으로 낸다. Scheduler·DMA·ingest는 없다(P4.4~P4.6).
 // ============================================================
 `timescale 1ns / 1ps
 
@@ -20,8 +20,8 @@ module p43_timing_top (
     // weight_cache
     input  wire [31:0]  now_us,
     input  wire [14:0]  phase_us,
-    input  wire [15:0]  epoch,
-    input  wire         first_epoch,
+    input  wire [15:0]  period,
+    input  wire         first_period,
     input  wire         cfg_we,
     input  wire [10:0]  cfg_addr,
     input  wire [15:0]  cfg_data,
@@ -85,7 +85,7 @@ module p43_timing_top (
 
     weight_cache #(.E(4)) u_wc (
         .clk(clk), .rst(rst),
-        .now_us(now_us), .phase_us(phase_us), .epoch(epoch), .first_epoch(first_epoch),
+        .now_us(now_us), .phase_us(phase_us), .period(period), .first_period(first_period),
         .cfg_we(cfg_we), .cfg_addr(cfg_addr), .cfg_data(cfg_data),
         .arr_valid(arr_valid), .arr_model(arr_model), .arr_t_host(arr_t_host), .arr_n_expect(arr_n_expect),
         .q_ne(q_ne),
@@ -108,7 +108,7 @@ module p43_timing_top (
         .dbg_cur(), .dbg_mem_sat(), .dbg_spk()
     );
 
-    membrane_storage #(.N_ONCHIP(768)) u_ms (
+    membrane_storage #(.N_ON_CHIP(768)) u_ms (
         .clk(clk), .rst(rst), .state_base(state_base),
         .track(track), .can_start(can_start), .start(start), .done(done),
         .wb_done(wb_done), .wb_track(wb_track),

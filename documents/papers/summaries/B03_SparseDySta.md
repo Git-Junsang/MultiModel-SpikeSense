@@ -1,7 +1,7 @@
 # B03: Sparse-DySta
 
 원문: `B03_SparseDySta_multiDNN.pdf`
-Fan 외, MICRO 2023
+Fan 등, MICRO 2023
 
 ## 1. 문제
 
@@ -43,7 +43,7 @@ Dysta의 sparsity 대신 다음 정보를 쓴다.
 - 남은 weight byte
 - 진행 중인 prefetch
 - 트랙 compute와 state DMA
-- deadline slack
+- Deadline slack
 
 이미 completion time에 넣은 transfer를 별도 penalty로 다시 더하면 안 된다.
 
@@ -53,6 +53,6 @@ Dysta의 sparsity 대신 다음 정보를 쓴다.
 - 우리는 periodic 32 ms hard deadline을 다룬다.
 - Dysta는 모델 weight fetch를 scheduling cost로 보지 않는다.
 
-P3.8 비교에서는 Dysta Method 순서가 평균 응답 시간을 조금 줄였지만 off-chip byte는 줄이지 못했다. 느린 DDR3 조건에서는 miss가 났다.
+P3.8 비교에서는 Dysta Method 순서가 평균 response time을 조금 줄였지만 off-chip byte는 줄이지 못했다. 느린 DDR3 조건에서는 miss가 났다.
 
-원문 확인: algorithm 1~3, 결과 표 5·그림 12, resource 표 6.
+원문 확인: algorithm 1–3, 결과 표 5·그림 12, resource 표 6.

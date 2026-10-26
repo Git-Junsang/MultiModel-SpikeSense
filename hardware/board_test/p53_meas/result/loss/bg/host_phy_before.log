@@ -1,0 +1,5 @@
+phy 1 reg  0 = 0x1140
+phy 1 reg  1 = 0x796d
+phy 1 reg  9 = 0x0200
+phy 1 reg 10 = 0x7800
+phy 1 reg 15 = 0x3000

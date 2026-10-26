@@ -1,6 +1,6 @@
 """PLIF `40→384→256→64→2` FP32 NumPy 순전파 (PyTorch 없이).
 
-`snn_torch.AnomalySNN`의 추론 경로를 프레임워크 없이 한 줄씩 다시 쓴 것이다.
+`snn_torch.AnomalySNN`의 추론 경로를 frame워크 없이 한 줄씩 다시 쓴 것이다.
 P1.7 INT8 golden 참조의 뼈대이며, FP 단계에서 PyTorch와 출력이 같은지 먼저 확인한다
 (P0.8, 검증 스크립트 `model/eval/numpy_fp.py`).
 
@@ -10,8 +10,8 @@ P1.7 INT8 golden 참조의 뼈대이며, FP 단계에서 PyTorch와 출력이 �
   mem     = beta · mem + W · x          # 누설 → 적분 (bias 없음)
   spike   = (mem >= thr)
   mem     = mem - spike · thr           # soft reset
-타임스텝마다 layer 1 → 4 순서로 갱신하고, membrane potential 초기값은 0이다.
-layer 1 입력은 mel 특징값(연속값 [0, 1])이고, layer 2~4 입력은 앞 layer spike(0/1)다.
+timestep마다 layer 1 → 4 순서로 갱신하고, membrane potential 초기값은 0이다.
+layer 1 입력은 mel 특징값(연속값 [0, 1])이고, layer 2–4 입력은 앞 layer spike(0/1)다.
 판정: 출력 layer membrane potential의 시간 평균 argmax (0 = 정상, 1 = 이상).
 """
 

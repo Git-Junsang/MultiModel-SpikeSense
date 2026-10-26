@@ -3,7 +3,7 @@
 
     python3 simulation/engine/engine.py simulation/environment/<파일>.toml [--jobs 11]
 
-환경 파일 → Setup(하드웨어 조건 + 부품 조립) → mode(run·search·tune·bound·adversarial) → 결과 CSV. 부품은 part_*.py에 종류별로 있다.
+환경 파일 → Setup(hardware 조건 + 부품 조립) → mode(run·search·tune·bound·adversarial) → 결과 CSV. 부품은 part_*.py에 종류별로 있다.
 구조, 식, mode, 결과 CSV 열은 documents/design_references/simulation_engine.md에 있다. 시간은 µs, B/µs = MB/s
 """
 import argparse
@@ -17,11 +17,11 @@ import numpy as np
 
 from part_cache import LRU, PNU, PNURTL, OffsetOnly, OracleMIN, PNUTimeout
 from part_compute import Compute
-from part_deadline import DelayPattern, bound, group_stats, host_max_us
+from part_deadline import DelayPattern, bound, model_group_delay_stats, host_max_us
 from part_hardware import MODEL_SIZES, PERIOD_US, ROOT, Hardware
 from part_jitter import JITTERS, Jitter
-from part_result import RESP_BIN_MS, RESP_BINS, read_csv, seed_stats, summarize, write_csv  # noqa: F401 (그림 script가 engine.read_csv로 쓴다)
-from part_scheduler import DeepRT, Dysta, Grouping
+from part_result import RESPONSE_TIME_BIN_MS, RESPONSE_TIME_BINS, read_csv, seed_stats, summarize, write_csv  # noqa: F401 (그림 script가 engine.read_csv로 쓴다)
+from part_scheduler import DeepRTMethod, DystaMethod, Grouping
 from part_simulator import simulate
 from part_workload import SCENARIOS, Workload
 
@@ -30,28 +30,28 @@ TEMPLATE = os.path.join(ENV_DIR, 'template.toml')
 OUT = os.path.join(ROOT, 'simulation', 'result')
 
 CACHE_POLICIES = {'lru': LRU, 'offset_only': OffsetOnly, 'pnu_timeout': PNUTimeout, 'pnu_count': PNU, 'pnu_rtl': PNURTL,
-                  'oracle': OracleMIN}
-SCHEDULERS = {'grouping': Grouping, 'dysta': Dysta, 'deeprt': DeepRT}
+                  'oracle_min': OracleMIN}
+SCHEDULERS = {'grouping': Grouping, 'dysta_method': DystaMethod, 'deeprt_method': DeepRTMethod}
 
 
 class Setup:
-    """환경 값 하나(점 e) → 하드웨어 조건 hw, 부품 셋(cache·scheduler·compute), BRAM tile, 배치 가능 여부, on-chip 트랙 수.
+    """환경 값 하나(점 e) → hardware 조건 hw, 부품 셋(cache·scheduler·compute), BRAM tile, 배치 가능 여부, on-chip 트랙 수.
     추론 요청열과 실행도 여기서 만든다. 조립 순서는 simulation_engine.md §7.1"""
 
     def __init__(self, e):
         self.e = e
         hw = self.hw = Hardware(e['compute_lanes'], e['track_count'], e['membrane_place'], e['membrane_bits'],
                                 MODEL_SIZES[e['model_size']], e['compute_ctrl_scale'], e['compute_spikes_per_cycle'],
-                                e['model_count'], e['ddr_bw_mbps'])
+                                e['model_count'], e['ddr3_bandwidth_mbps'])
         c = self.compute = Compute(hw)
         budget = hw.tile_budget - e['bram_reserve_tiles']
         st = self.cache = CACHE_POLICIES[e['cache_policy']](hw, entries=e['cache_entries'] or None, budget=budget - c.tiles(),
                                                             **e['cache_attrs'])
         self.used_tiles = st.tiles() + c.tiles()
-        self.feasible = self.used_tiles <= budget and st.entries >= 2      # entry 2벌 이상이어야 적재와 연산이 겹친다
+        self.feasible = self.used_tiles <= budget and st.entries >= 2      # Entry 2벌 이상이어야 적재와 연산이 겹친다
         place = e['membrane_place']                    # on-chip 트랙: split은 weight entry·준비 버퍼를 뺀 남는 BRAM에 들어가는 만큼
-        self.onchip_tracks = (hw.split_membrane(budget - self.used_tiles) if place == 'split'
-                              else e['track_count'] if place == 'onchip' else 0)
+        self.on_chip_tracks = (hw.split_membrane(budget - self.used_tiles) if place == 'split'
+                              else e['track_count'] if place == 'on_chip' else 0)
         self.scheduler = SCHEDULERS[e['scheduler']](hw, **e['scheduler_attrs'])
 
     def draw_tracks(self, scn, seed):
@@ -60,25 +60,25 @@ class Setup:
 
     def workload(self, scn, seed, jit=None):
         """시나리오 scn, seed의 추론 요청열. jit를 주면 (트랙, 주기) Host 처리 지연 µs로 그대로 쓴다(adversarial search).
-        PNU는 그래도 host_jitter_dist·host_group_trace 분포만 안다. 단계는 simulation_engine.md §4.1"""
+        PNU는 그래도 host_jitter_dist·host_model_group_delay_trace 분포만 안다. 단계는 simulation_engine.md §4.1"""
         e, hw, M = self.e, self.hw, self.hw.models
         n, kw = e['track_count'], dict(SCENARIOS[scn])
         tm, offs = self.draw_tracks(scn, seed)
         model_off = np.arange(M) * (PERIOD_US / M)     # Model-Grouped Offset Assignment: 모델 m의 offset
-        if e['host_offset'] != 'none':                 # none(Unaligned)이면 시나리오의 offset 그대로(make가 같은 값을 뽑는다)
-            offs = model_off[tm] if e['host_offset'] == 'model' else np.zeros(n)   # global: 모든 트랙 nominal offset 0
+        if e['host_offset'] != 'unaligned':                 # unaligned이면 시나리오의 offset 그대로(make가 같은 값을 뽑는다)
+            offs = model_off[tm] if e['host_offset'] == 'offset_assignment' else np.zeros(n)   # global_alignment: 모든 트랙 nominal offset 0
             kw.pop('offset', None)
             kw.update(offset=offs, track_model=tm)
-        wl = Workload.make(hw, n, seed, warm=e['sim_warm_periods'], meas=e['sim_meas_periods'], spike=e['compute_input'] == 'golden',
+        wl = Workload.make(hw, n, seed, warmup=e['sim_warmup_periods'], meas=e['sim_meas_periods'], spike=e['compute_input'] == 'golden',
                            jit=jit, jitter=Jitter.of(e['host_jitter_dist'], e['host_jitter_ms'] * 1000.0, e['host_jitter_trace']),
-                           group=Jitter.of('trace', 0.0, e['host_group_trace']) if e['host_group_trace'] else None,
+                           model_group_delay=Jitter.of('trace', 0.0, e['host_model_group_delay_trace']) if e['host_model_group_delay_trace'] else None,
                            drop_busy=e['fpga_drop_busy'], **kw)
         wait = host_max_us(e) if e['host_gather_to_max'] else e['host_gather_ms'] * 1000.0
         if wait:                                       # 모아 보내기: 모델·주기마다 다 준비되거나 offset + D가 되면 한꺼번에
             wl.gather(model_off, wait)
         if e['host_packet_gap_us']:
             wl.packetize(e['host_packet_gap_us'])
-        if e['host_fixed_delay_us']:                   # t_host 뒤 송신 전 고정 지연. 응답 시간에 들어간다
+        if e['host_fixed_delay_us']:                   # t_host 뒤 송신 전 고정 지연. Response time에 들어간다
             wl.delay(e['host_fixed_delay_us'])
         return wl
 
@@ -140,14 +140,14 @@ def check(lb, e):
     rules = [('sim_mode', e['sim_mode'] in MODES), ('model_size', e['model_size'] in MODEL_SIZES),
              ('model_count', isinstance(e['model_count'], int) and e['model_count'] >= 1),
              ('compute_spikes_per_cycle', e['compute_spikes_per_cycle'] in (1, 2)), ('compute_input', e['compute_input'] in ('golden', 'dense')),
-             ('membrane_place', e['membrane_place'] in ('split', 'onchip', 'ddr')), ('membrane_bits', e['membrane_bits'] in (12, 16)),
+             ('membrane_place', e['membrane_place'] in ('split', 'on_chip', 'ddr3')), ('membrane_bits', e['membrane_bits'] in (12, 16)),
              ('cache_policy', e['cache_policy'] in CACHE_POLICIES), ('scheduler', e['scheduler'] in SCHEDULERS),
-             ('host_offset', e['host_offset'] in ('model', 'none', 'global')),
+             ('host_offset', e['host_offset'] in ('offset_assignment', 'unaligned', 'global_alignment')),
              ('host_jitter_dist', e['host_jitter_dist'] in JITTERS and (e['host_jitter_dist'] != 'trace' or exists(e['host_jitter_trace']))),
-             ('host_group_trace', not e['host_group_trace'] or exists(e['host_group_trace'])),
-             ('host_gather_ms', e['host_gather_ms'] >= 0 and (not e['host_gather_ms'] or e['host_offset'] == 'model')),
+             ('host_model_group_delay_trace', not e['host_model_group_delay_trace'] or exists(e['host_model_group_delay_trace'])),
+             ('host_gather_ms', e['host_gather_ms'] >= 0 and (not e['host_gather_ms'] or e['host_offset'] == 'offset_assignment')),
              ('host_gather_to_max', isinstance(e['host_gather_to_max'], bool)
-              and (not e['host_gather_to_max'] or (e['host_offset'] == 'model' and not e['host_gather_ms']))),
+              and (not e['host_gather_to_max'] or (e['host_offset'] == 'offset_assignment' and not e['host_gather_ms']))),
              ('host_packet_gap_us', e['host_packet_gap_us'] >= 0
               and (not e['host_packet_gap_us'] or bool(e['host_gather_ms'] or e['host_gather_to_max']))),
              ('host_fixed_delay_us', e['host_fixed_delay_us'] >= 0),
@@ -178,12 +178,12 @@ class Run:
 
     @staticmethod
     def one(job):
-        """실행 하나 → simulate() 지표 + 응답 시간 히스토그램"""
+        """실행 하나 → simulate() 지표 + response time 히스토그램"""
         i, lb, e, scn, seed = job
         s = Setup(e)
         r = s.run(scn, seed, detail=True)
-        resp = r.pop('resp') / 1000
-        h = np.bincount(np.minimum((resp / RESP_BIN_MS).astype(int), RESP_BINS))
+        response_time = r.pop('response_time') / 1000
+        h = np.bincount(np.minimum((response_time / RESPONSE_TIME_BIN_MS).astype(int), RESPONSE_TIME_BINS))
         return dict(point=i, label=lb, scn=scn, seed=seed, **r, c_req=s.hw.dense_req_us, model_b=s.hw.model_bytes,
                     hist=[[int(j), int(h[j])] for j in np.flatnonzero(h)])
 
@@ -211,7 +211,7 @@ class Run:
             a = summarize(by[i])
             L.append(f"| {lb} | {a['runs']} | {a['miss']:,} | {a['mean_ms']:.3f} | {a['p99_ms']:.2f}{'+' if a['p99_ms'] > 70 else ''} | "
                      f"{a['max_ms']:.2f} | {a['in_ms']:.2f} · {a['fpga_ms']:.2f} · {a['out_ms']:.2f} | {a['w_kib']:.1f} | "
-                     f"{a['dram_kib']:.1f} | {a['ddr_mbps']:.0f} | {a['batch']:.1f} | {a['hit']:.2f} |")
+                     f"{a['ddr3_traffic_kib']:.1f} | {a['ddr3_used_bandwidth_mbps']:.0f} | {a['batch']:.1f} | {a['hit']:.2f} |")
         return '\n'.join(L) + '\n'
 
 
@@ -278,7 +278,7 @@ class Search:
 
     @staticmethod
     def track_values(e):
-        """track_count 후보: search_step 단위로 평균 연산 가동률 ≤ 100 %인 가장 큰 값까지. dense 연산 기준이라 상한이 보수적이다"""
+        """track_count 후보: search_step 단위로 평균 연산 가동률 ≤ 100%인 가장 큰 값까지. dense 연산 기준이라 상한이 보수적이다"""
         req_us, step = Setup(e).hw.dense_req_us, e['search_step']
         cap = min(int(PERIOD_US / (req_us * Search._active_share(s))) // step * step for s in e['sim_scenarios'])
         return list(range(step, cap + 1, step))
@@ -300,7 +300,7 @@ class Tune:
 
     @staticmethod
     def one(job):
-        """(점, 후보 값) 하나 → miss 난 실행 수, 추론 요청당 weight·DDR3 KiB, 최대 응답 시간"""
+        """(점, 후보 값) 하나 → miss 난 실행 수, 추론 요청당 weight·DDR3 KiB, 최대 response time"""
         i, lb, e, v = job
         fails, wb, mb, req, mx = 0, 0.0, 0.0, 0, 0.0
         for cond in e['tune_conds'] or [{}]:
@@ -318,7 +318,7 @@ class Tune:
                         req += r['req_win']
                         mx = max(mx, r['max_ms'])
         return dict(point=i, label=lb, attr=e['tune_attr'], value=v, fails=fails, w_kib=wb / req / 1024 if req else None,
-                    dram_kib=(wb + mb) / req / 1024 if req else None, max_ms=mx if req else None)
+                    ddr3_traffic_kib=(wb + mb) / req / 1024 if req else None, max_ms=mx if req else None)
 
     @staticmethod
     def summary(rs):
@@ -340,13 +340,13 @@ class Tune:
 
     @staticmethod
     def pick(rs):
-        """모든 실행이 miss 0인 값들과 그중 weight byte가 가장 작은 값(같으면 최대 응답 시간이 작은 값)"""
+        """모든 실행이 miss 0인 값들과 그중 weight byte가 가장 작은 값(같으면 최대 response time이 작은 값)"""
         good = [r for r in rs if r['fails'] == 0]
         return good, (min(good, key=lambda r: (round(r['w_kib'], 6), r.get('max_ms') or 0.0)) if good else min(rs, key=lambda r: r['fails']))
 
 
 class Bound:
-    """bound: 점마다 조건부 응답 시간을 식으로 계산한다(part_deadline.bound, 05 §6.1). 시뮬레이션은 돌리지 않는다"""
+    """bound: 점마다 조건부 response time을 식으로 계산한다(part_deadline.bound, 05 §6.1). Simulation은 돌리지 않는다"""
 
     @staticmethod
     def jobs(pts, info):
@@ -393,11 +393,11 @@ class Adversarial:
 
     @staticmethod
     def one(job):
-        """점 하나 → 가장 나쁜 꼴의 지표, 탐색한 모든 꼴에서 본 최대(seen_*), 조건부 응답 시간, 시험한 꼴 기록"""
+        """점 하나 → 가장 나쁜 꼴의 지표, 탐색한 모든 꼴에서 본 최대(seen_*), 조건부 response time, 시험한 꼴 기록"""
         i, lb, e, base = job
         A, s, rng = Adversarial, Setup(e), np.random.default_rng(2000 + base)
-        G, J, M = group_stats(e['host_group_trace'])[1], e['host_jitter_ms'] * 1000.0, e['model_count']
-        K = e['sim_warm_periods'] + e['sim_meas_periods']
+        G, J, M = model_group_delay_stats(e['host_model_group_delay_trace'])[1], e['host_jitter_ms'] * 1000.0, e['model_count']
+        K = e['sim_warmup_periods'] + e['sim_meas_periods']
         ng, nu = len(DelayPattern.GROUP), len(DelayPattern.REQUEST)
         starts = [DelayPattern(np.full(M, g), np.full(M, u)) for g in range(ng) for u in range(nu)]
         starts += [DelayPattern(rng.integers(0, ng, M), rng.integers(0, nu, M)) for _ in range(A.RANDOM_STARTS)]
@@ -405,13 +405,13 @@ class Adversarial:
         for k in range(len(starts) + A.CLIMB_STEPS):
             p = starts[k] if k < len(starts) else cur.mutated(rng, A.CLIMB_MODELS)
             v = A.evaluate(s, p, K, G, J)
-            tested.append(dict(step=k, group_pattern=p.codes()[0], request_pattern=p.codes()[1], **v))
+            tested.append(dict(step=k, model_group_delay_pattern=p.codes()[0], request_pattern=p.codes()[1], **v))
             if worst is None or v['send_max_ms'] > worst['send_max_ms']:
                 cur, worst = p, v
         g_code, u_code = cur.codes()
         return dict(point=i, label=lb, evals=len(tested), adv_send_max_ms=worst['send_max_ms'], adv_max_ms=worst['max_ms'],
                     adv_scn=worst['scn'], adv_miss=worst['miss'], adv_drop=worst['drop'], adv_window_loads_max=worst['window_loads_max'],
-                    adv_loads_per_model_period=worst['weight_loads'] / max(1, worst['model_periods']), adv_group_pattern=g_code,
+                    adv_loads_per_model_period=worst['weight_loads'] / max(1, worst['model_periods']), adv_model_group_delay_pattern=g_code,
                     adv_req_pattern=u_code, seen_window_loads_max=max(t['window_loads_max'] for t in tested),
                     seen_drop_max=max(t['drop'] for t in tested), seen_miss_max=max(t['miss'] for t in tested), **bound(s), tested=tested)
 
@@ -462,7 +462,7 @@ def point_rows(env, pts, info, rows):
         t, budget, ok = info[i]
         row = dict(point=i, label=lb, **{k: e[k] for k in keys}, tiles=t, budget=budget, feasible=ok)
         if e['membrane_place'] == 'split':
-            row['onchip_tracks'] = Setup(e).onchip_tracks       # 남는 BRAM에 둔 membrane potential 트랙 수(나머지는 DDR3)
+            row['on_chip_tracks'] = Setup(e).on_chip_tracks       # 남는 BRAM에 둔 membrane potential 트랙 수(나머지는 DDR3)
         row.update(MODES[env['sim_mode']].summary(by.get(i, [])))
         out.append(row)
     return out

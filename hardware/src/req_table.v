@@ -1,6 +1,6 @@
 // req_table.v — request table: 트랙마다 추론 요청 1개와 모델별 대기 목록 (03_ARCHITECTURE.md §2·§3)
 //
-// 트랙 칸: {RESET_STATE, x} 321 bit(연산 입력), {t_in, t_host, seq, model, RESET_STATE} 87 bit(결과용). BRAM, 읽기 latency 2.
+// 트랙 칸: {RESET_STATE, x} 321 bit(연산 입력), {t_in, t_host, seq, model, RESET_STATE} 87 bit(결과용). BRAM, 읽기 지연 2.
 // pend[트랙]: 추론 요청을 받았고 결과를 아직 보내지 않았다. ingest가 켜고 result가 끈다(drop 규칙, 06 §4.3).
 // 모델별 대기 목록: 도착 순서의 linked list(next[트랙]). head·tail·수·head의 도착 순번을 모델마다 둔다.
 //   추가(ingest)는 tail 뒤에 붙인다. 떼어 내기(track_scheduler)는 batch를 시작할 때 목록 전체를 가져가고 목록을 비운다.
@@ -30,10 +30,10 @@ module req_table #(
     output wire [31:0]         sc_hseq,
     input  wire [5:0]          hd_model,      // 다음 batch 첫 추론 요청
     output wire [9:0]          hd_head,
-    input  wire                dt_valid,      // batch 시작: 목록 떼어 내기
+    input  wire                dt_valid,      // Batch 시작: 목록 떼어 내기
     input  wire [5:0]          dt_model,
     output wire [10:0]         dt_cnt,
-    input  wire [9:0]          nx_track,      // batch 안 다음 추론 요청
+    input  wire [9:0]          nx_track,      // Batch 안 다음 추론 요청
     output wire [9:0]          nx_next,
     // 연산 입력 읽기
     input  wire                xr_en,

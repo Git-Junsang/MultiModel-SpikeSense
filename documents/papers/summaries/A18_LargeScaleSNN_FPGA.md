@@ -5,7 +5,7 @@ Cheung, Schultz, Luk, ICANN 2012
 
 ## 1. 문제
 
-큰 SNN은 state와 synapse weight가 많다. A18은 자주 갱신하는 state를 BRAM에 두고, 큰 synapse data는 DDR3에서 읽는다.
+큰 SNN은 state와 synapse weight가 많다. A18은 자주 갱신하는 state를 BRAM에 두고, 큰 synapse 데이터는 DDR3에서 읽는다.
 
 ## 2. 구조
 
@@ -46,8 +46,8 @@ Weight는 source neuron이 fire할 때만 읽는다. 여러 update가 같은 BRA
 - 모델 cache 교체와 request deadline이 없다.
 - A18의 on-chip state는 누적 synaptic current다. 우리 state는 트랙별 membrane potential이다.
 
-on-chip state와 off-chip weight 구성은 기존 기법이다. 우리 연구는 여러 모델의 cache와 여러 트랙의 실행 순서를 다룬다.
+On-chip state와 off-chip weight 구성은 기존 기법이다. 우리 연구는 여러 모델의 cache와 여러 트랙의 실행 순서를 다룬다.
 
-MIG와 memory interface resource도 실제 구현에서 측정해야 한다는 근거로 쓴다.
+MIG와 메모리 interface resource도 실제 구현에서 측정해야 한다는 근거로 쓴다.
 
 원문 확인: 구조 §3, platform §4, resource·성능 §5.

@@ -2,21 +2,21 @@
 """analyze_p325.py — M1·M3·M4 로그 → simulator trace CSV와 jitter 요약 (P3.25)
 
     python3 hardware/board_test/host/analyze_p325.py --m3 <m3 로그> --out <trace.csv>
-    python3 hardware/board_test/host/analyze_p325.py --m1 <m1> --m3 <m3> --m4 <m4> --out <trace.csv> [--epochs 400]
+    python3 hardware/board_test/host/analyze_p325.py --m1 <m1> --m3 <m3> --m4 <m4> --out <trace.csv> [--periods 400]
 출력: <trace>(.csv 또는 .csv.gz), <trace>.summary.json, 화면 요약. 있는 파일은 덮어쓰지 않는다.
 
-trace 열(µs, 시각 원점 = 기준 로그의 가장 이른 t_gen):
-  epoch,track_id,model_id,t_gen_us,t_ready_us,t_send_us,t_arr_us,t_done_us,t_recv_us,status
-  status = ok | lost(M4 결과 없음) | xrun(M1 frame 안에서 녹음이 끊김). 없는 값은 빈 칸이고 t_gen_us·t_ready_us는 늘 있다.
-  simulation/engine/part_jitter.py의 TraceJitter(host_jitter_dist = "trace")는 epoch, track_id, t_gen_us, t_ready_us만 읽는다. 앞 절반 epoch로
-  분포(PNU LUT)를 만들고 뒤 절반을 재생한다. 그래서 --epochs(기본 400 = 12.8 s)로 앞에서부터 자른다. 0이면 전부 쓴다.
+trace 열(µs, 시각 원점 = 기준 로그의 가장 이른 t_host):
+  period,track_id,model_id,t_host_us,t_ready_us,t_send_us,t_arr_us,t_done_us,t_recv_us,status
+  status = ok | lost(M4 결과 없음) | xrun(M1 frame 안에서 수음이 끊김). 없는 값은 빈 칸이고 t_host_us·t_ready_us는 늘 있다.
+  simulation/engine/part_jitter.py의 TraceJitter(host_jitter_dist = "trace")는 period, track_id, t_host_us, t_ready_us만 읽는다. 앞 절반 period로
+  분포(PNU LUT)를 만들고 뒤 절반을 재생한다. 그래서 --periods(기본 400 = 12.8 s)로 앞에서부터 자른다. 0이면 전부 쓴다.
   요약은 자르기 전 전체로 낸다.
 
-로그 합치기: 기준 격자(트랙 × epoch)는 --m3다(없으면 --m1, 그다음 --m4). 다른 로그의 지연은 engine의 trace 재생처럼 트랙·epoch
-순번을 그 로그의 트랙 수·epoch 수로 나눈 나머지 칸에서 가져와 더한다. 단계 지연이 서로 독립이라는 가정이다.
+로그 합치기: 기준 격자(트랙 × period)는 --m3다(없으면 --m1, 그다음 --m4). 다른 로그의 지연은 engine의 trace 재생처럼 트랙·period
+순번을 그 로그의 트랙 수·period 수로 나눈 나머지 칸에서 가져와 더한다. 단계 지연이 서로 독립이라는 가정이다.
 M1 장치가 트랙보다 적으면 여러 트랙이 같은 장치의 지연을 받는다.
-  t_gen   = M3 t_frame | M1 수음 시각 | M4 t_sched
-  t_ready = t_gen + M1 frame 준비 지연 + M3 준비 지연(t_ready − t_frame)
+  t_host   = M3 t_frame | M1 수음 시각 | M4 t_sched
+  t_ready = t_host + M1 frame 준비 지연 + M3 준비 지연(t_ready − t_frame)
   t_send  = t_ready + M4 보내기 지연(t_send − t_sched). M4가 없으면 t_send 이후는 빈 칸
   t_arr   = t_send + 편도(추론 요청), t_done = t_arr + (받는 쪽 t_done − t_arr), t_recv = t_done + 편도(결과)
 M1 수음 시각: 장치마다 1초 창의 가장 빨리 온 block으로 drift 직선을 맞추고, xrun 구간마다 가장 빠른 block에 붙인다.
@@ -27,9 +27,9 @@ M4 편도: 1초 창마다 왕복(받는 쪽 처리 제외)이 가장 짧은 pack
   구한다. θ(t) = 창 값들의 직선(clock drift) + 창 사이 나머지의 선형 보간이다. 양방향 대칭 가정이다.
   loopback 로그는 'M4 loopback code-check'로 표시한다.
 파생값(01_OVERVIEW.md §3, 실험 요청서 §4):
-  delta_ready = t_ready − t_gen, delta_send = t_send − t_ready, delta_net = t_arr − t_send, delta_total = t_arr − t_gen
-  cm_* = 같은 epoch의 중앙값(common-mode), diff_* = 추론 요청 − 그 epoch 중앙값(differential)
-  spread_* = 같은 모델·epoch 추론 요청의 최대 − 최소(jitter 폭 J)
+  delta_ready = t_ready − t_host, delta_send = t_send − t_ready, delta_net = t_arr − t_send, delta_total = t_arr − t_host
+  cm_* = 같은 period의 중앙값(common-mode), diff_* = 추론 요청 − 그 period 중앙값(differential)
+  spread_* = 같은 모델·period 추론 요청의 최대 − 최소(jitter 폭 J)
 """
 import argparse
 import json
@@ -42,7 +42,7 @@ import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from p325_common import M, OFF_NS, P_NS, SR, open_in, open_out, read_meta  # noqa: E402
 
-TRACE_COLS = 'epoch,track_id,model_id,t_gen_us,t_ready_us,t_send_us,t_arr_us,t_done_us,t_recv_us,status'
+TRACE_COLS = 'period,track_id,model_id,t_host_us,t_ready_us,t_send_us,t_arr_us,t_done_us,t_recv_us,status'
 LOOPBACK_WARN = 'M4 loopback code-check: 같은 PC의 127.0.0.1이다. Ethernet 측정값으로 쓰지 않는다'
 
 
@@ -53,11 +53,11 @@ def load(path, cols):
     return {c: a[:, i] for i, c in enumerate(cols)}
 
 
-def grid(track, epoch, **vals):
-    """(트랙, epoch) 표. 없는 칸은 NaN"""
+def grid(track, period, **vals):
+    """(트랙, period) 표. 없는 칸은 NaN"""
     tu, ti = np.unique(track, return_inverse=True)
-    eu, ei = np.unique(epoch, return_inverse=True)
-    g = dict(track=tu, epoch=eu)
+    eu, ei = np.unique(period, return_inverse=True)
+    g = dict(track=tu, period=eu)
     for k, v in vals.items():
         g[k] = np.full((tu.size, eu.size), np.nan)
         g[k][ti, ei] = v
@@ -82,11 +82,11 @@ def first_min(key, val):
 
 def m1(path):
     r = load(path, ['device_id', 'track_id', 'model_id', 'sample_index', 'host_block_arrival_ns', 'frame_ready_ns',
-                    'epoch', 'frame_end_index', 'xrun'])
+                    'period', 'frame_end_index', 'xrun'])
     meta = read_meta(path)
     rate = meta.get('rate', SR)
     frame, per0, T0 = 2 * rate * 32 // 1000, 1e9 / rate, meta.get('T0_ns')
-    devs, F = [], {k: [] for k in ('track', 'epoch', 'model', 't_gen', 'd_audio', 'xrun')}
+    devs, F = [], {k: [] for k in ('track', 'period', 'model', 't_host', 'd_audio', 'xrun')}
     for d in np.unique(r['device_id']):
         sel = r['device_id'] == d
         b = sel & (r['track_id'] == r['track_id'][sel].min())       # block 줄(장치의 첫 트랙만)
@@ -104,37 +104,37 @@ def m1(path):
         per = per0 + c1
         f = sel & (r['frame_ready_ns'] >= 0)
         e = r['frame_end_index'][f]
-        t_gen = c0[seg[np.minimum(np.searchsorted(x, e), x.size - 1)]] + e * per     # frame 끝이 든 block의 구간
+        t_host = c0[seg[np.minimum(np.searchsorted(x, e), x.size - 1)]] + e * per     # Frame 끝이 든 block의 구간
         B = int(np.median(np.diff(x))) if x.size > 1 else 1
         xs = x[xr > 0]
         bad = np.searchsorted(xs, e + B - 1, 'right') > np.searchsorted(xs, e - frame + 1, 'left')
-        for k, v in (('track', r['track_id'][f]), ('epoch', r['epoch'][f]), ('model', r['model_id'][f]), ('t_gen', t_gen),
-                     ('d_audio', r['frame_ready_ns'][f] - t_gen), ('xrun', bad)):
+        for k, v in (('track', r['track_id'][f]), ('period', r['period'][f]), ('model', r['model_id'][f]), ('t_host', t_host),
+                     ('d_audio', r['frame_ready_ns'][f] - t_host), ('xrun', bad)):
             F[k].append(v)
         dm = meta.get('devices') or []
         info = dm[d] if d < len(dm) else {}
-        cut = t_gen - (T0 + r['model_id'][f] * OFF_NS + r['epoch'][f] * P_NS) if T0 is not None and e.size else None
-        devs.append(dict(device=int(d), name=info.get('name'), latency_s=info.get('latency_s'), block=B, blocks=int(x.size),
+        cut = t_host - (T0 + r['model_id'][f] * OFF_NS + r['period'][f] * P_NS) if T0 is not None and e.size else None
+        devs.append(dict(device=int(d), name=info.get('name'), device_delay_s=info.get('device_delay_s'), block=B, blocks=int(x.size),
                          xrun_blocks=int(xr.sum()), windows=int(xm.size), drift_ppm=(per0 / per - 1) * 1e6,
                          err_ms_per_hour=(per / per0 - 1) * 3.6e6,
                          fit_resid_max_us=float(np.ptp(ym - c1 * xm)) / 1e3 if xm.size else None,
                          cut_err_first_ms=float(cut[0]) / 1e6 if cut is not None else None,
                          cut_err_last_ms=float(cut[-1]) / 1e6 if cut is not None else None,
-                         block_delay=pct(dl), frame_ready=pct(r['frame_ready_ns'][f] - t_gen)))
+                         block_delay=pct(dl), frame_ready=pct(r['frame_ready_ns'][f] - t_host)))
     F = {k: np.concatenate(v) for k, v in F.items()}
-    g = grid(F['track'], F['epoch'], t_gen=F['t_gen'], d_audio=F['d_audio'], xrun=F['xrun'], model=F['model'])
+    g = grid(F['track'], F['period'], t_host=F['t_host'], d_audio=F['d_audio'], xrun=F['xrun'], model=F['model'])
     return g, dict(path=path, label=meta.get('note') or 'M1', rate=rate, devices=devs, frames=int(F['track'].size),
                    frame_ready=pct(F['d_audio']), xrun_frames=int(F['xrun'].sum()))
 
 
 def m3(path):
-    r = load(path, ['epoch', 'track_id', 'model_id', 't_frame_ns', 't_compute_start_ns', 't_ready_ns', 'cpu', 'thread'])
+    r = load(path, ['period', 'track_id', 'model_id', 't_frame_ns', 't_compute_start_ns', 't_ready_ns', 'cpu', 'thread'])
     meta = read_meta(path)
-    g = grid(r['track_id'], r['epoch'], t_gen=r['t_frame_ns'], d_mel=r['t_ready_ns'] - r['t_frame_ns'], model=r['model_id'])
-    _, i = np.unique(r['epoch'] * M + r['model_id'], return_index=True)       # (epoch, 모델) 묶음 하나씩
+    g = grid(r['track_id'], r['period'], t_host=r['t_frame_ns'], d_mel=r['t_ready_ns'] - r['t_frame_ns'], model=r['model_id'])
+    _, i = np.unique(r['period'] * M + r['model_id'], return_index=True)       # (period, 모델) 모델 그룹 하나씩
     i = i[np.argsort(r['t_compute_start_ns'][i], kind='stable')]
     mig = {int(t): int((np.diff(r['cpu'][i][r['thread'][i] == t]) != 0).sum()) for t in np.unique(r['thread'][i])}
-    return g, dict(path=path, label=meta.get('note') or 'M3', tracks=int(g['track'].size), epochs=int(g['epoch'].size),
+    return g, dict(path=path, label=meta.get('note') or 'M3', tracks=int(g['track'].size), periods=int(g['period'].size),
                    audio=meta.get('audio'), pin=meta.get('pin'), load=meta.get('load'), loadavg_end=meta.get('loadavg'),
                    wake=pct(r['t_compute_start_ns'][i] - r['t_frame_ns'][i]),
                    compute=pct(r['t_ready_ns'][i] - r['t_compute_start_ns'][i]),
@@ -143,7 +143,7 @@ def m3(path):
 
 
 def m4(path):
-    c = ['track_id', 'model_id', 'epoch', 't_send_host_ns', 't_arr_fpga_ns', 't_done_fpga_ns', 't_recv_host_ns', 'lost',
+    c = ['track_id', 'model_id', 'period', 't_send_host_ns', 't_arr_fpga_ns', 't_done_fpga_ns', 't_recv_host_ns', 'lost',
          'reordered', 'retransmitted', 't_sched_host_ns']
     r = load(path, c)
     meta = read_meta(path)
@@ -163,7 +163,7 @@ def m4(path):
         fwd, back, fpga = (np.where(ok, v, np.nan) for v in (t2 - t1 - theta, t4 - t3 + theta, t3 - t2))
         drift = float(cf[0] * 1e6) if pick.size >= 3 else None
     late = t1 - r['t_sched_host_ns']
-    g = grid(r['track_id'], r['epoch'], t_gen=r['t_sched_host_ns'], d_late=late, d_fwd=fwd, d_fpga=fpga, d_back=back,
+    g = grid(r['track_id'], r['period'], t_host=r['t_sched_host_ns'], d_late=late, d_fwd=fwd, d_fpga=fpga, d_back=back,
              lost=r['lost'], model=r['model_id'])
     loop = meta.get('mode') == 'loopback'
     return g, dict(path=path, label=LOOPBACK_WARN if loop else (meta.get('label') or 'M4'), mode=meta.get('mode'),
@@ -174,16 +174,16 @@ def m4(path):
 
 
 def compose(logs):
-    """기준 로그 격자에 다른 로그의 단계 지연을 더한다. 반환: 트랙·epoch·모델, 시각 표(ns), status 표"""
+    """기준 로그 격자에 다른 로그의 단계 지연을 더한다. 반환: 트랙·period·모델, 시각 표(ns), status 표"""
     b = logs.get('m3') or logs.get('m1') or logs.get('m4')
-    T, E = b['t_gen'].shape
+    T, E = b['t_host'].shape
 
     def take(name, key):
         g = logs[name][key]
         return g[np.arange(T)[:, None] % g.shape[0], np.arange(E)[None, :] % g.shape[1]]
 
-    t = dict(t_gen=b['t_gen'])
-    t['t_ready'] = t['t_gen'] + (take('m1', 'd_audio') if 'm1' in logs else 0) + (take('m3', 'd_mel') if 'm3' in logs else 0)
+    t = dict(t_host=b['t_host'])
+    t['t_ready'] = t['t_host'] + (take('m1', 'd_audio') if 'm1' in logs else 0) + (take('m3', 'd_mel') if 'm3' in logs else 0)
     if 'm4' in logs:
         t['t_send'] = t['t_ready'] + take('m4', 'd_late')
         t['t_arr'] = t['t_send'] + take('m4', 'd_fwd')
@@ -199,12 +199,12 @@ def compose(logs):
     with warnings.catch_warnings():
         warnings.simplefilter('ignore', RuntimeWarning)
         model = np.nanmax(b['model'], 1).astype(int)
-    return b['track'], b['epoch'], model, t, status
+    return b['track'], b['period'], model, t, status
 
 
 def summarize(model, t):
-    d = dict(delta_ready=t['t_ready'] - t['t_gen'], delta_send=t['t_send'] - t['t_ready'],
-             delta_net=t['t_arr'] - t['t_send'], delta_total=t['t_arr'] - t['t_gen'])
+    d = dict(delta_ready=t['t_ready'] - t['t_host'], delta_send=t['t_send'] - t['t_ready'],
+             delta_net=t['t_arr'] - t['t_send'], delta_total=t['t_arr'] - t['t_host'])
     out = {k: pct(v) for k, v in d.items()}
     with warnings.catch_warnings():
         warnings.simplefilter('ignore', RuntimeWarning)
@@ -217,10 +217,10 @@ def summarize(model, t):
     return out
 
 
-def write_trace(path, track, epoch, model, t, status, n_epochs):
-    origin = np.nanmin(t['t_gen'])
-    E = t['t_gen'].shape[1] if not n_epochs else min(n_epochs, t['t_gen'].shape[1])
-    keys = ('t_gen', 't_ready', 't_send', 't_arr', 't_done', 't_recv')
+def write_trace(path, track, period, model, t, status, n_periods):
+    origin = np.nanmin(t['t_host'])
+    E = t['t_host'].shape[1] if not n_periods else min(n_periods, t['t_host'].shape[1])
+    keys = ('t_host', 't_ready', 't_send', 't_arr', 't_done', 't_recv')
     n = dropped = 0
     with open_out(path) as f:
         f.write(TRACE_COLS + '\n')
@@ -230,10 +230,10 @@ def write_trace(path, track, epoch, model, t, status, n_epochs):
                 if not (np.isfinite(v[0]) and np.isfinite(v[1])):          # engine은 빈 칸을 트랙 중앙값으로 채운다
                     dropped += 1
                     continue
-                f.write(f'{epoch[j]},{track[i]},{model[i]},' + ','.join(f'{x:.3f}' if np.isfinite(x) else '' for x in v)
+                f.write(f'{period[j]},{track[i]},{model[i]},' + ','.join(f'{x:.3f}' if np.isfinite(x) else '' for x in v)
                         + f',{status[i, j]}\n')
                 n += 1
-    return dict(rows=n, dropped=dropped, epochs=E, time_origin_ns=float(origin))
+    return dict(rows=n, dropped=dropped, periods=E, time_origin_ns=float(origin))
 
 
 def show(name, s):
@@ -248,7 +248,7 @@ def main():
     ap.add_argument('--m3', default='')
     ap.add_argument('--m4', default='')
     ap.add_argument('--out', required=True, help='trace CSV(.csv 또는 .csv.gz)')
-    ap.add_argument('--epochs', type=int, default=400, help='trace에 쓸 앞쪽 epoch 수. 0 = 전부')
+    ap.add_argument('--periods', type=int, default=400, help='trace에 쓸 앞쪽 period 수. 0 = 전부')
     a = ap.parse_args()
     if os.path.exists(a.out) or os.path.exists(a.out + '.summary.json'):
         sys.exit(f'출력 파일이 이미 있다: {a.out}')
@@ -258,10 +258,10 @@ def main():
             logs[name], info[name] = fn(getattr(a, name))
     if not logs:
         sys.exit('--m1, --m3, --m4 중 하나 이상이 필요하다')
-    track, epoch, model, t, status = compose(logs)
+    track, period, model, t, status = compose(logs)
     summ = dict(inputs={k: v['path'] for k, v in info.items()}, labels={k: v['label'] for k, v in info.items()},
                 base=next(k for k in ('m3', 'm1', 'm4') if k in logs), stats=summarize(model, t), **info)
-    summ['trace'] = dict(path=a.out, **write_trace(a.out, track, epoch, model, t, status, a.epochs))
+    summ['trace'] = dict(path=a.out, **write_trace(a.out, track, period, model, t, status, a.periods))
     with open_out(a.out + '.summary.json') as f:
         json.dump(summ, f, ensure_ascii=False, indent=1, default=float)
     for k, v in info.items():
@@ -285,7 +285,7 @@ def main():
     for k, s in summ['stats'].items():
         show(k, s)
     tr = summ['trace']
-    print(f"trace {tr['rows']}줄(빠진 칸 {tr['dropped']}), epoch {tr['epochs']}개 → {a.out}, 요약 {a.out}.summary.json")
+    print(f"trace {tr['rows']}줄(빠진 칸 {tr['dropped']}), period {tr['periods']}개 → {a.out}, 요약 {a.out}.summary.json")
 
 
 if __name__ == '__main__':

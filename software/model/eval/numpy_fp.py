@@ -4,7 +4,7 @@
    저장소의 weight HEX로 돌려 선행 golden vector(membrane potential·spike)와 비트 단위로 비교한다.
    선행 저장소는 읽기만 한다.
 2) FP 일치: 학습한 40대 모델(`weights/L_normal_noaug/<장비>/last.pth`)마다 DCASE test 평가 세트
-   (train_1unit.prepare의 supervised 분할, 학습과 같은 seed)를 PyTorch(CPU FP32)와
+   (train_1unit.prepare의 지도학습 분할, 학습과 같은 seed)를 PyTorch(CPU FP32)와
    `snn_fp32`(FP32)로 순전파해 layer별 spike·출력 membrane potential·판정·파일 단위 AUC를 비교한다.
    spike가 다르면 처음 달라진 지점의 |mem - thr|를 기록해 반올림 차이인지 확인한다.
 
@@ -80,9 +80,9 @@ def softmax_p1(mean_mem):
 
 
 def first_div_margin(layers, x, t_spk):
-    """세그먼트별로 spike가 처음 달라진 지점에서 NumPy membrane potential과 threshold의 차 |mem - thr|.
+    """segment별로 spike가 처음 달라진 지점에서 NumPy membrane potential과 threshold의 차 |mem - thr|.
 
-    반환: (분기 세그먼트 수, 최대 |mem - thr|). 반올림 차이라면 ~1e-6 이하다.
+    반환: (분기 segment 수, 최대 |mem - thr|). 반올림 차이라면 ~1e-6 이하다.
     """
     B, T, _ = x.shape
     mems = [np.zeros((B, l["W"].shape[0]), sn.DTYPE) for l in layers]

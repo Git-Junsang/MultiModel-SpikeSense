@@ -1,6 +1,6 @@
 """P1.7: 내보낸 모델만 읽어 INT8 RTL 대조용 golden vector를 만든다.
 
-모델당 test 세트의 첫 정상·이상 세그먼트를 사용한다. 각 NPZ는 입력과 모든 layer의
+모델당 test 세트의 첫 정상·이상 segment를 사용한다. 각 NPZ는 입력과 모든 layer의
 전류, 포화 후/발화 전 membrane potential, spike, soft reset 후 membrane potential을 담는다.
 fan_id01 정상 벡터는 $readmemh용 HEX로도 생성한다.
 

@@ -8,7 +8,7 @@
 // buffer는 그룹 12개 × 64 bit chunk 12개로 둔다. row slot s = chunk 3s~3s+2, beat k = chunk 4k~4k+3.
 //
 // 같은 트랙의 다음 추론 요청은 되쓰기 응답 뒤에만 오므로(req_table, 03_ARCHITECTURE.md §3) DDR3 읽기가 앞 쓰기를 앞지르지 않는다.
-// compute 읽기 latency 2. dma 쪽은 valid/ready handshake 뒤 beat 34개를 순서대로 주고받는다.
+// compute 읽기 지연 2. DMA 쪽은 valid/ready handshake 뒤 beat 34개를 순서대로 주고받는다.
 
 module membrane_buf (
     input  wire         clk,
@@ -29,13 +29,13 @@ module membrane_buf (
     input  wire         c_wr_en,
     input  wire [5:0]   c_wr_row,
     input  wire [191:0] c_wr_data,
-    // dma 읽기
+    // DMA 읽기
     output reg          dr_req_valid,
     input  wire         dr_req_ready,
     output reg  [31:0]  dr_req_addr,
     input  wire         dr_valid,
     input  wire [255:0] dr_data,
-    // dma 쓰기
+    // DMA 쓰기
     output reg          dw_req_valid,
     input  wire         dw_req_ready,
     output reg  [31:0]  dw_req_addr,

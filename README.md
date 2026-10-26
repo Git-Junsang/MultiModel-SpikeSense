@@ -6,16 +6,16 @@
 
 ## 1. 배경
 
-회전 기계는 고장 전에 이상음을 낸다. 같은 기종이라도 장비와 설치 환경에 따라 정상 소리가 달라서 장비마다 SNN 모델을 따로 둔다. 이 연구는 모델 40개와 mic 트랙 1,024개를 FPGA 하나로 처리한다. 트랙마다 32 ms에 추론 요청이 하나 생기고 Host는 frame 마지막 샘플이 Host에 들어온 시각부터 32 ms 안에 결과를 받아야 한다.
+회전 장비 고장 전에 이상음을 낸다. 같은 기종이라도 장비와 설치 환경에 따라 정상 소리가 달라서 장비마다 SNN 모델을 따로 둔다. 이 연구는 모델 40개와 mic 트랙 1,024개를 FPGA 하나로 처리한다. 트랙마다 32 ms에 추론 요청이 하나 생기고 Host는 frame 마지막 샘플이 Host에 들어온 시각부터 32 ms 안에 결과를 받아야 한다.
 
-병목은 연산이 아니라 weight 전송이다. 모델 40개의 weight는 4.97 MiB라 BRAM(약 1.6 MiB)에 다 들어가지 않는다. weight를 재사용하지 않으면 DDR3에 4.17 GB/s가 필요해 보드의 읽기 대역폭 3.015 GB/s를 넘는다.
+병목은 연산이 아니라 weight 전송이다. 모델 40개의 weight는 4.97 MiB라 BRAM(약 1.6 MiB)에 다 들어가지 않는다. weight를 재사용하지 않으면 DDR3에 4.17 GB/s가 필요해 보드의 읽기 bandwidth 3.015 GB/s를 넘는다.
 
 | 기법 | 하는 일 |
 |---|---|
 | Model-Grouped Offset Assignment | Host가 같은 모델을 쓰는 트랙에 같은 frame offset을 배정한다. 같은 모델의 추론 요청이 FPGA에 함께 도착한다 |
 | Grouping | FPGA가 추가 추론 요청을 기다리지 않고 이미 도착한 같은 모델 추론 요청을 batch로 묶는다 |
-| predicted-next-use weight cache | queue, Host 지연 분포, 예상 추론 요청 수로 다음 사용 시각을 예측해 가장 늦게 쓸 모델을 내보낸다(PNU-count) |
-| 12 bit membrane storage | membrane potential을 12 bit로 저장해 남는 BRAM에 일부 트랙(entry 4이면 768트랙)을 둔다 |
+| Predicted-Next-Use Weight Cache | queue, Host 처리 지연 분포, 예상 추론 요청 수로 다음 사용 시각을 예측해 가장 늦게 쓸 모델을 내보낸다(PNU-Count) |
+| 12 bit Membrane Storage | membrane potential을 12 bit로 저장해 남는 BRAM에 일부 트랙(entry 4이면 768트랙)을 둔다 |
 
 ---
 
@@ -25,7 +25,7 @@
 
 | 구성 | 역할 |
 |---|---|
-| Host | 특징 추출(mel 40개), offset 배정, 판정. 최종 Host는 라즈베리파이 5(8 GB)이고, 지금 Host 지연 측정은 Xeon에서 했다 |
+| Host | 특징 추출(mel 40개), Offset Assignment, 판정. 최종 Host는 라즈베리파이 5(8 GiB)이고, 지금 Host 처리 지연 측정은 Xeon에서 했다 |
 | Gigabit Ethernet (UDP) | 추론 요청 64 B, 결과 32 B |
 | FPGA (ALINX AX7A200B, XC7A200T) | request table, Grouping scheduler, DMA, next-use predictor와 weight cache entry 4개, membrane bank, 64-lane compute array |
 | DDR3 1 GiB | 모델 40개의 weight, 256트랙의 membrane potential |
@@ -36,11 +36,11 @@
 
 ### 3.1 모델: PLIF SNN
 
-- 입력: 16 kHz 음성, FFT 1,024, hop 512에서 구한 mel 40개. frame은 64 ms이고 32 ms마다 하나씩 만든다
+- 입력: 16 kHz 음성, FFT 1,024, hop 512에서 구한 mel 40개. Frame은 64 ms이고 32 ms마다 하나씩 만든다
 - 구조: `40→384→256→64→2`, 뉴런 706개, bias 없음. DCASE 2020 Task 2의 장비 ID 40개마다 한 모델
 - 뉴런: PLIF. 뉴런마다 누설 계수와 threshold를 학습한다
 - 판정: 31 frame(992 ms)의 출력 membrane potential 평균 중 큰 쪽(0 정상, 1 이상)
-- 양자화: weight는 layer별 대칭 INT8(130,176 B), 누설 계수는 Q0.8. membrane potential은 16 bit 포화 연산, 저장은 12 bit
+- 양자화: weight는 layer별 대칭 INT8(130,176 B), 누설 계수는 Q0.8. Membrane potential은 16 bit 포화 연산, 저장은 12 bit
 - 학습: focal loss, Adam(lr 0.002, cosine), batch 512, 60 epoch
 
 | 형식 | 평균 ROC-AUC (40대) | AUC 0.9 이상 |
@@ -54,25 +54,25 @@
 
 | 항목 | 값 |
 |---|---|
-| compute array | 64 lane output-stationary, 100 MHz. layer 2·3은 spike 0 건너뛰기, cycle마다 spike input 2개 |
+| compute array | 64-lane output-stationary, 100 MHz. layer 2·3은 spike 0 건너뛰기, cycle마다 spike input 2개 |
 | 추론 1번 | 실데이터 평균 535.9 cycle(5.36 µs), 모든 spike 발생 1,205 cycle(12.05 µs). control overhead 67 cycle 포함 |
 | BRAM 365 tile | weight cache entry 4개 114 tile, membrane potential 768트랙 200.5 tile, 링크·request table·buffer 50 tile, predictor 0.5 tile |
 | weight 적재 | 모델 전체 131,648 B, 43.91 µs |
-| deadline | hard deadline 보장은 주장하지 않는다. 측정 최대를 넣은 조건부 응답 시간은 CPU 고정 Host에서 19.87~26.62 ms |
+| deadline | hard deadline 보장은 주장하지 않는다. 측정 최대를 넣은 조건부 response time은 CPU 고정 Host에서 19.87–26.62 ms |
 
-RTL은 compute array(P4.1), membrane storage(P4.2), weight cache(P4.3)까지 있다. cycle과 bit 정확도는 RTL simulation, timing은 out-of-context 배치·배선 결과다. 나머지 숫자는 계산과 simulation이며 보드로 확인해야 한다.
+RTL은 compute array(P4.1), Membrane Storage(P4.2), weight cache(P4.3)까지 있다. cycle과 bit 정확도는 RTL simulation, timing은 out-of-context 배치·배선 결과다. 나머지 숫자는 계산과 simulation이며 보드로 확인해야 한다.
 
 ### 3.3 Simulation 결과
 
-1,024트랙, entry 4, 같은 BRAM에서 비교했다. Host 처리 지연은 Xeon(CPU 고정·부하 없음)에서 잰 모델 묶음 지연에 추론 요청별 지연 j ~ Uniform(0, 0.8 ms)를 더해 재생했다. 보드 실측이 아니다.
+1,024트랙, entry 4, 같은 BRAM에서 비교했다. Host 처리 지연은 Xeon(CPU 고정·부하 없음)에서 잰 모델 그룹 지연에 추론 요청별 지연 j ~ Uniform(0, 0.8 ms)를 더해 재생했다. 보드 실측이 아니다.
 
-| 방법 | DDR3 KiB/추론 | 응답 시간 최대 ms | 준비 완료 뒤 최대 ms |
+| 방법 | DDR3 KiB/추론 | response time 최대 ms | 준비 완료 뒤 최대 ms |
 |---|---:|---:|---:|
 | Dysta Method | 56.62 | 10.58 | 6.90 |
 | DeepRT Method | 11.35 | 23.80 | 16.41 |
 | 제안 | 6.38 | 9.58 | 1.42 |
 
-세 방법 모두 deadline miss와 drop이 없었다. 응답 시간 최대에는 Host 처리 지연(관측 최대 8.94 ms)이 들어 있다. 비교군은 원 논문의 정책을 같은 FPGA 모델로 옮긴 것이다. 다른 실험은 [08_EVALUATION.md](documents/design_references/08_EVALUATION.md)에 있다.
+세 방법 모두 deadline miss와 drop이 없었다. Response time 최대에는 Host 처리 지연(관측 최대 8.94 ms)이 들어 있다. 비교군은 원 논문의 정책을 같은 FPGA 모델로 옮긴 것이다. 다른 실험은 [08_EVALUATION.md](documents/design_references/08_EVALUATION.md)에 있다.
 
 ---
 
@@ -114,12 +114,12 @@ MultiModel-SpikeSense/
 | `model/references/` | 선행 저장소 code 사본. 고치지 않는다 |
 | `host/` | C program `mmss_host` 하나에 `setup`·`run`·`stop`이 있다. 사용법은 `main.c` 첫머리, 식은 파일마다 첫머리에 적었다. `build/`는 빌드 산출물이다 |
 
-학습 이름은 `<크기>_<용도>_<학습방법>`이다. 크기는 `XS`·`P`·`S`·`M`·`L`·`XL`(layer 구조는 `snn_torch.py`의 `ARCHS`), 용도는 `normal`·`mixed`(섞인 소리), 학습방법은 `noaug`·`aug`(겹침 증강)다.
+학습 이름은 `<크기>_<용도>_<학습방법>`이다. 크기는 `XS`·`P`·`synchronized`·`M`·`L`·`XL`(layer 구조는 `snn_torch.py`의 `ARCHS`), 용도는 `normal`·`mixed`(섞인 소리), 학습방법은 `noaug`·`aug`(겹침 증강)다.
 
 | 학습 이름 | 장비 | 내용 | 옛 위치 |
 |---|---:|---|---|
 | `L_normal_noaug` | 40 | 지금 export한 모델(P2.4) | `model_weights/<장비>` |
-| `XS`·`P`·`S`·`M_normal_noaug` | 40 | P3.6 크기 비교, 미채택 | `model_weights/_sweep/{XS,P,S,M}` |
+| `XS`·`P`·`synchronized`·`M_normal_noaug` | 40 | P3.6 크기 비교, 미채택 | `model_weights/_sweep/{XS,P,S,M}` |
 | `XL_normal_noaug` | 40 | P3.6 크기 비교 | `model_weights/_sweep/XL` |
 | `L_mixed_aug` | 40 | 겹침 증강 학습. 다음 export 후보 | `model_weights/_sweep/L_aug` |
 | `XL_mixed_aug` | 40 | 겹침 증강 학습, P3.10 export | `model_weights/_sweep/XL_aug` |
@@ -127,12 +127,12 @@ MultiModel-SpikeSense/
 
 2026-10-15 이전 결과 파일에는 옛 이름과 경로가 남아 있다. 위 표로 옮겨 읽는다.
 
-### simulation
+### Simulation
 
 | 대상 | 규칙 | 예 |
 |---|---|---|
 | 환경 파일 | `<결과 접두사>_<실험>.toml`. 접두사는 `p` + 작업 번호 | `p326_final_compare.toml` |
-| 환경 키 | `대상_속성[_단위]`. 대상은 sim, model, compute, membrane, bram, ddr, track, host, fpga, cache, scheduler, search, tune | `host_jitter_ms` |
+| 환경 키 | `대상_속성[_단위]`. 대상은 `sim`, `model`, `compute`, `membrane`, `bram`, `ddr3`, `track`, `host`, `fpga`, `cache`, `scheduler`, `search`, `tune` | `host_jitter_ms` |
 | 점별 결과 | `<환경 이름>.csv`. 점마다 환경 값 전부, BRAM tile, 요약 지표 | `p326_final_compare.csv` |
 | 실행별 결과 | `<환경 이름>_runs.csv.gz`. run은 점 × 시나리오 × seed마다 한 줄 | `p326_final_compare_runs.csv.gz` |
 
@@ -144,20 +144,20 @@ MultiModel-SpikeSense/
 
 | 주제 | 그림 | 내용 | 원자료 |
 |---|---|---|---|
-| `architecture` | `fig1_x-dataflow_y-block` | 시스템 구조. Host offset 배정, next-use predictor, 제어·metadata 경로. entry 4·768/256트랙은 평가 구성(†) | 없음 |
-| `offset` | `fig5_x-time_y-track` | frame offset 배정과 실제 도착. (c) FPGA 도착 = 모델 묶음 지연 G + 추론 요청별 지연 | 없음 |
-| `offset` | `fig6_x-time_y-arrival-cache` | 묶음 지연을 고려한 cache 교체 예. 묶음 지연을 무시한 예측과 비교 | 없음(설명용 예) |
-| `latency` | `fig1_x-host-delay_y-ccdf` | Xeon Host의 모델 묶음 처리 지연 CCDF, 조건 4개 | `hardware/board_test/p325_meas/result/m3_delay_ccdf.csv` |
-| `compare` | `fig12_x-ddr_y-max-latency` | offset 배정과 scheduler에 따른 DDR3 전송량과 관측 최대 (a) 응답 시간 (b) 준비 완료 뒤 시간 | `p326_final_compare` |
-| `compare` | `fig13_x-jitter_y-ddr-reload` | 추론 요청별 퍼짐에 따른 cache 정책의 DDR3 전송량과 재적재 | `p326_cache_policy` |
-| `entry` | `fig1_x-jitter_y-entry_c-ddr` | 추론 요청별 퍼짐 J와 entry 수에 따른 DDR3 전송량(PNU-count), 고른 entry 표시 | `p326_jitter_entry` |
-| `cache` | `fig1_x-prediction-error_y-hit-gap` | cache 정책의 hit rate, 다음 사용 예측 오차, Oracle MIN·Belady 하한 대비 전송량 차이 | `p326_cache_policy` |
-| `compare` | `fig15_x-jitter_y-method_c-ddr-latency` | 묶음 지연이 없는 합성 조건(G = 0)에서 J를 넓힌 민감도 | `p325_crossover` |
-| `compare` | `fig14_x-bw-tracks_y-max-latency` | 합성 조건(G = 0)에서 DDR3 대역폭·트랙 수를 바꾼 관측 최대 응답 시간 | `p325_scale_bw`, `p325_scale_tracks` |
+| `architecture` | `fig1_x-dataflow_y-block` | 시스템 구조. Host Offset Assignment, next-use predictor, 제어·메타데이터 경로. Entry 4·768/256트랙은 평가 구성(†) | 없음 |
+| `offset` | `fig5_x-time_y-track` | Offset Assignment와 실제 도착. (c) FPGA 도착 = 모델 그룹 지연 G + 추론 요청별 지연 | 없음 |
+| `offset` | `fig6_x-time_y-arrival-cache` | 모델 그룹 지연을 고려한 cache 교체 예. 모델 그룹 지연을 무시한 예측과 비교 | 없음(설명용 예) |
+| `latency` | `fig1_x-host-processing-delay_y-ccdf` | Xeon Host의 모델 그룹 처리 지연 CCDF, 조건 4개 | `hardware/board_test/p325_meas/result/m3_delay_ccdf.csv` |
+| `compare` | `fig12_x-ddr3-traffic_y-max-response-time` | Offset Assignment와 scheduler에 따른 DDR3 traffic과 관측 최대 (a) response time (b) 준비 완료 뒤 response time | `p326_final_compare` |
+| `compare` | `fig13_x-jitter_y-ddr3-traffic-reload` | 추론 요청별 퍼짐에 따른 cache 정책의 DDR3 traffic과 재적재 | `p326_cache_policy` |
+| `entry` | `fig1_x-jitter_y-entry_c-ddr3-traffic` | 추론 요청별 퍼짐 J와 entry 수에 따른 DDR3 traffic(PNU-Count), 고른 entry 표시 | `p326_jitter_entry` |
+| `cache` | `fig1_x-prediction-error_y-hit-gap` | cache 정책의 hit rate, 다음 사용 예측 오차, Oracle MIN·Belady 하한 대비 traffic 차이 | `p326_cache_policy` |
+| `compare` | `fig15_x-jitter_y-method_c-ddr3-traffic-response-time` | 모델 그룹 지연이 없는 합성 조건(G = 0)에서 J를 넓힌 민감도 | `p325_crossover` |
+| `compare` | `fig14_x-bandwidth-tracks_y-max-response-time` | 합성 조건(G = 0)에서 DDR3 bandwidth·트랙 수를 바꾼 관측 최대 response time | `p325_scale_bandwidth`, `p325_scale_tracks` |
 
 `figure/`에는 설계 정본과 값이 같은 그림만 둔다. 나머지는 `discards/`에 같은 경로로 옮겼다.
 
-시뮬레이션 원자료는 `simulation/result/<이름>.csv`, 모델 원자료는 `software/` 아래에 있다. 논문 그림의 사본은 `documents/papers/journal/image/DAC2027_draft/`에 논문 그림 번호로 둔다.
+Simulation 원자료는 `simulation/result/<이름>.csv`, 모델 원자료는 `software/` 아래에 있다. 논문 그림의 사본은 `documents/papers/journal/image/DAC2027_draft/`에 논문 그림 번호로 둔다.
 
 `discards/`의 스크립트는 그대로 돌지 않는다. 다시 쓰려면 `develop/`·`figure/`로 옮긴다.
 
@@ -165,8 +165,8 @@ MultiModel-SpikeSense/
 
 | 폴더 | 내용 |
 |---|---|
-| `board_test/` | LED·MIG·XDMA 시험과 DDR3·PCIe 측정. 원자료와 요약은 `p3_meas/result/`, 분석은 `host/analyze_p3.py`. Host 지연 측정(mic–Host 지연, clock drift, Host 처리 지연, Ethernet 지연, P3.25) code는 `host/p325_*.py`·`analyze_p325.py`·`test_p325.py`, 결과는 `p325_meas/result/`. Host 처리 지연 측정 원자료의 모델 묶음 지연 표(`m3_group_<조건>.csv.gz`, simulation `host_group_trace` 입력)는 `host/p326_m3_group.py`가 만든다(P3.26). accel_top 보드 시험(RGMII 보정 `host/p52_link.py`, tb_sys 순서 `host/p52_sys.py`, P5.2) 결과는 `p52_meas/result/`. 목표 부하 정확도·속도(`host/p52_acc.py`, `host/p52_acc_run.sh`, P5.3) 요약은 `p53_meas/result/` |
-| `data/models_l64/`, `data/golden_l64/` | L INT8 모델 40개(64 lane slot)와 golden 82개. RTL 기준 |
+| `board_test/` | LED·MIG·XDMA 시험과 DDR3·PCIe 측정. 원자료와 요약은 `p3_meas/result/`, 분석은 `host/analyze_p3.py`. Host 처리 지연 측정(mic–Host 지연, clock drift, Host 처리 지연, Ethernet 지연, P3.25) code는 `host/p325_*.py`·`analyze_p325.py`·`test_p325.py`, 결과는 `p325_meas/result/`. Host 처리 지연 측정 원자료의 모델 그룹 지연 표(`m3_group_<조건>.csv.gz`, simulation `host_model_group_delay_trace` 입력)는 `host/p326_m3_group.py`가 만든다(P3.26). accel_top 보드 시험(RGMII 보정 `host/p52_link.py`, tb_sys 순서 `host/p52_sys.py`, P5.2) 결과는 `p52_meas/result/`. 목표 부하 정확도·속도(`host/p52_acc.py`, `host/p52_acc_run.sh`, P5.3) 요약은 `p53_meas/result/`. 결과 손실 조사(`host/p53_loss_run.sh`, `p53_loss_gap.py`, `p53_mdio.py`, `p53_hostphy.py`) 요약은 `p53_meas/result/loss/` |
+| `data/models_l64/`, `data/golden_l64/` | L INT8 모델 40개(64-lane slot)와 golden 82개. RTL 기준 |
 | `data/golden_l64_m12/` | golden_l64와 같은 입력, membrane potential 12 bit 저장. P4.2 기준(`export_golden.py --format l64 --mem-bits 12`) |
 | `data/models/`, `data/golden/` | 1 lane slot(row-major) |
 | `data/models_xl/`, `data/golden_xl/` | `XL_mixed_aug`, 256 lane slot(모델 비교용) |
@@ -185,7 +185,7 @@ pip install torch numpy librosa soundfile scikit-learn matplotlib
 
 ### 데이터
 
-[DCASE 2020 Task 2](https://dcase.community/challenge2020/task2-unsupervised-detection-of-anomalous-sounds)의 wav를 `software/dataset/dcase/<종류>/{train,test}/`에 둔다. mel cache와 증강 data는 `dataset/dcase_data.py`, `dataset/overlap_aug.py`가 만든다.
+[DCASE 2020 Task 2](https://dcase.community/challenge2020/task2-unsupervised-detection-of-anomalous-sounds)의 wav를 `software/dataset/dcase/<종류>/{train,test}/`에 둔다. Mel cache와 증강 데이터는 `dataset/dcase_data.py`, `dataset/overlap_aug.py`가 만든다.
 
 ### 학습과 export
 
@@ -222,18 +222,18 @@ python3 software/host/verify_host.py                                    # qemu-a
 Pi에서는 저장소 root에서 돌린다. FPGA는 `192.168.10.2`, Pi NIC는 `192.168.10.1/24`다(06 §4).
 
 ```bash
-mmss_host setup --models hardware/data/models_l64/models.ddr.bin --map map.txt --group-trace g.csv --jitter-us 800
+mmss_host setup --models hardware/data/models_l64/models.ddr3.bin --map map.txt --model-group-delay-trace g.csv --jitter-us 800
 arecord -D hw:1 -f S16_LE -r 16000 -c 8 | mmss_host run --map map.txt --cpu 3 --log run    # mic 8개
 mmss_host run --tracks 1024 --in fan.wav --pace --loop --seconds 300 --cpu 3 --log load      # wav로 1,024트랙 부하
 mmss_host stop
 ```
 
-`map.txt`는 한 줄에 model_id 하나이고 줄 번호가 track_id다. 없으면 트랙 i의 모델은 i % 40이다. `run --log`가 쓰는 `<이름>_bundle.csv`는 묶음 지연 표 형식(`epoch, model_id, delay_us`)이라 `setup --group-trace`와 simulation의 `host_group_trace`에 그대로 넣을 수 있다.
+`map.txt`는 한 줄이 트랙 하나(줄 번호 = track_id)이고 `model_id [dB 하한]`을 적는다. 없으면 트랙 i의 모델은 i % 40이다. 하한은 mic의 바닥 잡음 위로 정하고, 적지 않으면 `--floor-db`(기본 −80 dB)를 쓴다(02 §5). `run --log`가 쓰는 `<이름>_model_group.csv`는 모델 그룹 지연 표 형식(`epoch, model_id, delay_us`)이라 `setup --model-group-delay-trace`와 simulation의 `host_model_group_delay_trace`에 그대로 넣을 수 있다.
 
 ### 그림
 
 ```bash
-python3 analysis/develop/compare/fig12_x-ddr_y-max-latency.py
+python3 analysis/develop/compare/fig12_x-ddr3-traffic_y-max-response-time.py
 ```
 
 ---
@@ -243,10 +243,10 @@ python3 analysis/develop/compare/fig12_x-ddr_y-max-latency.py
 | Phase | 내용 | 상태 |
 |---|---|---|
 | 1. 개발 환경과 보드 | 서버, Vivado, JTAG, MIG DDR3, PCIe XDMA 시험 | 완료 |
-| 2. 모델 | 40모델 학습, INT8, export, golden | 완료. checkpoint 교체와 실시간 정규화 남음 |
-| 3. 설계 검증 | DDR3 실측, architecture simulation, 비교군 비교, Host 처리 지연 측정(Xeon) | 대부분 완료. 목표 Host 지연 측정, Ethernet interface 설계 남음 |
+| 2. 모델 | 40모델 학습, INT8, export, golden | 완료. checkpoint 교체 남음. 실시간 정규화는 정함(P2.9, 보드 AUC 0.9531) |
+| 3. 설계 검증 | DDR3 실측, architecture simulation, 비교군 비교, Host 처리 지연 측정(Xeon) | 대부분 완료. 목표 Host 처리 지연 측정, Ethernet interface 설계 남음 |
 | 4. RTL | compute array, membrane bank, weight cache, DMA, scheduler, Ethernet | compute array 완료(P4.1). 나머지 예정 |
-| 5. 보드 통합 | synthesis·P&R, board test, end-to-end | 예정 |
+| 5. 보드 통합 | synthesis·배치·배선, 보드 test, end-to-end | 예정 |
 | 6. 평가와 논문 | 비교 실험, simulation과 보드 대조, 전력 | 예정 |
 
 작업별 상태는 [TASKS.md](documents/TASKS.md)에 있다.

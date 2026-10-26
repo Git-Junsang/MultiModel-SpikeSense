@@ -12,7 +12,7 @@
 #
 # 구성:
 #   mig_ddr3  : mig_ddr3.prj (AXI 256 bit, 400 MHz, UI 100 MHz)
-#   example_top: MIG 예제 설계 탑 + AXI4 트래픽 생성기. ui_clk_o 포트만 덧붙인다.
+#   example_top: MIG 예제 설계 탑 + AXI4 traffic 생성기. ui_clk_o 포트만 덧붙인다.
 #   vio_p06   : 상태 읽기용 VIO
 #   p06_top   : 탑(LED·버튼·VIO)
 # ============================================================

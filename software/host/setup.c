@@ -1,9 +1,9 @@
-/* setup.c — 시작 설정(06 §6 1~6)과 종료. PNU 표 값은 04 §3.1, 06 §7.4의 식이다.
+/* setup.c — 시작 설정(06 §6 1–6)과 종료. PNU 표 값은 04 §3.1, 06 §7.4의 식이다.
  *
  * PNU 표(engine part_cache.PNURTL._tables와 같은 칸):
  *   LUT_G[i]     = δ_G((i + 0.5) × 256 µs) = G > e인 표본에서 구한 G − e의 평균, EG = δ_G(0) = G의 평균, TAU_G = G 최대(올림)
  *   LUT_U[i][rb] = (J − x) / (r + 1), x = (i + 0.5) × 256 µs < J, r = 남은 수 칸 대표값. TAU_U = J
- * G 표본은 묶음 지연 표(CSV의 delay_us 열)다. run의 --log가 만드는 <이름>_bundle.csv나 p326_m3_group.py 출력을 쓴다.
+ * G 표본은 모델 그룹 지연 표(CSV의 delay_us 열)다. run의 --log가 만드는 <이름>_model_group.csv나 p326_m3_group.py 출력을 쓴다.
  * engine은 δ_G를 5 µs 칸 수치 적분으로 구해 몇 µs 다를 수 있다. 표 칸이 256 µs라 무시한다. */
 #define _GNU_SOURCE
 #include <getopt.h>
@@ -121,7 +121,7 @@ int cmd_setup(int argc, char **argv)
     int n_tracks = MAX_TRACKS;
     double J = 0, margin = 0;
     static struct option o[] = {{"fpga", 1, 0, 'f'}, {"tracks", 1, 0, 'n'}, {"map", 1, 0, 'p'}, {"models", 1, 0, 'm'},
-                                {"group-trace", 1, 0, 'g'}, {"jitter-us", 1, 0, 'j'}, {"margin-us", 1, 0, 'r'}, {0}};
+                                {"model-group-delay-trace", 1, 0, 'g'}, {"jitter-us", 1, 0, 'j'}, {"margin-us", 1, 0, 'r'}, {0}};
     for (int ch; (ch = getopt_long(argc, argv, "", o, NULL)) != -1;)
         switch (ch) {
         case 'f': ip = optarg; break;
@@ -134,17 +134,17 @@ int cmd_setup(int argc, char **argv)
         default: return 2;
         }
     uint8_t model[MAX_TRACKS];
-    if (n_tracks < 1 || n_tracks > MAX_TRACKS || (n_tracks = load_map(map, n_tracks, model)) < 0)
+    if (n_tracks < 1 || n_tracks > MAX_TRACKS || (n_tracks = load_map(map, n_tracks, model, NULL)) < 0)
         return 2;
     ctl_t c;
     if (ctl_open(&c, ip, 100, 5) < 0)
         return 1;
 
-    /* 1~2. 설계 확인, MIG 보정, 합성 parameter */
+    /* 1–2. 설계 확인, MIG 보정, 합성 parameter */
     uint32_t info[4], st;
     if (must(ctl_rw(&c, 1, A_ID, 4, info), "정보 읽기") || must(ctl_rd1(&c, A_STATUS, &st), "STATUS 읽기"))
         return 1;
-    printf("ID 0x%08X, VERSION 0x%08X, N_ENTRY %u, N_ONCHIP %u, STATUS 0x%X\n", info[0], info[1], info[2], info[3], st);
+    printf("ID 0x%08X, VERSION 0x%08X, N_ENTRY %u, N_ON_CHIP %u, STATUS 0x%X\n", info[0], info[1], info[2], info[3], st);
     if (info[0] != FPGA_ID || !(st & 4) || (st & 1)) {
         fprintf(stderr, "ID가 다르거나 MIG 보정 전이거나 RUN = 1이다(먼저 stop)\n");
         return 1;
@@ -163,7 +163,7 @@ int cmd_setup(int argc, char **argv)
         }
         uint64_t t0 = mono_ns();
         for (size_t m = 0; m < sz / SLOT_B; m++)
-            if (write_verify(&c, A_DDR + (uint32_t)(m * SLOT_B), img + m * SLOT_B, SLOT_USED, "모델 적재"))
+            if (write_verify(&c, A_DDR3 + (uint32_t)(m * SLOT_B), img + m * SLOT_B, SLOT_USED, "모델 적재"))
                 return 1;
         printf("모델 %zu개 적재·확인 %.2f s\n", sz / SLOT_B, (mono_ns() - t0) / 1e9);
         free(img);
@@ -179,7 +179,7 @@ int cmd_setup(int argc, char **argv)
     }
     uint32_t off[N_MODELS], nreg[N_MODELS] = {0}, tau[3], lut_g[LUT_BINS], lut_u[LUT_BINS * 8];
     for (int m = 0; m < N_MODELS; m++)
-        off[m] = (uint32_t)m;                      /* offset 배정: 모델 m → offset 번호 m */
+        off[m] = (uint32_t)m;                      /* Offset Assignment: 모델 m → offset 번호 m */
     for (int i = 0; i < n_tracks; i++)
         nreg[model[i]]++;
     long ns = pnu_tables(trace, J, tau, lut_g, lut_u);

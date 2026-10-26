@@ -13,7 +13,7 @@ golden은 tb_sys와 같은 vec_m12(hardware/testbench/export_compute_vectors.py�
   4) timestep마다 NOW_US를 t_host로 추론 요청 80개(트랙 80, DDR3 20)를 datagram(최대 23개)으로 보내고 결과 80개를 받아
      out0·out1을 golden과 비교, track·seq·model·flags·batch_n·시각 순서 확인
   5) IDLE 뒤 RUN = 0, counter, DDR3 트랙 membrane potential을 DDR3 창으로 읽어 golden 마지막 12 bit 저장값과 비교
-  5b) 모델 slot을 둘씩(2k ↔ 2k+1) 맞바꿔 쓰고 SOFT_RESET, DEADLINE_US 1로 timestep 한 번. cache entry가 남으면 out이 어긋난다
+  5b) 모델 slot을 둘씩(2k ↔ 2k+1) 맞바꿔 쓰고 SOFT_RESET, DEADLINE_US 1로 timestep 한 번. Cache entry가 남으면 out이 어긋난다
   6) 오류: model_id 45 → ERR_CODE 3·ERR_INFO 트랙, 100 B datagram은 첫 오류 유지, ERR_CLEAR, 100 B → ERR_CODE 7·100
 """
 import argparse
@@ -27,10 +27,10 @@ import time
 
 FPGA_IP, HOST_IP = '192.168.10.2', '192.168.10.1'
 RPORT, CPORT = 6000, 6100                    # Host 쪽 port(FPGA는 받은 port로 되돌려 보낸다)
-N_MOD, N_VEC, N_ONCHIP, E, T, ROWS, LD = 40, 80, 768, 4, 31, 45, 4114
+N_MOD, N_VEC, N_ON_CHIP, E, T, ROWS, LD = 40, 80, 768, 4, 31, 45, 4114
 SB, DEADLINE, MARGIN = 0x0200_0000, 32000, 0
 DDR = 0x8000_0000
-CMP_BUSY_SIM = 1_331_594                     # tb_sys(nt 31)의 CMP_BUSY. 연산 cycle은 data로 정해져 batch 구성과 상관없다
+CMP_BUSY_SIM = 1_331_594                     # tb_sys(nt 31)의 CMP_BUSY. 연산 cycle은 데이터로 정해져 batch 구성과 상관없다
 
 errors = []
 
@@ -104,7 +104,7 @@ class Golden:
         for v in range(N_VEC):
             if self.idx[v] != v // 2:
                 err(f'index.hex v{v} model {self.idx[v]}')
-            if trk(v) >= N_ONCHIP:
+            if trk(v) >= N_ON_CHIP:
                 e = readhex(f'{vec}/v{v:02d}_e.hex')
                 self.e[v] = e[(nt - 1) * ROWS:nt * ROWS]
         self.img = []                        # slot 이미지 word: params row 46개, 그다음 512 bit word마다 beat 2개(앞 = 아래 256 bit)
@@ -155,7 +155,7 @@ class Infer:
     def reset_stats(self):
         self.nreq = self.n_res = self.n_late = self.err_out = self.err_fld = 0
         self.n_bn = [0, 0, 0]
-        self.lat = []                        # t_done − t_in (µs)
+        self.fpga_delay = []                        # t_done − t_in (µs)
 
     def check(self, r, t, th, got):
         g = int.from_bytes(r, 'little')
@@ -179,7 +179,7 @@ class Infer:
         self.n_late += late
         if 1 <= bn <= 2:
             self.n_bn[bn] += 1
-        self.lat.append(s32((t_dn - t_in) & 0xFFFF_FFFF))
+        self.fpga_delay.append(s32((t_dn - t_in) & 0xFFFF_FFFF))
         if (seq != t or model != self.mmap[self.g.idx[v]] or fl != (late << 2 | int(t == 0)) or not 1 <= bn <= 2
                 or t_host != th or s32((t_in - t_host) & 0xFFFF_FFFF) < 0 or s32((t_st - t_in) & 0xFFFF_FFFF) < 0
                 or s32((t_dn - t_st) & 0xFFFF_FFFF) < 0 or rsv != 0):
@@ -233,7 +233,7 @@ def main():
     g = Golden(a.vec, nt)
     ctl = Ctl(a.timeout)
     inf = Infer(ctl, g, a.timeout)
-    n_ddr = sum(trk(v) >= N_ONCHIP for v in range(N_VEC))
+    n_ddr3 = sum(trk(v) >= N_ON_CHIP for v in range(N_VEC))
     summary = {'nt': nt, 'seed': a.seed, 'link': a.link}
     if a.link:                               # 손실이 있는 기본값에서 쓰므로 다시 읽어 맞을 때까지 되풀이한다
         rx, tx = (int(x) for x in a.link.split(','))
@@ -253,7 +253,7 @@ def main():
     e0 = len(errors)
     ctl.wr(0x0104, 8, 'RUN = 0, ERR_CLEAR')  # 앞 실행이 RUN = 1이나 오류 7로 끝났을 수 있다
     info = ctl.rd(0x0000, 4, 'info')
-    for i, (e, n) in enumerate([(0x534E_4E58, 'ID'), (0x0001_0000, 'VERSION'), (E, 'N_ENTRY'), (N_ONCHIP, 'N_ONCHIP')]):
+    for i, (e, n) in enumerate([(0x534E_4E58, 'ID'), (0x0001_0000, 'VERSION'), (E, 'N_ENTRY'), (N_ON_CHIP, 'N_ON_CHIP')]):
         expect(info[i], e, n)
     expect(ctl.rd(0x0100, 1, 'STATUS')[0] & 0xD, 0x4, 'STATUS (RUN 0, MIG_CALIB 1, ERR 0)')
     print(f'run   1) 정보·STATUS(MIG 보정 1), 오류 {len(errors) - e0}', flush=True)
@@ -265,7 +265,7 @@ def main():
     summary['load_s'] = round(time.time() - c0, 2)
     print(f'run   2) 모델 {N_MOD}개 Ethernet 적재·확인, 제어 packet {ctl.n}, {summary["load_s"]} s, 오류 {len(errors) - e0}', flush=True)
 
-    # 3. 설정, PNU 표(시나리오 값: OFFSET m, N_REG 2, 나머지 0), SOFT_RESET, RUN
+    # 3. 설정, PNU 표(시나리오 값: offset m, N_REG 2, 나머지 0), SOFT_RESET, RUN
     e0 = len(errors)
     st = [1024, N_MOD, 0, SB, DEADLINE, MARGIN]
     ctl(2, 0x0300, 6, st, name='settings write')
@@ -299,12 +299,12 @@ def main():
         inf.do_t(t, rng)
         if t == 0 or t == nt - 1:
             print(f'run      t{t}: 결과 {inf.n_res}, 누적 오류 {len(errors) - e0}', flush=True)
-    lat = sorted(inf.lat)
+    fpga_delay = sorted(inf.fpga_delay)
     summary.update(infer_s=round(time.time() - c0, 2), nreq=inf.nreq, n_res=inf.n_res, err_out=inf.err_out,
                    err_fld=inf.err_fld, batch_n=inf.n_bn[1:], late=inf.n_late,
-                   t_done_minus_t_in_us={'min': lat[0], 'p50': lat[len(lat) // 2], 'max': lat[-1]})
-    print(f'run   4) 추론 요청 {inf.nreq}, 결과 {inf.n_res} (DDR3 트랙 {n_ddr}), out 불일치 {inf.err_out}, 필드 불일치 {inf.err_fld}, '
-          f'batch_n 1: {inf.n_bn[1]}·2: {inf.n_bn[2]}, LATE {inf.n_late}, t_done − t_in {lat[0]}~{lat[-1]} µs, 오류 {len(errors) - e0}',
+                   t_done_minus_t_in_us={'min': fpga_delay[0], 'p50': fpga_delay[len(fpga_delay) // 2], 'max': fpga_delay[-1]})
+    print(f'run   4) 추론 요청 {inf.nreq}, 결과 {inf.n_res} (DDR3 트랙 {n_ddr3}), out 불일치 {inf.err_out}, 필드 불일치 {inf.err_fld}, '
+          f'batch_n 1: {inf.n_bn[1]}·2: {inf.n_bn[2]}, LATE {inf.n_late}, t_done − t_in {fpga_delay[0]}~{fpga_delay[-1]} µs, 오류 {len(errors) - e0}',
           flush=True)
 
     # 5. 끝: IDLE, RUN = 0, counter, DDR3 membrane potential
@@ -315,7 +315,7 @@ def main():
     c, wb, sb, bz, stl = counters(ctl, 'counters')
     for got, exp, n in [(c[0], inf.nreq, 'REQ_IN'), (c[1], 0, 'REQ_DROP'), (c[2], inf.nreq, 'RES_OUT'), (c[3], inf.n_late, 'LATE'),
                         (c[5], inf.n_bn[2] // 2 + inf.n_bn[1], 'BATCHES (results)'), (wb, c[6] * 131648, 'WEIGHT_BYTES'),
-                        (c[7], 0, 'SAT_COUNT'), (sb, n_ddr * (2 * nt - 1) * 1088, 'STATE_BYTES')]:
+                        (c[7], 0, 'SAT_COUNT'), (sb, n_ddr3 * (2 * nt - 1) * 1088, 'STATE_BYTES')]:
         expect(got, exp, n)
     if not 1 <= c[4] <= N_VEC:
         err(f'MAX_PENDING {c[4]}')
@@ -371,7 +371,7 @@ def main():
         err(f'5b: BATCHES {c[5]}')
     if c[6] < N_MOD or wb != c[6] * 131648:
         err(f'5b: MODEL_LOADS {c[6]} WEIGHT_BYTES {wb}')
-    if c[7] != 0 or sb != n_ddr * 1088:
+    if c[7] != 0 or sb != n_ddr3 * 1088:
         err(f'5b: SAT_COUNT {c[7]} STATE_BYTES {sb}')
     ctl.wr(0x0310, DEADLINE, 'DEADLINE_US restore')
     inf.dl = DEADLINE

@@ -5,7 +5,8 @@
   1 setup: 모델 image 40개가 DDR3 창에 그대로 있다. 설정 블록. PNU 표 = 04 §3.1 식(numpy). engine PNURTL 표와의 차이(참고)
   2 run: 2채널 WAV(DCASE fan_id06 정상·이상), 트랙 34개(모델 5에 30개 → datagram 23 + 7개), 실시간 속도(--pace)
     2a 추론 요청 필드: RESET_STATE, seq, model_id, n_expect, 빈 byte, datagram 크기, t_host_us(FPGA 시각, 2^32 되감기 포함)
-    2b x = Python 특징 추출(p325_mel_load.mel_db + SegNorm + snn_int8.quantize_input)을 같은 샘플 구간에 쓴 값
+    2b x = Python 특징 추출(p325_mel_load.mel_db + TrackNorm + snn_int8.quantize_input)을 같은 샘플 구간에 쓴 값.
+       채널 1에 2 s 무음(무음 frame은 기준 멈춤), 트랙 33은 map 둘째 칸으로 하한 −60 dB
     2c mock 결과 = snn_int8.forward(checkpoint 양자화, 12 bit 저장)를 받은 x에 쓴 값. 모델 image 적재와 RESET_STATE 확인
     2d 판정 = mock 결과로 Python이 구한 판정(decision 같음, score 차 < 1e-9). 버린 추론 요청이 든 판정 주기는 판정 없음
     2e summary: 보낸 수 = mock이 받은 수, 버린 1개 = lost, 늦춘 1개(45 ms) = late, missing_cycles 1, unmatched 0
@@ -34,11 +35,12 @@ import snn_int8 as si  # noqa: E402
 from part_jitter import TraceJitter, UniformJitter  # noqa: E402
 
 BIN = os.path.join(HERE, 'build', 'mmss_host')
-IMG = os.path.join(ROOT, 'hardware', 'data', 'models_l64', 'models.ddr.bin')
+IMG = os.path.join(ROOT, 'hardware', 'data', 'models_l64', 'models.ddr3.bin')
 MANIFEST = os.path.join(ROOT, 'hardware', 'data', 'models_l64', 'manifest.json')
 TRACE = os.path.join(ROOT, 'hardware', 'board_test', 'p325_meas', 'result', 'm3_group_pin3_load0.csv.gz')
 WAVS = [os.path.join(ROOT, 'software', 'dataset', 'dcase', 'fan', 'test', f'{c}_id_06_00000000.wav') for c in ('normal', 'anomaly')]
 MAP = [5] * 30 + [0, 1, 39, 20]                  # 트랙 → 모델. 트랙 i는 채널 i % 2
+FLOOR = {33: -60.0}                              # map 둘째 칸으로 준 트랙별 하한(나머지는 기본 −80 dB)
 DROP, DELAY = (31, 40), (7, 70, 45)              # (트랙, seq) 버림, (트랙, seq, ms) 늦춤
 J_US, SLOT, USED, SEG = 800, 0x40000, 131648, 31
 ok = True
@@ -58,13 +60,13 @@ def expected_tables(tmp):
     """앞 절반 주기의 G(engine TraceJitter의 calib와 같은 표본) → (G 파일, 04 §3.1 식 표, engine 표)"""
     with gzip.open(TRACE, 'rt') as f:
         rows = list(csv.DictReader(f))
-    eps = sorted({int(r['epoch']) for r in rows})
+    eps = sorted({int(r['period']) for r in rows})
     cut = eps[len(eps) // 2]
-    g = np.array([float(r['delay_us']) for r in rows if int(r['epoch']) < cut])
+    g = np.array([float(r['delay_us']) for r in rows if int(r['period']) < cut])
     path = os.path.join(tmp, 'group.csv')
     with open(path, 'w') as f:
-        f.write('epoch,model_id,delay_us\n')
-        f.writelines(f"{r['epoch']},{r['model_id']},{r['delay_us']}\n" for r in rows if int(r['epoch']) < cut)
+        f.write('period,model_id,delay_us\n')
+        f.writelines(f"{r['period']},{r['model_id']},{r['delay_us']}\n" for r in rows if int(r['period']) < cut)
     mean_above = [np.rint((g[g > e] - e).mean()) if (g > e).any() else 0.0 for e in (np.arange(128) + 0.5) * 256]
     remain = (1.0, 2.0, 3.5, 6.5, 12.5, 24.0)
     jt, gt = UniformJitter(J_US), TraceJitter(TRACE)
@@ -88,19 +90,20 @@ def make_wav(tmp):
         src = '합성 noise(DCASE wav 없음)'
     n = min(len(c) for c in ch)
     pcm = np.stack([c[:n] for c in ch], 1)
+    pcm[48000:80000, 1] = 0                      # 채널 1의 3–5 s: 무음(정규화 기준을 멈추는지)
     path = os.path.join(tmp, 'test.wav')
     sf.write(path, pcm, 16000, subtype='PCM_16')
     return path, pcm, src
 
 
 def ref_features(pcm, track, model, ks):
-    """트랙 하나의 frame k들 → 0~127 (C와 같은 샘플 구간, Python 식)"""
+    """트랙 하나의 frame k들(0부터 이어짐) → 0–127 (C와 같은 샘플 구간, Python 식)"""
     off = (model * 512 + 20) // 40
     w = pcm[:, track % 2].astype(np.float32) / 32768.0
     db = ml.mel_db(np.stack([w[off + 512 * k: off + 512 * k + 1024] for k in ks]))
-    norm, out = ml.SegNorm(1), []
+    norm, out = ml.TrackNorm(1, FLOOR.get(track, ml.FLOOR_DB)), []
     for i, k in enumerate(ks):
-        out.append(si.quantize_input(norm(db[i:i + 1], np.array([0]), k % SEG == 0))[0])
+        out.append(si.quantize_input(norm(db[i:i + 1], np.array([0])))[0])
     return np.array(out)
 
 
@@ -113,7 +116,7 @@ def main():
     mock = None
     try:
         with open(os.path.join(tmp, 'map.txt'), 'w') as f:
-            f.writelines(f'{m}\n' for m in MAP)
+            f.writelines(f'{m} {FLOOR[t]}\n' if t in FLOOR else f'{m}\n' for t, m in enumerate(MAP))
         gpath, exp, eng = expected_tables(tmp)
         wav, pcm, src = make_wav(tmp)
         mock = subprocess.Popen([sys.executable, os.path.join(HERE, 'mock_fpga.py'), '--out', os.path.join(tmp, 'mock'),
@@ -122,7 +125,7 @@ def main():
         mp = os.path.join(tmp, 'map.txt')
 
         # ---- 1. setup ----
-        r = host('setup', '--map', mp, '--models', IMG, '--group-trace', gpath, '--jitter-us', str(J_US), timeout=600)
+        r = host('setup', '--map', mp, '--models', IMG, '--model-group-delay-trace', gpath, '--jitter-us', str(J_US), timeout=600)
         print(r.stdout + r.stderr, end='')
         check('1 setup 종료 코드 0', r.returncode == 0)
         r_run = host('run', '--map', mp, '--in', wav, '--pace', '--log', os.path.join(tmp, 'run'), timeout=120)
@@ -130,8 +133,8 @@ def main():
         print(r_run.stderr + r_stop.stdout + r_stop.stderr, end='')
         d = np.load(os.path.join(tmp, 'mock', 'requests.npz'))
         regs = json.load(open(os.path.join(tmp, 'mock', 'regs.json')))
-        ddr, img = open(os.path.join(tmp, 'mock', 'ddr.bin'), 'rb').read(), open(IMG, 'rb').read()
-        check('1a 모델 image 40개 = models.ddr.bin', all(ddr[m * SLOT:m * SLOT + USED] == img[m * SLOT:m * SLOT + USED] for m in range(40)))
+        ddr, img = open(os.path.join(tmp, 'mock', 'ddr3.bin'), 'rb').read(), open(IMG, 'rb').read()
+        check('1a 모델 image 40개 = models.ddr3.bin', all(ddr[m * SLOT:m * SLOT + USED] == img[m * SLOT:m * SLOT + USED] for m in range(40)))
         cfg = [regs['cfg'][str(0x300 + 4 * i)] for i in range(6)]
         check('1b 설정 블록', cfg == [len(MAP), 40, 0, 0x0200_0000, 32000, 0], str(cfg))
         pnu = {int(k): v for k, v in regs['pnu'].items()}
@@ -149,7 +152,7 @@ def main():
         tr, seq, mdl = d['track'], d['seq'], d['model']
         n = tr.size
         order = np.lexsort((seq, tr))
-        k = np.zeros(n, np.int64)                    # seq는 16 bit. 이 시험은 10 s라 epoch = seq
+        k = np.zeros(n, np.int64)                    # seq는 16 bit. 이 시험은 10 s라 period = seq
         k[:] = seq
         check('2a model_id = map, RESET_STATE = (k % 31 == 0), 빈 byte 0',
               (mdl == np.array(MAP)[tr]).all() and (d['flags'] == (k % SEG == 0)).all() and d['pad_ok'].all())
@@ -212,9 +215,9 @@ def main():
         check('2e summary: sent = mock이 받은 수, lost 1, late 1, deadline_miss 2, missing_cycles 1, unmatched 0, send_err 0',
               sm['sent'] == n and sm['lost'] == 1 and sm['late'] == 1 and sm['deadline_miss'] == 2 and sm['missing_cycles'] == 1
               and sm['unmatched'] == 0 and sm['send_err'] == 0 and sm['judged'] == len(want),
-              f"응답 시간 평균 {sm['resp_mean_us']:.0f} µs, 최대 {sm['resp_max_us']:.0f} µs(늦춘 결과), overrun {sm['overrun']:.0f}, "
+              f"응답 시간 평균 {sm['response_time_mean_us']:.0f} µs, 최대 {sm['response_time_max_us']:.0f} µs(늦춘 결과), overrun {sm['overrun']:.0f}, "
               f"시각 맞추기 {sm['sync_ok']:.0f}번")
-        with open(os.path.join(tmp, 'run_bundle.csv')) as f:
+        with open(os.path.join(tmp, 'run_model_group.csv')) as f:
             nb = sum(1 for _ in f) - 1
         check('2e 묶음 log = 모델 묶음 수', nb == len({(int(m), int(s)) for m, s in zip(mdl, seq)}), f'{nb}줄')
 

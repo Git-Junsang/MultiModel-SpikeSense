@@ -3,7 +3,7 @@
 # xdma_roundtrip.sh — P0.7 PCIe 링크 확인과 XDMA 데이터 왕복 시험 (FPGA Host)
 # ============================================================
 # 전제:
-#   - p07_top 비트스트림이 올라가 있고 Host가 장치를 열거했다
+#   - p07_top bitstream이 올라가 있고 Host가 장치를 열거했다
 #     (JTAG 다운로드 후 PCI 재스캔, 또는 QSPI 플래시 후 Host 재부팅).
 #   - Xilinx dma_ip_drivers의 XDMA 드라이버(xdma.ko)가 적재되어 /dev/xdma0_h2c_0,
 #     /dev/xdma0_c2h_0이 있다. 도구 dma_to_device·dma_from_device 경로를 TOOLS로 준다.

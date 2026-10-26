@@ -3,12 +3,12 @@
 환경 파일 p43_pnu_rtl에서 cache_policy = pnu_rtl인 점 하나를 시나리오·seed 하나로 돌린다.
 출력 hardware/sim/weight_cache/t<번호>/
   n.hex     줄 1 = 설정 수, 줄 2 = 사건 수
-  cfg.hex   설정 쓰기. 줄마다 {addr 16 bit, data 16 bit} (next_use_predictor.v 주소)
+  cfg.hex   설정 쓰기. 줄마다 {addr 16 bit, 데이터 16 bit} (next_use_predictor.v 주소)
   ev.hex    사건. 줄마다 144 bit {kind 4, now 32, model 8, t_host 32, n_expect 16, exp 4, victim 8, q_ne 40}
             kind 1 = 도착, 2 = 교체 계획. exp 0 = hit, 1 = 빈 entry에 적재, 2 = 내보내고 적재
 
 프로젝트 루트에서:
-  python3 hardware/testbench/export_pnu_trace.py --id 0 --entries 4 --jitter 3.2 --scn U --seed 0
+  python3 hardware/testbench/export_pnu_trace.py --id 0 --entries 4 --jitter 3.2 --scn uniform --seed 0
 """
 
 import argparse
@@ -26,7 +26,7 @@ def main():
     ap.add_argument("--id", type=int, required=True)
     ap.add_argument("--entries", type=int, default=4)
     ap.add_argument("--jitter", type=float, default=3.2)
-    ap.add_argument("--scn", default="U")
+    ap.add_argument("--scn", default="uniform")
     ap.add_argument("--seed", type=int, default=0)
     a = ap.parse_args()
 

@@ -1,11 +1,13 @@
-/* mel.c — 특징 추출: frame 하나 → mel 40개 → 0~127 (02 §3·§4, 06 §2)
+/* mel.c — 특징 추출: frame 하나 → mel 40개 → 0–127 (02 §3·§4, 06 §2)
  *
  * 학습 특징(software/dataset/dcase_data.py, librosa melspectrogram power 2)을 frame 하나에 쓴 것이다.
- * p325_mel_load.py의 mel_db·SegNorm·quantize_input과 같은 식이다.
+ * p325_mel_load.py의 mel_db·TrackNorm·quantize_input과 같은 식이다.
  *   periodic Hann 1,024 → FFT → |X|² → Slaney mel 40 → 10·log10(max(S, 1e-10))
- *   seg 정규화: 판정 주기 첫 frame부터 지금까지의 최대·최소 dB로 [0, 1]에 늘인다. 최소는 최대 − 80 dB 아래로 내려가지 않는다
+ *   정규화(02 §5, P2.9): mel dB를 트랙의 하한 아래로 자른다. 트랙마다 기준(최대·최소 dB)을 이어 간다. Frame의 최대·최소가
+ *   기준을 넘으면 바로 받고, 아니면 기준을 그 값 쪽으로 frame마다 1 − e^(−32 ms / τ)만큼 돌린다(τ = NORM_TAU_S).
+ *   Frame 최대가 하한 + GATE_DB 이하인 무음 frame은 기준을 그대로 둔다. Frame 최대가 기준 최대 − QUIET_DB보다 작은 조용한
+ *   Frame(소리와 0이 섞인 경계 frame 등)은 최소를 그대로 두고 최대만 잊는다. 최소는 최대 − 80 dB 아래로 내려가지 않는다
  *   x_q = clip(rint(x × 127), 0, 127)
- * 실시간 정규화는 아직 정하지 않았다(02 §5, TASKS P2.9). seg는 P3.21에서 손실이 가장 적던 방식이다.
  * shortcut: 학습의 파일 단위 평균 빼기(DC 제거)는 하지 않는다. Slaney mel 첫 filter의 DC 칸 weight가 0이라 영향이 작다. */
 #define _GNU_SOURCE
 #include <math.h>
@@ -21,6 +23,7 @@ static float rw[NBIN], iw[NBIN];              /* 실수 분리 twiddle e^{-2πik
 static uint16_t rev[NH];
 static float fb[NMEL * NBIN];                 /* filter weight. filter i는 칸 lo[i]~hi[i]만 0이 아니다 */
 static int fb_lo[NMEL], fb_hi[NMEL];
+static double keep;                           /* 정규화 기준이 frame 하나 뒤에 남기는 몫 e^(−32 ms / τ) */
 
 static double hz_to_mel(double f)              /* librosa 기본(htk = False): 1 kHz 아래 선형, 위 log */
 {
@@ -34,6 +37,7 @@ static double mel_to_hz(double m)
 
 void mel_init(void)
 {
+    keep = exp(-(double)HOP / SR / NORM_TAU_S);
     for (int n = 0; n < FRAME; n++)
         win[n] = (float)(0.5 - 0.5 * cos(2.0 * M_PI * n / FRAME));
     for (int k = 0; k < NH / 2; k++) {
@@ -107,23 +111,33 @@ void mel_db(const float *x, float *db)
     }
 }
 
-void seg_norm_q(const float *db, double *hi, double *lo, int first, uint8_t *q)
+/* has: 이 트랙에 기준이 있는지. 처음 소리가 난 frame에서 기준을 시작한다. 그 전 무음 frame은 x = 0 */
+void norm_q(const float *db, double floor_db, double *hi, double *lo, uint8_t *has, uint8_t *q)
 {
-    double h = db[0], l = db[0];
+    double d[NMEL], m, n;
+    for (int i = 0; i < NMEL; i++)
+        d[i] = fmax(db[i], floor_db);
+    m = n = d[0];
     for (int i = 1; i < NMEL; i++) {
-        h = fmax(h, db[i]);
-        l = fmin(l, db[i]);
+        m = fmax(m, d[i]);
+        n = fmin(n, d[i]);
     }
-    if (!first) {
-        h = fmax(h, *hi);
-        l = fmin(l, *lo);
+    if (m > floor_db + GATE_DB) {
+        if (!*has) {
+            *hi = m;
+            *lo = n;
+            *has = 1;
+        } else {
+            int quiet = m < *hi - QUIET_DB;
+            *hi = fmax(m, keep * *hi + (1.0 - keep) * m);
+            if (!quiet)
+                *lo = fmin(n, keep * *lo + (1.0 - keep) * n);
+        }
     }
-    *hi = h;
-    *lo = l;
-    l = fmax(l, h - TOP_DB);
+    double h = *has ? *hi : m, l = fmax(*has ? *lo : n, h - TOP_DB);
     double den = fmax(h - l, 1e-8);
     for (int i = 0; i < NMEL; i++) {
-        double v = fmin(fmax((db[i] - l) / den, 0.0), 1.0);
+        double v = fmin(fmax((d[i] - l) / den, 0.0), 1.0);
         q[i] = (uint8_t)fmin(fmax(rint(v * 127.0), 0.0), 127.0);
     }
 }

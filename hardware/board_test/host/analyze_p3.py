@@ -3,7 +3,7 @@
 
 입력 (hardware/board_test/p3_meas/result/raw/):
   ddr_<tag>.jsonl          p3_ddr_bench.py 출력 (tag = brc / rbc: MIG 주소 매핑)
-  pcie/<시험>_<조건>.txt   pcie_lat.c 출력 (한 줄 = 표본 1개, ns)
+  pcie/<시험>_<조건>.txt   pcie_delay.c 출력 (한 줄 = 표본 1개, ns)
   pcie/ts_sync*.txt        "t0_ns ts_cycles t1_ns"
 출력: hardware/board_test/p3_meas/result/summary_ddr.md, summary_pcie.md
 
@@ -19,7 +19,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, '..', 'p3_meas', 'result')
 RAW = os.path.join(OUT, 'raw')
 CYC_NS = 10.0                 # ui_clk 100 MHz
-ASSUMED_BPS = 2.0e9           # 제안서의 실효 대역폭 가정
+ASSUMED_BPS = 2.0e9           # 제안서의 실효 bandwidth 가정
 
 
 def load_ddr():
@@ -31,12 +31,12 @@ def load_ddr():
     return recs
 
 
-def lat_stats(r, key='log_lat'):
+def delay_stats(r, key='log_delay'):
     """전송별 지연 기록(cycle) → µs 통계. 기록이 없으면 min/평균/max만."""
     res = r['res']
-    out = {'n': res['xfers'], 'min': res['lat_min'] * CYC_NS / 1e3,
-           'avg': res['lat_sum'] / max(res['xfers'], 1) * CYC_NS / 1e3,
-           'max': res['lat_max'] * CYC_NS / 1e3}
+    out = {'n': res['xfers'], 'min': res['delay_min'] * CYC_NS / 1e3,
+           'avg': res['delay_sum'] / max(res['xfers'], 1) * CYC_NS / 1e3,
+           'max': res['delay_max'] * CYC_NS / 1e3}
     v = np.array(res.get(key, []), dtype=np.float64) * CYC_NS / 1e3
     if len(v):
         out.update(p50=float(np.percentile(v, 50)), p99=float(np.percentile(v, 99)), nlog=len(v))
@@ -109,8 +109,8 @@ def ddr_summary(recs):
             sp = get(t, 'slice', f'seq_pipe_{sz}')
             if not rb:
                 continue
-            s = lat_stats(rb)
-            fs = lat_stats(rb, 'log_fst')
+            s = delay_stats(rb)
+            fs = delay_stats(rb, 'log_fst')
             L.append(f'| {sz:,} | {sz / ASSUMED_BPS * 1e6:.3f} | {f3(rb["res"]["GBps"])} | '
                      f'{s["avg"]:.3f} / {s.get("p99", float("nan")):.3f} / {s["max"]:.3f} | {fs["avg"]:.3f} | '
                      f'{f3(rp["res"]["GBps"]) if rp else "-"} | {f3(sb["res"]["GBps"]) if sb else "-"} | '
@@ -120,7 +120,7 @@ def ddr_summary(recs):
         for sz in sizes:
             rb = get(t, 'slice', f'slot_rand_blk_{sz}')
             if rb:
-                st = lat_stats(rb)
+                st = delay_stats(rb)
                 xs.append(sz)
                 ya.append(st['avg'])
                 ym.append(st['max'])
@@ -141,7 +141,7 @@ def ddr_summary(recs):
             if tg != t or g != 'model':
                 continue
             sz = r['cfg']['xfer_beats'] * 32
-            s = lat_stats(r)
+            s = delay_stats(r)
             sec, order = lab.rsplit('_slot_', 1)
             L.append(f'| {t} | {sec} | {sz:,} | slot_{order} | {f3(r["res"]["GBps"])} | '
                      f'{s["avg"]:.3f} / {s.get("p99", float("nan")):.3f} / {s["max"]:.3f} | '
@@ -156,7 +156,7 @@ def ddr_summary(recs):
             r = get(t, 'single', lab)
             if not r:
                 continue
-            s = lat_stats(r)
+            s = delay_stats(r)
             L.append(f'| {t} | {lab} | {s["min"] * 1e3:.0f} | {s["avg"] * 1e3:.0f} | '
                      f'{s.get("p50", 0) * 1e3:.0f} | {s.get("p99", 0) * 1e3:.0f} | {s["max"] * 1e3:.0f} |')
     L.append('')

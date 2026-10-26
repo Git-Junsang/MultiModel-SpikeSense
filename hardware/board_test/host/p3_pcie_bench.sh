@@ -2,10 +2,10 @@
 # ============================================================
 # p3_pcie_bench.sh — P3.3 PCIe 지연·jitter 측정 묶음 (FPGA Host)
 # ============================================================
-# pcie_lat로 시험을 차례로 돌리고 결과를 <OUT>/<설계>_<시험>_<조건>.txt로 남긴다.
-# 사용: ./p3_pcie_bench.sh <설계 태그> <OUT 폴더> [BRAM 주소] [DDR 주소]
+# pcie_delay로 시험을 차례로 돌리고 결과를 <OUT>/<설계>_<시험>_<조건>.txt로 남긴다.
+# 사용: ./p3_pcie_bench.sh <설계 태그> <OUT 폴더> [BRAM 주소] [DDR3 주소]
 #   p07(P1.7 설계, BRAM @0x0, 사용자 BAR 없음):  ./p3_pcie_bench.sh p07 ~/fpga_work/p3/pcie 0x0
-#   p3 (측정 설계, BRAM @0x10000, DDR @0x80000000, 사용자 BAR 있음):
+#   p3 (측정 설계, BRAM @0x10000, DDR3 @0x80000000, 사용자 BAR 있음):
 #                                                ./p3_pcie_bench.sh p3 ~/fpga_work/p3/pcie 0x10000 0x80000000
 # 환경 변수 TAG2를 주면 파일명 끝에 붙인다(예: 드라이버 poll 모드 구분).
 # ============================================================
@@ -15,7 +15,7 @@ OUT=${2:?출력 폴더}
 BRAM=${3:-0x0}
 DDR=${4:-}
 T2=${TAG2:+_$TAG2}
-L=$(dirname "$0")/pcie_lat
+L=$(dirname "$0")/pcie_delay
 mkdir -p "$OUT"
 run() { local name=$1; shift; echo "== $name"; sudo "$L" "$@" -o "$OUT/${D}_${name}${T2}.txt"; }
 

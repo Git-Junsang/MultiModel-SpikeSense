@@ -11,7 +11,7 @@
 ## ---- 코어보드 사용자 LED (BANK34, 1.5 V, Active-High, Part 2.6) ----
 set_property -dict { PACKAGE_PIN W5  IOSTANDARD LVCMOS15 } [get_ports led_core]
 
-## ---- 캐리어보드 사용자 LED1~4 (BANK15, 3.3 V, Active-Low, Part 3.14) ----
+## ---- 캐리어보드 사용자 LED1–4 (BANK15, 3.3 V, Active-Low, Part 3.14) ----
 ## IO가 Low일 때 켜진다. led_n[0] = LED1.
 set_property -dict { PACKAGE_PIN L13 IOSTANDARD LVCMOS33 } [get_ports {led_n[0]}]
 set_property -dict { PACKAGE_PIN M13 IOSTANDARD LVCMOS33 } [get_ports {led_n[1]}]

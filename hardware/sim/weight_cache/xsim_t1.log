@@ -3,7 +3,7 @@
   **** SW Build 6511674 on Tue Jun 16 11:01:26 MDT 2026
   **** IP Build 6504888 on Tue Jun 09 09:05:25 MDT 2026
   **** SharedData Build 6501428 on Mon Jun 08 17:34:18 MDT 2026
-  **** Start of session at: Tue Oct 20 15:40:43 2026
+  **** Start of session at: Mon Oct 26 19:19:18 2026
     ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
     ** Copyright 2022-2026 Advanced Micro Devices, Inc. All Rights Reserved.
 
@@ -15,7 +15,7 @@ run   entry 경로: entry 4개, 불일치 0
 run   재생 t1: 도착 81920, 계획 41371 (hit 38328, 빈 entry 4, 내보냄 3039)
 run   결정 불일치 0, 연산 중 entry를 내보냄 0
 PASS
-$finish called at time : 2143030 ns : File "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/testbench/tb_weight_cache.sv" Line 176
+$finish called at time : 2234200 ns : File "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/testbench/tb_weight_cache.sv" Line 176
 exit
-INFO: xsimkernel Simulation Memory Usage: 164352 KB (Peak: 212980 KB), Simulation CPU Usage: 830 ms
-INFO: [Common 17-206] Exiting xsim at Tue Oct 20 15:40:45 2026...
+INFO: xsimkernel Simulation Memory Usage: 164364 KB (Peak: 212992 KB), Simulation CPU Usage: 840 ms
+INFO: [Common 17-206] Exiting xsim at Mon Oct 26 19:19:20 2026...

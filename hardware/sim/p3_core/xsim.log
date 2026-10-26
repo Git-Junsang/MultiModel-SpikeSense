@@ -3,7 +3,7 @@
   **** SW Build 6511674 on Tue Jun 16 11:01:26 MDT 2026
   **** IP Build 6504888 on Tue Jun 09 09:05:25 MDT 2026
   **** SharedData Build 6501428 on Mon Jun 08 17:34:18 MDT 2026
-  **** Start of session at: Fri Oct  9 19:58:22 2026
+  **** Start of session at: Mon Oct 26 19:32:27 2026
     ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
     ** Copyright 2022-2026 Advanced Micro Devices, Inc. All Rights Reserved.
 
@@ -25,5 +25,5 @@ run w=0 v=0 am=0 pipe=1 xb=1 bmax=1 n=400 out=16 : cyc=662 beats=400 xfers=400 l
 PASS tb_p3_core
 $finish called at time : 731435 ns : File "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/board_test/p3_meas/tb_p3_core.sv" Line 332
 exit
-INFO: xsimkernel Simulation Memory Usage: 155172 KB (Peak: 211996 KB), Simulation CPU Usage: 730 ms
-INFO: [Common 17-206] Exiting xsim at Fri Oct  9 19:58:23 2026...
+INFO: xsimkernel Simulation Memory Usage: 155184 KB (Peak: 212008 KB), Simulation CPU Usage: 730 ms
+INFO: [Common 17-206] Exiting xsim at Mon Oct 26 19:32:29 2026...

@@ -29,7 +29,7 @@ PyTorch CUDA와 4096×4096 FP32 matrix multiply를 확인했다. 학습 전에�
 
 - `/usr/local/bin/vivado` wrapper를 쓴다. 원본 실행 파일은 이 환경에서 libudev 오류가 났다.
 - MIG·XDMA가 있는 설계는 공백 없는 `~/mmss_build/<name>`에서 build한다.
-- IP가 여러 개면 `-jobs 1`을 쓴다. 16 GiB 환경에서 `-jobs 3`은 memory 부족으로 실패했다.
+- IP가 여러 개면 `-jobs 1`을 쓴다. 16 GiB 환경에서 `-jobs 3`은 메모리 부족으로 실패했다.
 - RTL simulation은 `xvlog`, `xelab`, `xsim`을 쓴다. `iverilog`, `vvp`는 쓰지 않는다.
 
 tool 확인 결과:
@@ -49,7 +49,7 @@ tool 확인 결과:
 | GPU | RTX 3090, 24,576 MiB |
 | JTAG | FT232H, Digilent, `xc7a200t_0` 인식 |
 | FPGA IDCODE | `0x13636093` |
-| Vivado | 2026.1, Artix-7 설치 |
+| Vivado | 2026.1, Artix 7 설치 |
 | PCIe slot | SLOT5, root port `00:1d.0`, 전기적 x4 |
 
 보드는 PCIe slot 전원만 쓴다. Host 전원이 꺼지면 FPGA 구성도 사라진다.
@@ -72,7 +72,7 @@ network `hw_server`는 상시 열어 두지 않는다.
 | `ax7a200b_ddr3.xdc` | DDR3 32 bit pin |
 | `ax7a200b_pcie.xdc` | PCIe clock, lane, PERST# |
 
-dummy top을 모든 XDC와 함께 배치했다. 87개 port의 `PACKAGE_PIN`이 XDC와 모두 같았다. DDR3 DQ/DQS는 Artix-7 HR bank에 맞춰 `SSTL15`와 `DIFF_SSTL15`를 쓴다.
+dummy top을 모든 XDC와 함께 배치했다. 87개 port의 `PACKAGE_PIN`이 XDC와 모두 같았다. DDR3 DQ/DQS는 Artix 7 HR bank에 맞춰 `SSTL15`와 `DIFF_SSTL15`를 쓴다.
 
 PCIe PERST#는 보드 시험으로 L16을 찾았다. fan control pin과 UART 방향은 아직 확인하지 않았다.
 

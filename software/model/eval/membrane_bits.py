@@ -1,6 +1,6 @@
-"""membrane potential 저장 bit 수에 따른 정확도 (P3.13).
+"""Membrane potential 저장 bit 수에 따른 정확도 (P3.13).
 
-membrane potential을 DDR3에 쓸 때 16 bit 대신 더 적은 bit로 저장하면 정확도가 얼마나 변하는지 본다.
+Membrane potential을 DDR3에 쓸 때 16 bit 대신 더 적은 bit로 저장하면 정확도가 얼마나 변하는지 본다.
 연산은 snn_int8과 같다(누설 → 적분 → 16 bit 포화 → 발화 → soft reset). 다른 점은 soft reset 뒤 다음 timestep으로
 넘기는 membrane potential(= DDR3에 쓰는 값)만 저장 형식으로 바꾼다는 것이다.
   b16           16 bit 포화(기준, snn_int8.forward와 같음)

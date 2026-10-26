@@ -5,13 +5,13 @@
 // RGMII 선으로 accel_sys에 잇는다. DDR3는 AXI4 256 bit slave 모델이다: 무작위 ready·지연·beat 간격(tb_dma MODE 1),
 // ID가 다른 읽기 burst끼리 beat 섞기. 모델 slot m = 0x40000 × m(유효 4,114 beat), 트랙 k = 0x0200_0000 + 0x800 × k.
 // 순서 (06_HOST_INTERFACE.md §6):
-//   1) mig_calib = 0: DDR3 창 읽기·쓰기는 status 2, register 읽기(ID, VERSION, N_ENTRY, N_ONCHIP, STATUS.MIG_CALIB 0)
+//   1) mig_calib = 0: DDR3 창 읽기·쓰기는 status 2, register 읽기(ID, VERSION, N_ENTRY, N_ON_CHIP, STATUS.MIG_CALIB 0)
 //   2) mig_calib = 1 뒤: 모델 0·1(+FULL=1이면 40개 모두)을 1 KiB 제어 쓰기로 DDR3 창에 적재하고 다시 읽어 비교.
 //      나머지 slot은 DDR3 모델에 직접 넣는다(backdoor)
 //   3) 설정 쓰기와 읽기(LINK_TUNE과 tx_ps 포함), PNU 표(주소마다 다른 값, 그다음 시나리오 값)를 쓰고 predictor 안 값을 계층 이름으로 확인, SOFT_RESET, STATUS.IDLE, RUN = 1, RUN = 1일 때 설정·DDR3 쓰기 무시
-//   4) golden vector 80개(모델 0~39 × 2, 포화 시험용 모델 40·41 제외)를 트랙 80개(on-chip 60, DDR3 20)에.
+//   4) golden vector 80개(모델 0–39 × 2, 포화 시험용 모델 40·41 제외)를 트랙 80개(on-chip 60, DDR3 20)에.
 //      t = 0~NT−1마다 NOW_US를 읽어 t_host로 쓰고 80개를 datagram(최대 23개)으로 보낸 뒤 결과 80개를 다 받는다.
-//      결과마다 out0·out1이 golden과 bit 일치, track·seq·model·flags(RESET_STATE, 포화 0, LATE 식)·batch_n 1~2·시각 순서
+//      결과마다 out0·out1이 golden과 bit 일치, track·seq·model·flags(RESET_STATE, 포화 0, LATE 식)·batch_n 1–2·시각 순서
 //   5) IDLE 뒤 RUN = 0, counter 확인(REQ_IN, RES_OUT, REQ_DROP 0, WEIGHT_BYTES, STATE_BYTES, BATCHES, CMP_BUSY·CMP_STALL 등과
 //      DDR3 모델이 센 beat), DDR3 트랙의 membrane potential을 DDR3 창으로 읽어 golden 마지막 12 bit 저장값과 비교
 //   5b) cache에 있는 두 모델의 slot을 맞바꿔 쓰고 SOFT_RESET: entry·pending·counter·NOW_US 0, DEADLINE_US 1로
@@ -19,7 +19,7 @@
 //   6) 오류: model_id 45 → ERR_CODE 3·ERR_INFO 트랙, 100 B datagram은 첫 오류를 바꾸지 않음, ERR_CLEAR,
 //      다시 100 B datagram → ERR_CODE 7·ERR_INFO 100
 //   AXI 규칙(valid 유지, 4 KiB 경계, 주소 범위, 주소 전 W 없음, wlast, run 쪽마다 burst 꼴), RUN이 바뀔 때 DDR3 거래 없음,
-//   DDR3 트랙 결과는 되쓰기 B 응답 뒤, 결과·DDR3 쓰기 data에 X 없음
+//   DDR3 트랙 결과는 되쓰기 B 응답 뒤, 결과·DDR3 쓰기 데이터에 X 없음
 // plusarg: +FULL=1 모델 40개를 모두 Ethernet으로 적재, +NT=n timestep 수(기본 31), +MAXERR=n 오류 n개면 멈춤
 // 실행 (저장소 루트):
 //   bash hardware/testbench/run_sys.sh
@@ -32,13 +32,13 @@ module tb_sys;
     localparam [31:0] DUT_IP   = {8'd192, 8'd168, 8'd10, 8'd2};
     localparam [31:0] HOST_IP  = {8'd192, 8'd168, 8'd10, 8'd1};
     localparam [15:0] RPORT = 16'd6000, CPORT = 16'd6100;
-    localparam int    PHY_RST = 50, E = 4, N_MOD = 40, N_VEC = 80, N_ONCHIP = 768, T = 31, ROWS = 45, LD = 4114;
+    localparam int    PHY_RST = 50, E = 4, N_MOD = 40, N_VEC = 80, N_ON_CHIP = 768, T = 31, ROWS = 45, LD = 4114;
     localparam string VEC = "hardware/sim/compute_array/vec_m12/";
     localparam [31:0] SB = 32'h0200_0000, DEADLINE = 32'd32000, MARGIN = 32'd0;
 
     int full = 0, nt = T, maxerr = 40;
     logic [31:0] dl = DEADLINE;              // 지금 DEADLINE_US(5b에서 1로 바꾼다)
-    int          mmap [0:N_MOD-1];           // 요청에 싣는 model_id(5b에서 slot을 맞바꾼 두 모델만 다르다)
+    int          mmap [0:N_MOD-1];           // 추론 요청에 싣는 model_id(5b에서 slot을 맞바꾼 두 모델만 다르다)
     int errors = 0;
     function automatic void err(input string s);
         errors++;
@@ -80,7 +80,7 @@ module tb_sys;
     reg  [255:0] m_rdata = '0;
     reg  [1:0]   m_rresp = 2'd0, m_bresp = 2'd0;
 
-    accel_sys #(.TARGET("GENERIC"), .PHY_RST_CYC(PHY_RST), .E(E), .N_MODELS(N_MOD), .N_ONCHIP(N_ONCHIP)) dut (
+    accel_sys #(.TARGET("GENERIC"), .PHY_RST_CYC(PHY_RST), .E(E), .N_MODELS(N_MOD), .N_ON_CHIP(N_ON_CHIP)) dut (
         .clk(clk), .rst(rst), .mig_calib(mig_calib), .gtx_clk(gtx), .gtx_clk90(gtx90),
         .rgmii_rx_clk(h_txc), .rgmii_rxd(h_txd), .rgmii_rx_ctl(h_txctl),
         .rgmii_tx_clk(d_txc), .rgmii_txd(d_txd), .rgmii_tx_ctl(d_txctl),
@@ -294,7 +294,7 @@ module tb_sys;
         err($sformatf("AXI: %s (cycle %0d)", s, cyc));
     endfunction
 
-    // burst 꼴: 정렬, 4 KiB 경계, 주소 범위. run = 1이면 dma(weight ID 0 ≤ 16 beat, membrane potential 34 beat),
+    // burst 꼴: 정렬, 4 KiB 경계, 주소 범위. run = 1이면 DMA(weight ID 0 ≤ 16 beat, membrane potential 34 beat),
     // run = 0이면 ctrl(ID 0, ≤ 32 beat)
     function automatic void chk_burst(input string s, input bit wr, input [31:0] a, input [7:0] len, input bit id);
         logic [31:0] z;
@@ -305,7 +305,7 @@ module tb_sys;
         k = (a - SB) >> 11;
         if (run) begin
             if (wr || id) begin
-                if (len != 8'd33 || !in_state(a) || ((a - SB) & 32'h7FF) != 0 || k < N_ONCHIP)
+                if (len != 8'd33 || !in_state(a) || ((a - SB) & 32'h7FF) != 0 || k < N_ON_CHIP)
                     prot($sformatf("%s membrane potential burst %h len %0d", s, a, len));
             end else if (len + 1 > 16 || !in_slot(a))
                 prot($sformatf("%s weight burst %h len %0d", s, a, len));
@@ -378,7 +378,7 @@ module tb_sys;
             else begin
                 a = awq[0].addr + wk * 32;
                 wd2 = m_wdata;
-                // DRAM은 X를 담지 못한다(X가 제어 응답 frame에 들어가면 xsim에서 FCS가 깨져 Host가 버린다)
+                // DDR3은 X를 담지 못한다(X가 제어 응답 frame에 들어가면 xsim에서 FCS가 깨져 Host가 버린다)
                 if ($isunknown(m_wdata)) err($sformatf("X in DDR3 write data at %h", a));
                 if (in_state(a))     mstate[(a - SB) >> 5] = wd2;
                 else if (in_slot(a)) mslot[slot_i(a)] = wd2;
@@ -407,7 +407,7 @@ module tb_sys;
         if (dut.rs_valid && dut.rs_ready && $isunknown(dut.rs_data))
             err($sformatf("result with X bits: %h", dut.rs_data));
         // DDR3 트랙 결과는 그 timestep의 되쓰기 응답 뒤에 나간다(result.v, 03 §3). 같은 block이라 B를 먼저 센다
-        if (dut.rs_valid && dut.rs_ready && dut.rs_data[15:0] >= N_ONCHIP && dut.rs_data[15:0] < 1024
+        if (dut.rs_valid && dut.rs_ready && dut.rs_data[15:0] >= N_ON_CHIP && dut.rs_data[15:0] < 1024
             && wbk[dut.rs_data[9:0]] <= dut.rs_data[31:16])
             err($sformatf("track %0d seq %0d: result sent before membrane potential write-back (B %0d)",
                           dut.rs_data[15:0], dut.rs_data[31:16], wbk[dut.rs_data[9:0]]));
@@ -682,7 +682,7 @@ module tb_sys;
     endtask
 
     // ---------------- PNU 표 ----------------
-    // pat = 1: 주소마다 다른 값(위 16 bit는 버려져야 한다), 0: 시나리오 값(OFFSET m, N_REG 2, 나머지 0)
+    // pat = 1: 주소마다 다른 값(위 16 bit는 버려져야 한다), 0: 시나리오 값(offset m, N_REG 2, 나머지 0)
     function automatic logic [15:0] pnu_v(input bit pat, input int tbl, input int i);
         case (tbl)
         0: return pat ? 16'(39 - i) : 16'(i);                 // OFFSET_TABLE
@@ -755,7 +755,7 @@ module tb_sys;
             if (idx[v] != v / 2) err($sformatf("index.hex v%0d model %0d", v, idx[v]));
         end
         n_ddr = 0;
-        for (int v = 0; v < N_VEC; v++) if (trk(v) >= N_ONCHIP) n_ddr++;
+        for (int v = 0; v < N_VEC; v++) if (trk(v) >= N_ON_CHIP) n_ddr++;
         for (int m = 0; m < N_MOD; m++) begin
             $readmemh($sformatf("%sm%02d_w.hex", VEC, m), wall, m * 2034, m * 2034 + 2033);
             $readmemh($sformatf("%sm%02d_p.hex", VEC, m), pall, m * 46, m * 46 + 45);
@@ -776,7 +776,7 @@ module tb_sys;
         expect_word(0, 32'h534E_4E58, "ID");
         expect_word(1, 32'h0001_0000, "VERSION");
         expect_word(2, E, "N_ENTRY");
-        expect_word(3, N_ONCHIP, "N_ONCHIP");
+        expect_word(3, N_ON_CHIP, "N_ON_CHIP");
         reg_rd(32'h0100, 1, "STATUS before calib");
         expect_word(0, 32'h2, "STATUS before calib");        // IDLE만
         ctl(8'd1, 32'h8000_0000, 8, 2, "DDR3 read before calib");
@@ -897,9 +897,14 @@ module tb_sys;
         end
         reg_rd(32'h0500, 2, "ERR after run");
         expect_word(0, 0, "ERR_CODE after run");
+        reg_rd(32'h0440, 12, "link counters");               // eth_link 진단 counter(SOFT_RESET 뒤부터)
+        if (rd[0] != nreq) err($sformatf("link: results accepted %0d, expected %0d", rd[0], nreq));
+        if (rd[2] < rd[1] || rd[2] > rd[1] + 2)              // MAC good frame = UDP + ARP 응답
+            err($sformatf("link: MAC good frames %0d, UDP headers %0d", rd[2], rd[1]));
+        for (int i = 3; i < 12; i++) if (rd[i] != 0) err($sformatf("link counter %0d = %0d", i, rd[i]));
         mis = 0;
         for (int v = 0; v < N_VEC; v++)
-            if (trk(v) >= N_ONCHIP) begin
+            if (trk(v) >= N_ON_CHIP) begin
                 logic [34*256-1:0] img;
                 logic [31:0] a;
                 a = 32'h8000_0000 + SB + 32'h800 * trk(v);
@@ -922,8 +927,8 @@ module tb_sys;
                  n_ddr, mis, errors - e0);
 
         // 5b. 활동 뒤 SOFT_RESET (06 §6 5: entry 무효화, request table·counter·시각 초기화).
-        //     cache에 있는 두 모델 A·B의 slot을 Ethernet으로 맞바꿔 쓰고(A ← B 이미지, B ← A 이미지) SOFT_RESET한다.
-        //     A의 vector는 model_id B로, B의 vector는 A로 보낸다. entry가 남아 있으면 옛 weight로 계산해 golden과 어긋난다.
+        //     Cache에 있는 두 모델 A·B의 slot을 Ethernet으로 맞바꿔 쓰고(A ← B 이미지, B ← A 이미지) SOFT_RESET한다.
+        //     A의 vector는 model_id B로, B의 vector는 A로 보낸다. Entry가 남아 있으면 옛 weight로 계산해 golden과 어긋난다.
         //     DEADLINE_US = 1로 두어 모든 결과가 LATE여야 한다(LATE counter·flag, SAT_COUNT 0)
         e0 = errors;
         begin

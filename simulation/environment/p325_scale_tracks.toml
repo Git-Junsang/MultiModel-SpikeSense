@@ -1,15 +1,15 @@
-# P3.25 F5(b): DDR3 3,015 MB/s에서 트랙 수별 관측 최대 응답 시간. jitter U(0, 0.8 ms)
-# L·64 lane @100 MHz, 1,024트랙, 모델 40개, rtl67(P4.1 cycle 식 + control overhead 67, 모든 입력 spike 1,205 cycle, entry 28.5 tile,
+# P3.25 F5(b): DDR3 3,015 MB/s에서 트랙 수별 관측 최대 response time. Jitter U(0, 0.8 ms)
+# L·64-lane @100 MHz, 1,024트랙, 모델 40개, rtl67(P4.1 cycle 식 + control overhead 67, 모든 입력 spike 1,205 cycle, entry 28.5 tile,
 # 적재 131,648 B), DDR3 3,015 MB/s, 남는 BRAM에 12 bit membrane potential, Grouping, 즉시 입출력, host_fixed_delay_us 0.
-# jitter는 추론 요청·주기마다 새로 뽑아 Host 도착(t_host) → 준비(t_ready)에 더한다. deadline = t_host + 32 ms. 시나리오 6개 × seed 10
-# Dysta Method η = 0.0001, DeepRT Method window 14.9 ms·flush off(p325_dysta_tune, p325_deeprt_tune에서 고름)
+# Jitter는 추론 요청·주기마다 새로 뽑아 Host 도착(t_host) → 준비(t_ready)에 더한다. Deadline = t_host + 32 ms. 시나리오 6개 × seed 10
+# Dysta Method η = 0.0001, DeepRT Method window 14.9 ms·flush off(p325_dysta_method_tune, p325_deeprt_method_tune에서 고름)
 # 키 설명은 template.toml
 
 sim_mode = "run"
-sim_scenarios = ["U", "K", "S", "I", "SK", "R"]
+sim_scenarios = ["uniform", "skewed", "synchronized", "intermittent", "skewed_synchronized", "fluctuating"]
 sim_seeds = 10
 sim_seed0 = 0
-sim_warm_periods = 16
+sim_warmup_periods = 16
 sim_meas_periods = 64
 model_size = "L"
 model_count = 40
@@ -20,13 +20,13 @@ compute_ctrl_scale = 1.0
 membrane_place = "split"
 membrane_bits = 12
 bram_reserve_tiles = 25.5
-ddr_bw_mbps = 3015.0
+ddr3_bandwidth_mbps = 3015.0
 track_count = 1024
-host_offset = "model"
+host_offset = "offset_assignment"
 host_jitter_ms = 0.8
 host_jitter_dist = "uniform"
 host_jitter_trace = ""
-host_group_trace = ""
+host_model_group_delay_trace = ""
 host_gather_ms = 0.0
 host_gather_to_max = false
 host_packet_gap_us = 0.0
@@ -47,8 +47,8 @@ tune_conds = []
 [sweep]
 track_count = [512, 1024, 1536, 2048, 3072, 4096]
 method = [
-  {label = "Model-Grouped + Grouping + PNU-count (제안)", host_offset = "model", cache_policy = "pnu_count", scheduler = "grouping"},
-  {label = "Dysta Method (unaligned, LRU)", host_offset = "none", cache_policy = "lru", scheduler = "dysta", scheduler_attrs = {eta = 0.0001}},
-  {label = "DeepRT Method (unaligned, LRU)", host_offset = "none", cache_policy = "lru", scheduler = "deeprt", scheduler_attrs = {window = [14900.0, false]}},
-  {label = "Global + Grouping (LRU)", host_offset = "global", cache_policy = "lru", scheduler = "grouping"},
+  {label = "Model-Grouped Offset Assignment + Grouping + PNU-Count (제안)", host_offset = "offset_assignment", cache_policy = "pnu_count", scheduler = "grouping"},
+  {label = "Dysta Method (unaligned, LRU)", host_offset = "unaligned", cache_policy = "lru", scheduler = "dysta_method", scheduler_attrs = {eta = 0.0001}},
+  {label = "DeepRT Method (unaligned, LRU)", host_offset = "unaligned", cache_policy = "lru", scheduler = "deeprt_method", scheduler_attrs = {window = [14900.0, false]}},
+  {label = "global alignment + Grouping (LRU)", host_offset = "global_alignment", cache_policy = "lru", scheduler = "grouping"},
 ]

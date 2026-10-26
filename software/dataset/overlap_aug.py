@@ -4,10 +4,10 @@
 (dcase_data.mel_from_wave)을 거친다. 라벨은 대상 장비 기준 그대로다.
 
 섞음 규칙 (결과를 보기 전에 정함)
-  겹치는 장비 수      N ~ round(정규(4, 1.5)), 1~8
-  그중 강한 겹침 수   K ~ round(정규(1.5, 0.5)), 1~2 (K ≤ N), 나머지는 약한 겹침
+  겹치는 장비 수      N ~ round(정규(4, 1.5)), 1–8
+  그중 강한 겹침 수   K ~ round(정규(1.5, 0.5)), 1–2 (K ≤ N), 나머지는 약한 겹침
   겹침 수준(SNR, dB) = 10·log10(대상 전력 / 겹친 소리 전력), 녹음 전체 기준
-                      강함 ~ 정규(0, 3), −9~9 / 약함 ~ 정규(15, 3), 6~24
+                      강함 ~ 정규(0, 3), −9–9 / 약함 ~ 정규(15, 3), 6–24
   종류 ~ 균일(6종), ID ~ 균일(그 종류에서 대상 장비 제외), 녹음 ~ 균일(bank), 시작 위치 ~ 균일(원형 이동)
   겹치는 소리는 **정상음만** 쓴다(이상음을 섞으면 대상 라벨이 오염된다).
   배경 소음: 원본 녹음에 이미 들어 있다. 배경 소음만 따로 녹음한 파일은 없어, 약한 겹침 여러 대가 넓게 깔린
@@ -20,7 +20,7 @@
   bank_train.json, bank_test.json          bank 녹음 목록
   <종류>/<장비>_train.npz  mel [K, ΣT, 40] float16, off [F+1]     train 폴더 파일(list_files 순서)마다 K가지 섞음
   <종류>/<장비>_test.npz   fit [K, ΣT_a, 40], fit_files [A], fit_off [A+1]
-                        test 이상 파일의 K가지 섞음(학습 bank) — supervised 학습에 쓰는 이상 파일용
+                        test 이상 파일의 K가지 섞음(학습 bank) — 지도학습 학습에 쓰는 이상 파일용
                     eval [4, ΣT, 40], off [F+1]  test 전체 파일의 평가 조건(평가 bank)
                         T1 = 학습과 같은 분포, T2_p6 / T2_0 / T2_m6 = 강한 1대 SNR +6 / 0 / −6 dB + 약한 3대
   <종류>/<장비>_recipes.jsonl               섞음마다 사용한 소리·위치·SNR
@@ -35,7 +35,7 @@ import os
 import time
 from multiprocessing import Pool
 
-# 작업 프로세스 여러 개가 각자 스레드를 띄우면 CPU를 두고 다툰다(부하 100 이상 관측) → 프로세스당 1개
+# 작업 프로세스 여러 개가 각자 thread를 띄우면 CPU를 두고 다툰다(부하 100 이상 관측) → 프로세스당 1개
 for _v in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS", "NUMBA_NUM_THREADS"):
     os.environ.setdefault(_v, "1")
 
@@ -199,7 +199,7 @@ def selftest():
         d = x - s
         meas = 10 * np.log10(np.mean((s - s.mean()) ** 2) / np.mean(d ** 2))
         check(f"SNR {snr:+.0f} dB → 측정 {meas:+.4f} dB", abs(meas - snr) < 1e-6)
-    # 3. 분포: 강한 겹침 1~2개, 개수 평균 ≈ 4, 종류 균일, 대상 장비 제외
+    # 3. 분포: 강한 겹침 1–2개, 개수 평균 ≈ 4, 종류 균일, 대상 장비 제외
     rng = np.random.default_rng(0)
     rs = [sample_recipe(rng, "valve_id00") for _ in range(20000)]
     cnt = np.array([len(r) for r in rs])

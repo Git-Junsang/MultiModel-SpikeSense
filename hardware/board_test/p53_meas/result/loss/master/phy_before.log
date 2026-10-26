@@ -1,0 +1,9 @@
+reg 0x00 BMCR                 0x1140
+reg 0x01 BMSR                 0x796D
+reg 0x02 PHYID1               0x937C
+reg 0x03 PHYID2               0x4032
+reg 0x04 AN advertisement     0x01E1
+reg 0x05 AN partner           0xCDE1
+reg 0x09 1000BASE-T control   0x1A00
+reg 0x0A 1000BASE-T status    0x7800  M/S 오류 0, master 1, local rx OK 1, remote rx OK 1, idle 오류 0
+reg 0x0F extended status      0x2000

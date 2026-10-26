@@ -11,7 +11,7 @@ AGENTS.md
 .claude/
 _workspace/
 
-# 큰 data: code만 올린다
+# 큰 데이터: code만 올린다
 software/dataset/*
 !software/dataset/*.py
 
@@ -30,5 +30,5 @@ webtalk*
 __pycache__/
 *.pyc
 
-#unneccessary files
+# 폐기한 그림
 analysis/discards/

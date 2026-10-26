@@ -6,7 +6,7 @@
 slider id_06은 0.998) 2026-09-23에 둘을 맞바꿨다.
 
 특징은 선행 train.py와 같다: 16 kHz, n_fft 1024, hop 512(32 ms), 40 mel,
-파일 단위 power_to_db(ref=max, top_db 80) → [0, 1] 정규화, 31 frame(992 ms) 세그먼트.
+파일 단위 power_to_db(ref=max, top_db 80) → [0, 1] 정규화, 31 frame(992 ms) segment.
 """
 
 import os
@@ -116,7 +116,7 @@ def _segments(mel, hop=SEG_FRAMES):
 
 
 def load_unit(machine, mid, split, workers=10, hop=SEG_FRAMES):
-    """장비 1대의 세그먼트 cache를 읽거나 만든다.
+    """장비 1대의 segment cache를 읽거나 만든다.
 
     hop < SEG_FRAMES면 구간을 겹쳐 자른다. 학습 표본을 늘리는 용도이며, 평가는
     겹치지 않는 기본 분할(hop = SEG_FRAMES)로 한다.

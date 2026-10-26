@@ -10,7 +10,7 @@
 #   MIG 생성은 project 경로에 공백이 있으면 실패하므로 기본 project는 ~/mmss_build/top.
 # -rx_idelay: eth_link RGMII 수신 IDELAYE2 tap(0 = 두지 않음, 1 tap ≈ 78 ps). 기본 8은 보드 실측과 STA 모델을 둘 다 만족한다(P5.2). 송신 위상 기본값은 accel_top.v TX_PS.
 # 산출물: <out>/ (기본 hardware/vivado/build/top) timing·clock interaction·utilization·IO·DRC report, worst_paths.txt,
-#   rx_idelay_sweep.txt(-rx_idelay > 0일 때 tap 0~31 수신 setup·hold 여유),
+#   rx_idelay_sweep.txt(-rx_idelay > 0일 때 tap 0–31 수신 setup·hold 여유),
 #   accel_top.bit, route.dcp
 # ============================================================
 
@@ -63,7 +63,7 @@ foreach f [concat [glob $repo_root/hardware/src/*.v] [glob $eth/rtl/*.v] [glob $
 set_property top accel_top [current_fileset]
 set_property generic "RX_IDELAY=$opt(rx_idelay)" [current_fileset]
 
-# ---- 제약: board XDC + verilog-ethernet clock 경계 script(원본 예제처럼 XDC 목록에 넣는다) ----
+# ---- 제약: 보드 XDC + verilog-ethernet clock 경계 script(원본 예제처럼 XDC 목록에 넣는다) ----
 foreach x {io eth top} {
     add_files -fileset constrs_1 -norecurse [list "$repo_root/hardware/constraints/ax7a200b_$x.xdc"]
 }

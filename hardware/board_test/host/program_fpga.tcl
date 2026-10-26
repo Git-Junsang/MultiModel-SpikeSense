@@ -1,5 +1,5 @@
 # ============================================================
-# program_fpga.tcl — FPGA Host에서 JTAG로 비트스트림 다운로드, VIO 읽기
+# program_fpga.tcl — FPGA Host에서 JTAG로 bitstream 다운로드, VIO 읽기
 # ============================================================
 # FPGA Host(sdsl-llm)의 로컬 JTAG에서 실행한다 (ENVIRONMENT.md §4 작업 흐름).
 #

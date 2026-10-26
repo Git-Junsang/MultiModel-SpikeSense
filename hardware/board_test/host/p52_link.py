@@ -6,7 +6,7 @@ LINK_TUNE: bit[4:0] 수신 tap(1 tap ≈ 78 ps), bit[31:16] 송신 clock 위상(
 응답이 없는 요청 − 그 증가분 = Host → FPGA에서 FPGA가 버린 frame(추정).
 수신 tap이 너무 나쁘면 FPGA가 다음 LINK_TUNE 쓰기도 받지 못한다. 그러면 --bit를 JTAG로 다시 써서 기본값으로 되돌린다.
 
-    python3 p52_link.py rx  [--tx 0] [--bit accel_top.bit] [--out rx.json]       # 수신 tap 0~31
+    python3 p52_link.py rx  [--tx 0] [--bit accel_top.bit] [--out rx.json]       # 수신 tap 0–31
     python3 p52_link.py tx  --rx <tap> [--lo -224 --hi 224 --step 8] [--out tx.json]   # 송신 위상
     python3 p52_link.py check --rx <tap> --tx <단계> [--n 5000]                   # 한 조합을 오래
 """
@@ -19,7 +19,7 @@ import time
 
 import p52_sys as p
 
-DDR_TEST = p.DDR + 0x0100_0000             # 모델 slot·트랙 상태와 겹치지 않는 DDR3 주소(16 MiB)
+DDR_TEST = p.DDR + 0x0100_0000             # 모델 slot·트랙 state와 겹치지 않는 DDR3 주소(16 MiB)
 
 
 def crc_errors():

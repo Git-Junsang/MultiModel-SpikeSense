@@ -3,8 +3,8 @@
 // ============================================================
 // vector 82개를 트랙 82개에 둔다(on-chip 60, DDR3 22. 경계 트랙 0·767·768·1023 포함).
 // timestep마다 모델 순서로 batch를 만들고, 같은 모델의 트랙 두 개를 번갈아 추론한다.
-// DDR3 트랙은 앞 구성원을 연산하는 동안 다음 구성원을 준비한다. membrane potential은 RTL이 들고 있고
-// DDR3는 TB 모델이다(명령 수락·응답 지연과 beat 간격이 무작위, 처음 내용은 쓰레기 값).
+// DDR3 트랙은 앞 구성원을 연산하는 동안 다음 구성원을 준비한다. Membrane potential은 RTL이 들고 있고
+// DDR3는 TB 모델이다(명령 수락·response time과 beat 간격이 무작위, 처음 내용은 쓰레기 값).
 // 확인 항목:
 //   - row마다 전류, 포화 후 membrane potential, spike, 12 bit 저장값, 판정용 출력이 golden과 bit 일치
 //   - 트랙 분리(같은 모델 두 트랙을 번갈아 처리), 첫 timestep RESET_STATE
@@ -17,7 +17,7 @@
 
 module tb_membrane_storage;
 
-    localparam N_VEC = 82, N_MOD = 42, T = 31, ROWS = 45, CUR_W = 17, N_ONCHIP = 768;
+    localparam N_VEC = 82, N_MOD = 42, T = 31, ROWS = 45, CUR_W = 17, N_ON_CHIP = 768;
     localparam string VEC = "hardware/sim/compute_array/vec_m12/";
     localparam [31:0] STATE_BASE = 32'h0200_0000;
 
@@ -77,7 +77,7 @@ module tb_membrane_storage;
         .p_raddr(p_addr), .p_dout(p_data)
     );
 
-    membrane_storage #(.N_ONCHIP(N_ONCHIP)) u_ms (
+    membrane_storage #(.N_ON_CHIP(N_ON_CHIP)) u_ms (
         .clk(clk), .rst(rst), .state_base(STATE_BASE),
         .track(track), .can_start(can_start), .start(start), .done(done),
         .wb_done(wb_done), .wb_track(wb_track),
@@ -90,7 +90,7 @@ module tb_membrane_storage;
         .dw_valid(dw_valid), .dw_ready(dw_ready), .dw_data(dw_data), .dw_resp(dw_resp)
     );
 
-    // ---------------- DDR3 + dma 모델 (membrane potential 영역, beat = 32 B) ----------------
+    // ---------------- DDR3 + DMA 모델 (membrane potential 영역, beat = 32 B) ----------------
     reg  [255:0] ddr [0:65535];
     integer      rs = 0, rlat = 0, rcnt = 0, ws = 0, wlat = 0, wcnt = 0;
     reg  [15:0]  ridx = 16'd0, widx = 16'd0;
@@ -235,7 +235,7 @@ module tb_membrane_storage;
         while (!(can_start && !busy)) begin @(negedge clk); #1; end
         start = 1'b1; reset_state = (t == 0); x_in = xall[v * T + t];
         v_now = v; t_now = t; rows_seen = 0;
-        if (tk >= N_ONCHIP) pend[tk] = 1'b1;
+        if (tk >= N_ON_CHIP) pend[tk] = 1'b1;
         @(negedge clk);
         start = 1'b0;
     endtask
@@ -277,7 +277,7 @@ module tb_membrane_storage;
             $readmemh($sformatf("%sm%02d_p.hex", VEC, m), pall, m * 46, m * 46 + 45);
         end
         n_ddr = 0;
-        for (v = 0; v < N_VEC; v = v + 1) if (trk(v) >= N_ONCHIP) n_ddr = n_ddr + 1;
+        for (v = 0; v < N_VEC; v = v + 1) if (trk(v) >= N_ON_CHIP) n_ddr = n_ddr + 1;
 
         repeat (4) @(negedge clk);
         rst = 1'b0;
@@ -298,7 +298,7 @@ module tb_membrane_storage;
         for (i = 0; i < 1024; i = i + 1)
             while (pend[i]) begin @(negedge clk); w = w + 1; end
         for (v = 0; v < N_VEC; v = v + 1)
-            if (trk(v) >= N_ONCHIP) begin
+            if (trk(v) >= N_ON_CHIP) begin
                 for (i = 0; i < 34; i = i + 1) img[256*i +: 256] = ddr[trk(v) * 64 + i];
                 for (r = 0; r < ROWS; r = r + 1)
                     for (k = 0; k < ((r == 44) ? 2 : 16); k = k + 1)

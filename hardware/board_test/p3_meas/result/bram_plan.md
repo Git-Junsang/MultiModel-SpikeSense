@@ -14,7 +14,7 @@
 | 트랙 메타 | 512 × 64 bit | 4,096 B | 1 |
 | 부분 상주: 40모델 L1 | 19,200 × 256 bit | 614,400 B | 142.5 |
 
-membrane potential 합계 176.5 tile = 48.4% (데이터 722,944 B, 물리 794.25 KiB)
+Membrane potential 합계 176.5 tile = 48.4% (데이터 722,944 B, 물리 794.25 KiB)
 
 ## 저장 정책별 예산 (XDMA 20.5 + 기타 0 tile 실측 반영)
 
@@ -28,4 +28,4 @@ membrane potential 합계 176.5 tile = 48.4% (데이터 722,944 B, 물리 794.25
 
 제안서 709.375 KiB 갱신: 365 − XDMA 20.5 − membrane potential 176.5 − prefetch 1벌 28.5 = 139.5 tile = 627.75 KiB (물리), β·vth·queue·메타까지 빼면 117 tile = 526.50 KiB
 부분 상주(40모델 L1 전체 142.5 tile)는 시나리오 B 잔여 138 tile에 들어가지 않는다 (차이 -4.5).
-membrane potential을 전부 DDR3에 두면(시나리오 B 기준) weight에 314.5 tile → entry 11개. membrane potential 이동량은 추론 요청당 읽기·쓰기 2 × 1,412 B.
+Membrane potential을 전부 DDR3에 두면(시나리오 B 기준) weight에 314.5 tile → entry 11개. Membrane potential 이동량은 추론 요청당 읽기·쓰기 2 × 1,412 B.

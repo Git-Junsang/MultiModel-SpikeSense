@@ -1,0 +1,47 @@
+# P3.25 E4: Dysta Method 조정값. 조정 seed 100–109(평가 seed 0–29와 겹치지 않음)
+# L·64-lane @100 MHz, 1,024트랙, 모델 40개, rtl67(P4.1 cycle 식 + control overhead 67, 모든 입력 spike 1,205 cycle, entry 28.5 tile,
+# 적재 131,648 B), DDR3 3,015 MB/s, 남는 BRAM에 12 bit membrane potential, Grouping, 즉시 입출력, host_fixed_delay_us 0.
+# 비교군 조건: Offset Assignment 없음(unaligned), LRU entry 4(같은 BRAM). 조정 조건 4개(jitter 0.8, 3.2 ms, DDR3 2.0 GB/s, 모든 입력 spike)
+# 선택: 모든 조정 조건·시나리오·seed에서 miss 0 → weight KiB/추론 최소 → 같으면 최대 response time 최소
+# 키 설명은 template.toml
+
+sim_mode = "tune"
+sim_scenarios = ["uniform", "skewed", "synchronized", "intermittent", "skewed_synchronized", "fluctuating"]
+sim_seeds = 10
+sim_seed0 = 100
+sim_warmup_periods = 16
+sim_meas_periods = 64
+model_size = "L"
+model_count = 40
+compute_lanes = 64
+compute_input = "golden"
+compute_spikes_per_cycle = 2
+compute_ctrl_scale = 1.0
+membrane_place = "split"
+membrane_bits = 12
+bram_reserve_tiles = 25.5
+ddr3_bandwidth_mbps = 3015.0
+track_count = 1024
+host_offset = "unaligned"
+host_jitter_ms = 0.8
+host_jitter_dist = "uniform"
+host_jitter_trace = ""
+host_model_group_delay_trace = ""
+host_gather_ms = 0.0
+host_gather_to_max = false
+host_packet_gap_us = 0.0
+host_fixed_delay_us = 0.0
+fpga_drop_busy = false
+cache_policy = "lru"
+cache_entries = 4
+cache_attrs = {}
+scheduler = "dysta_method"
+scheduler_attrs = {}
+search_key = "track_count"
+search_values = []
+search_step = 16
+tune_attr = "eta"
+tune_values = [0.0, 0.0001, 0.0002, 0.0005, 0.001, 0.002, 0.005, 0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1.0, 10.0]
+tune_conds = [{label = "jitter 0.8 ms"}, {label = "jitter 3.2 ms", host_jitter_ms = 3.2}, {label = "DDR3 2.0 GB/s", ddr3_bandwidth_mbps = 2000.0}, {label = "모든 입력 spike", compute_input = "dense"}]
+
+[sweep]

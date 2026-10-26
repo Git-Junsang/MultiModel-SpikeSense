@@ -2,13 +2,13 @@
 //
 // word RAM: 64 B word 2,034개(04_MEMORY.md §3). true dual port BRAM.
 //   port A  compute 읽기
-//   port B  compute 읽기(spike 2개/cycle의 두 번째 word) 또는 dma 쓰기
-//   dma는 연산 중이 아닌 entry에만 쓰므로 port B를 compute와 동시에 쓰지 않는다.
-//   읽기 latency 2(BRAM 출력 register 포함).
+//   port B  compute 읽기(spike 2개/cycle의 두 번째 word) 또는 DMA 쓰기
+//   DMA는 연산 중이 아닌 entry에만 쓰므로 port B를 compute와 동시에 쓰지 않는다.
+//   읽기 지연 2(BRAM 출력 register 포함).
 // params RAM: row 46개 × 256 bit. row r = 뉴런 16r~16r+15의 {vth, beta}.
-//   slot params section의 32 B beat 하나가 row 하나다(02_MODEL.md §6). 읽기 latency 1.
+//   slot params section의 32 B beat 하나가 row 하나다(02_MODEL.md §6). 읽기 지연 1.
 //
-// word 주소: layer 1 0~239, layer 2 240~1,775, layer 3 1,776~2,031, layer 4 2,032~2,033.
+// word 주소: layer 1 0–239, layer 2 240–1,775, layer 3 1,776–2,031, layer 4 2,032–2,033.
 // lane j = word bit [8j+7:8j].
 
 module weight_entry (

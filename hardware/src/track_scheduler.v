@@ -1,16 +1,16 @@
 // track_scheduler.v — Grouping scheduler (05_SCHEDULING.md §3, simulation_engine.md §5)
 //
-// 계획: 계획된 batch가 없고 대기 추론 요청이 있으면 모델 목록의 head 도착 순번을 모델 0~39 차례로 비교해 가장 오래 기다린
-//   추론 요청의 모델을 고르고 weight_cache에 알린다(pl). miss면 그동안 dma가 적재한다(prefetch).
-//   계획은 앞 batch의 첫 추론이 시작된 뒤에만 한다. simulator가 batch 시작 시각 s에 다음 batch를 고르는 것과 같다.
+// 계획: 계획된 batch가 없고 대기 추론 요청이 있으면 모델 목록의 head 도착 순번을 모델 0–39 차례로 비교해 가장 오래 기다린
+//   추론 요청의 모델을 고르고 weight_cache에 알린다(pl). miss면 그동안 DMA가 적재한다(prefetch).
+//   계획은 앞 batch의 첫 추론이 시작된 뒤에만 한다. Simulator가 batch 시작 시각 s에 다음 batch를 고르는 것과 같다.
 // 시작: 다음에 시작할 추론 요청(지금 batch의 다음 구성원, 다 시작했으면 계획된 batch의 head)의 입력을 읽고 pf로 준비한 뒤 go를 낸다.
 //   계획된 batch의 head가 시작되는 cycle에 그 모델 목록 전체를 떼어 낸다. 그때까지 도착한 같은 모델 추론 요청이 모두 batch에 든다.
-//   batch 안에서는 도착 순서대로 시작한다. 결과 FIFO에 자리가 없으면(res_ok = 0) go를 내지 않는다.
+//   Batch 안에서는 도착 순서대로 시작한다. 결과 FIFO에 자리가 없으면(res_ok = 0) go를 내지 않는다.
 // 완료: done마다 그 추론의 {트랙, 시작·완료 시각, batch 크기, 출력, 16 bit 포화, DDR3 트랙}을 result로 넘긴다.
 
 module track_scheduler #(
     parameter N_MODELS = 40,
-    parameter N_ONCHIP = 768,
+    parameter N_ON_CHIP = 768,
     parameter EW       = 2
 )(
     input  wire          clk,
@@ -37,7 +37,7 @@ module track_scheduler #(
     input  wire          pl_ready,
     input  wire          pl_done,
     input  wire [EW-1:0] pl_entry,
-    // membrane potential 준비
+    // Membrane potential 준비
     output reg           pf_valid,
     output reg  [9:0]    pf_track,
     output reg           pf_reset,
@@ -158,7 +158,7 @@ module track_scheduler #(
                     rdc      <= 1'b0;
                     ms       <= M_READ;
                 end
-            M_READ: begin                                   // req_table 읽기 latency 2
+            M_READ: begin                                   // req_table 읽기 지연 2
                 rdc <= 1'b1;
                 if (rdc) begin
                     go_x     <= xr_data[319:0];
@@ -196,7 +196,7 @@ module track_scheduler #(
 
             if (done) begin
                 cp_valid <= 1'b1;
-                cp_data  <= {r_track, r_t0, now_us, r_bn, out_mem0, out_mem1, sat16, r_track >= N_ONCHIP};
+                cp_data  <= {r_track, r_t0, now_us, r_bn, out_mem0, out_mem1, sat16, r_track >= N_ON_CHIP};
             end
         end
     end

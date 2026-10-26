@@ -9,7 +9,7 @@ SNN은 multiply가 단순해도 weight 이동 비용이 크다. SpikeX는 weight
 
 ## 2. 방법
 
-- DRAM → global buffer → local double buffer의 3단 memory hierarchy
+- DRAM → global buffer → local double buffer의 3단 메모리 hierarchy
 - 여러 timestep을 time window로 묶어 weight reuse
 - activation tag가 0이면 관련 weight read 생략
 - layer별 time-window 크기 탐색
@@ -21,11 +21,11 @@ SNN은 multiply가 단순해도 weight 이동 비용이 크다. SpikeX는 weight
 
 | 항목 | 논문 결과 |
 |---|---:|
-| FC layer energy 중 memory | 62 % |
-| 전체 energy 중 weight access | 40.1 % |
-| 전체 energy 중 DRAM | 1.7 % |
+| FC layer energy 중 메모리 | 62% |
+| 전체 energy 중 weight access | 40.1% |
+| 전체 energy 중 DRAM | 1.7% |
 | 매우 낮은 spike rate latency | 최대 7.11배 개선 |
-| PTB 대비 EDP | 15.1~150.87배 개선 |
+| PTB 대비 EDP | 15.1–150.87배 개선 |
 
 Weight access와 DRAM access는 같은 항목이 아니다. 위 수치를 우리 시스템에 그대로 적용하면 안 된다.
 

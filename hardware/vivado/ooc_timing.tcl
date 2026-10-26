@@ -1,7 +1,7 @@
 # ============================================================
 # ooc_timing.tcl — RTL wrapper의 100 MHz out-of-context 합성·배치·배선
 # ============================================================
-# 실행 (저장소 루트에서). 인자는 wrapper 이름 앞부분: p41(compute array), p42(+ membrane storage)
+# 실행 (저장소 루트에서). 인자는 wrapper 이름 앞부분: p41(compute array), p42(+ Membrane Storage)
 #   vivado -mode batch -nojournal -nolog -source hardware/vivado/ooc_timing.tcl -tclargs p42
 # 두 번째 인자로 hardware/src의 module을 top으로 줄 수 있다(wrapper 없이): -tclargs p44 accel_core
 # wrapper: hardware/vivado/<인자>_timing_top.v, RTL: hardware/src/*.v 전부

@@ -2,15 +2,15 @@
 //
 // AXI4 master 256 bit 하나로 MIG에 붙는다. 우선순위는 membrane potential 읽기 > 쓰기 > weight 적재(04 §5).
 //   - 읽기 주소 채널에는 membrane potential 읽기를 먼저 올린다.
-//   - membrane potential 쓰기가 기다리거나 진행 중이면 weight burst를 새로 내지 않는다.
+//   - Membrane potential 쓰기가 기다리거나 진행 중이면 weight burst를 새로 내지 않는다.
 //     MIG는 읽기 우선(RD_PRI_REG)이라 weight 읽기가 이어지면 쓰기가 밀린다.
 // weight 적재: weight_cache가 ld_busy를 올리면 slot(model_base + ld_model × 256 KiB)의 앞 4,114 beat(131,648 B)를
 //   WB beat burst로 읽는다. 동시에 W_OUT개까지 내보낸다(P3.1: 16 beat burst 4개면 순차 읽기 3.015 GB/s).
-//   beat 0~45는 params row, 46부터는 beat 2개가 word 하나다(앞 beat = word bit [255:0], word 주소 = (beat − 46) / 2,
+//   beat 0–45는 params row, 46부터는 beat 2개가 word 하나다(앞 beat = word bit [255:0], word 주소 = (beat − 46) / 2,
 //   02_MODEL.md §6). 마지막 word를 쓰는 cycle에 ld_done을 준다.
-// membrane potential: membrane_buf의 전송 하나 = burst 하나(34 beat). 받는 쪽은 멈추지 않는다.
-// 읽기 data는 ID로 나눈다(weight 0, membrane potential 1). ID가 다르면 slave가 순서를 바꾸거나 beat를 섞어도 된다.
-// 쓰기 data는 주소 handshake 뒤에만 낸다. 오류 응답(SLVERR·DECERR)이면 err 1 cycle과 그 전송의 시작 주소
+// Membrane potential: membrane_buf의 전송 하나 = burst 하나(34 beat). 받는 쪽은 멈추지 않는다.
+// 읽기 데이터는 ID로 나눈다(weight 0, membrane potential 1). ID가 다르면 slave가 순서를 바꾸거나 beat를 섞어도 된다.
+// 쓰기 데이터는 주소 handshake 뒤에만 낸다. 오류 응답(SLVERR·DECERR)이면 err 1 cycle과 그 전송의 시작 주소
 // (weight는 slot 주소)를 낸다. 같은 cycle에 두 오류가 나면 쓰기 쪽만 낸다.
 // rst는 idle일 때만 준다. 나가 있는 burst가 있으면 그 응답을 다음 전송의 것으로 잘못 센다.
 
@@ -32,7 +32,7 @@ module dma #(
     output reg          wr_pwe,
     output reg  [5:0]   wr_paddr,
     output reg  [255:0] wr_pdata,
-    // membrane potential (membrane_buf)
+    // Membrane potential (membrane_buf)
     input  wire         dr_req_valid,
     output wire         dr_req_ready,
     input  wire [31:0]  dr_req_addr,
@@ -76,7 +76,7 @@ module dma #(
 
     localparam [12:0] LD_BEATS = 13'd4114;   // params 46 + weight 4,068 beat = 131,648 B
     localparam [12:0] P_BEATS  = 13'd46;
-    localparam [7:0]  MS_LEN   = 8'd33;      // membrane potential 34 beat
+    localparam [7:0]  MS_LEN   = 8'd33;      // Membrane potential 34 beat
 
     // ---------------- 읽기 주소 ----------------
     reg           w_act;                     // 이번 적재를 맡음(ld_busy가 내려갈 때까지)
@@ -93,7 +93,7 @@ module dma #(
                          && !dr_req_valid && !dw_req_valid && !mw_busy;
     assign dr_req_ready = mr_go;
 
-    // ---------------- 읽기 data (1단 register 뒤 나눔) ----------------
+    // ---------------- 읽기 데이터 (1단 register 뒤 나눔) ----------------
     reg         r_v, r_id, r_last;
     reg  [1:0]  r_resp;
     reg  [255:0] r_data;
@@ -175,7 +175,7 @@ module dma #(
     end
 
     // ---------------- 쓰기 ----------------
-    reg        w_open;                       // 주소 handshake 뒤 마지막 data beat까지
+    reg        w_open;                       // 주소 handshake 뒤 마지막 데이터 beat까지
     reg  [5:0] w_cnt;
     wire       mw_go = dw_req_valid && !mw_busy;
 

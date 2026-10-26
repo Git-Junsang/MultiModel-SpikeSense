@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""p3_regs.py — P3 측정 설계(p3_top)의 레지스터 접근 (FPGA Host, root 권한)
+"""p3_regs.py — P3 측정 설계(p3_top)의 register 접근 (FPGA Host, root 권한)
 
 BAR0(XDMA AXI-Lite 마스터, 64 KiB)를 mmap해 32 bit 단위로 읽고 쓴다.
 XDMA 드라이버가 적재되어 있으면 /dev/xdma0_user를, 없으면
-/sys/bus/pci/devices/<BDF>/resource0을 연다. 레지스터 지도는 p3_core.v 머리말과 같다.
+/sys/bus/pci/devices/<BDF>/resource0을 연다. register 지도는 p3_core.v 머리말과 같다.
 
     sudo python3 p3_regs.py            # ID·상태·시각 출력
-    sudo python3 p3_regs.py rd 0x8     # 한 레지스터 읽기
+    sudo python3 p3_regs.py rd 0x8     # 한 register 읽기
     sudo python3 p3_regs.py wr 0x44 1  # 쓰기
 """
 import glob
@@ -88,7 +88,7 @@ class P3:
         return {'calib': s & 1, 'lnk_up': (s >> 1) & 1, 'busy': (s >> 2) & 1,
                 'done': (s >> 3) & 1, 'ddr_sel': (s >> 4) & 1, 'narrow': (s >> 5) & 1}
 
-    # ---------------- 트래픽 생성기 ----------------
+    # ---------------- Traffic 생성기 ----------------
     def run(self, write=False, verify=False, amode='seq', pipe=False, base=0, xfer_beats=128,
             burst_max=128, n=1, max_outst=16, stride=0x21000, slot_cnt=40, slot_mask=63,
             addr_mask=(1 << 25) - 1, wrap=0, seed=0x12345678, gap=0, log_mask=0,
@@ -117,7 +117,7 @@ class P3:
             time.sleep(0.0005)
         res = {
             'cycles': self.r64('CYCLES'), 'beats': self.r64('BEATS'), 'xfers': self.r('XFERS'),
-            'lat_min': self.r('LAT_MIN'), 'lat_max': self.r('LAT_MAX'), 'lat_sum': self.r64('LAT_SUM'),
+            'delay_min': self.r('LAT_MIN'), 'delay_max': self.r('LAT_MAX'), 'delay_sum': self.r64('LAT_SUM'),
             'fst_min': self.r('FST_MIN'), 'fst_max': self.r('FST_MAX'), 'fst_sum': self.r64('FST_SUM'),
             'err_cnt': self.r('ERR_CNT'), 'err_addr': self.r('ERR_ADDR'),
             'proto_err': self.r('PROTO_ERR'), 'ax_stall': self.r('AX_STALL'),
@@ -127,11 +127,11 @@ class P3:
         res['sec'] = res['cycles'] / UI_HZ
         res['GBps'] = res['bytes'] / res['sec'] / 1e9 if res['cycles'] else 0.0
         if read_log:
-            lat, fst = [], []
+            delay, fst = [], []
             for i in range(res['log_n']):
                 fst.append(self.rd(LOG_BASE + 8 * i))
-                lat.append(self.rd(LOG_BASE + 8 * i + 4))
-            res['log_lat'] = lat
+                delay.append(self.rd(LOG_BASE + 8 * i + 4))
+            res['log_delay'] = delay
             res['log_fst'] = fst
         return cfg, res
 

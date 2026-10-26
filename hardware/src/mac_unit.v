@@ -4,7 +4,7 @@
 //   p = acc_clr ? m : p + m,   m = (a + d) × b
 //
 // layer별 사용 (03_ARCHITECTURE.md §4):
-//   layer 1     a = W1, d = 0,          b = mel 입력 x_q (0~127)
+//   layer 1     a = W1, d = 0,          b = mel 입력 x_q (0–127)
 //   layer 2·3   a = W(spike 1), d = W(spike 2) 또는 0, b = 1 (빈 cycle은 b = 0)
 //   layer 4     a = W4[k][j], d = 0,    b = s3[j]
 //

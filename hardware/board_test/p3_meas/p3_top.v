@@ -1,19 +1,19 @@
 // ============================================================
-// p3_top.v — P3.1~P3.3 측정 설계 탑 (DDR3 대역폭·지연, PCIe 지연, 자원)
+// p3_top.v — P3.1~P3.3 측정 설계 탑 (DDR3 bandwidth·지연, PCIe 지연, 자원)
 // ============================================================
 // 구성
 //   mig_ddr3   : P1.6과 같은 MIG 설정(AXI 256 bit, UI 100 MHz). 주소 매핑은
 //                build_p3.tcl의 -addr_map으로 고른다.
 //   p3_bd      : XDMA(Gen2 ×2) + JTAG-AXI + SmartConnect + BRAM 64 KiB (p3_bd.tcl)
-//   p3_core    : 레지스터(AXI-Lite) + 트래픽 생성기(ddr_tgen)
-//   정적 MUX   : MIG AXI 포트를 트래픽 생성기(ddr_sel=0) 또는 Host DMA(ddr_sel=1)에 연결.
+//   p3_core    : register(AXI-Lite) + traffic 생성기(ddr_tgen)
+//   정적 MUX   : MIG AXI 포트를 traffic 생성기(ddr_sel=0) 또는 Host DMA(ddr_sel=1)에 연결.
 //                전환은 양쪽이 모두 쉬고 있을 때만 한다(소프트웨어 규칙).
-//                트래픽 생성기가 MIG에 직접 붙으므로 DDR3 측정에 인터커넥트 지연이 섞이지 않는다.
+//                Traffic 생성기가 MIG에 직접 붙으므로 DDR3 측정에 인터커넥트 지연이 섞이지 않는다.
 //
 // 리셋: PCIe PERST#(L16)를 XDMA sys_rst_n에 그대로 연결한다(Xilinx 예제와 같다).
 //       MIG sys_rst는 RESET 버튼(Active-Low).
 //
-// LED (캐리어 Active-Low): LED1 calib, LED2 user_lnk_up, LED3 트래픽 생성기 동작, LED4 ui_clk 점멸
+// LED (캐리어 Active-Low): LED1 calib, LED2 user_lnk_up, LED3 traffic 생성기 동작, LED4 ui_clk 점멸
 // VIO (ui_clk): calib, lnk_up(동기화), tg_busy, 하트비트 — PCIe·AXI 경로가 죽었을 때의 확인용
 // ============================================================
 `timescale 1ns / 1ps
@@ -105,7 +105,7 @@ module p3_top (
 
     // ---------------- 블록 디자인 ----------------
     wire         lnk_up;
-    // Host DDR 포트 (ui_clk)
+    // Host DDR3 포트 (ui_clk)
     wire [31:0]  h_awaddr, h_araddr;
     wire [7:0]   h_awlen, h_arlen;
     wire [2:0]   h_awsize, h_arsize;
@@ -116,7 +116,7 @@ module p3_top (
     wire         h_wlast, h_wvalid, h_wready;
     wire [1:0]   h_bresp, h_rresp;
     wire         h_bvalid, h_bready, h_rlast, h_rvalid, h_rready;
-    // 레지스터 포트 (ui_clk)
+    // register 포트 (ui_clk)
     wire [31:0]  l_awaddr, l_araddr, l_wdata, l_rdata;
     wire         l_awvalid, l_awready, l_wvalid, l_wready, l_bvalid, l_bready;
     wire         l_arvalid, l_arready, l_rvalid, l_rready;
@@ -149,7 +149,7 @@ module p3_top (
         .M_AXIL_REG_rvalid(l_rvalid), .M_AXIL_REG_rready(l_rready)
     );
 
-    // ---------------- 레지스터 + 트래픽 생성기 ----------------
+    // ---------------- register + traffic 생성기 ----------------
     wire         ddr_sel, narrow_clr, tg_busy;
     reg          narrow_seen;
     wire [29:0]  t_awaddr, t_araddr;
@@ -182,7 +182,7 @@ module p3_top (
         .m_rresp(t_rresp)
     );
 
-    // ---------------- 정적 MUX (sel: 0 = 트래픽 생성기, 1 = Host) ----------------
+    // ---------------- 정적 MUX (sel: 0 = traffic 생성기, 1 = Host) ----------------
     wire s = ddr_sel;
     assign mi_awaddr  = s ? h_awaddr[29:0] : t_awaddr;
     assign mi_awlen   = s ? h_awlen   : t_awlen;
@@ -246,7 +246,7 @@ module p3_top (
 
 `ifdef P3_FIT
     // ---------------- BRAM 적합성 실험 (P3.2·P3.4, build_p3.tcl -fit) ----------------
-    // 트래픽 생성기의 DDR3 읽기 데이터를 weight cache 쓰기(fill)로 쓴다.
+    // Traffic 생성기의 DDR3 읽기 데이터를 weight cache 쓰기(fill)로 쓴다.
     wire [31:0] fit_sig;
     mem_fit #(.N_ENT(`FIT_N_ENT), .SLICE_BUF(`FIT_SLICE_BUF), .BV_ALL40(`FIT_BV_ALL40),
               .Q_BRAM(`FIT_Q_BRAM)) u_fit (

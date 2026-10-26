@@ -1,4 +1,4 @@
-"""part_jitter.py — Host 처리 지연 분포(Jitter). 분포마다 class 하나다. 분포의 꼴은 simulation_engine.md §4.2"""
+"""part_jitter.py — Host 처리 지연 분포(jitter). 분포마다 class 하나다. 분포의 꼴은 simulation_engine.md §4.2"""
 import functools
 import os
 
@@ -12,8 +12,8 @@ class Jitter:
     """Host 처리 지연 분포 공통(Host 도착 → 준비, µs). 추론 요청열은 draw로 뽑고 PNU는 delta·quantile·max_us만 쓴다.
     분포 class는 _draw(난수, 트랙 n, 주기 K)와 _surv(x)를 정하고, 최대가 J와 다르면 max_us도 정한다. max_us가 0 이하면
     지연이 없다. trace는 기록을 재생하므로 draw와 _quantile을 직접 정한다"""
-    TAIL_SHARE, TAIL_SPLIT_US = 0.05, 800.0   # tail·burst: 5 %, 추론 요청별 지연의 기본 폭 0.8 ms
-    closed_form = False                       # δ에 닫힌 식 (J − e) / (r + 1)을 쓴다(균등 분포)
+    TAIL_SHARE, TAIL_SPLIT_US = 0.05, 800.0   # tail·burst: 5%, 추론 요청별 지연의 기본 폭 0.8 ms
+    closed_form = False                       # δ에 닫힌 식 (J − e) / (r + 1)을 쓴다(균등분포)
 
     def __init__(self, jitter_us=0.0):
         self.jitter_us, self._memo = float(jitter_us), {}
@@ -124,12 +124,12 @@ class TailJitter(Jitter):
 
 
 class Tail1Jitter(TailJitter):
-    """tail1: tail과 같은 꼴로 1 %"""
+    """tail1: tail과 같은 꼴로 1%"""
     share = 0.01
 
 
 class BurstJitter(Jitter):
-    """burst: 주기마다 확률 5 %로 모든 추론 요청에 공통 U(0, J), 그 위에 추론 요청마다 U(0, b). b = min(0.8 ms, J)"""
+    """burst: 주기마다 확률 5%로 모든 추론 요청에 공통 U(0, J), 그 위에 추론 요청마다 U(0, b). b = min(0.8 ms, J)"""
 
     def __init__(self, jitter_us=0.0):
         super().__init__(jitter_us)
@@ -158,7 +158,7 @@ class CommonDelayJitter(Jitter):
 
 
 class TraceJitter(Jitter):
-    """trace: 측정 기록 재생. 모델 묶음 지연 표(epoch, model_id, delay_us. 행 = 모델)나 추론 요청별 기록(epoch, track_id, t_gen_us,
+    """trace: 측정 기록 재생. 모델 그룹 지연 표(period, model_id, delay_us. 행 = 모델)나 추론 요청별 기록(period, track_id, t_host_us,
     t_ready_us. 행 = 트랙)을 읽는다. 앞 절반 주기는 분포 추정(calib), 뒤 절반은 재생(replay). 빠진 칸은 그 행의 중앙값"""
 
     def __init__(self, trace):
@@ -167,12 +167,12 @@ class TraceJitter(Jitter):
         self.by_model = 'track_id' not in rows[0]
         col = 'model_id' if self.by_model else 'track_id'
         trk = sorted({int(r[col]) for r in rows})
-        eps = sorted({int(r['epoch']) for r in rows})
+        eps = sorted({int(r['period']) for r in rows})
         ti, ei = {t: i for i, t in enumerate(trk)}, {k: i for i, k in enumerate(eps)}
         D = np.full((len(trk), len(eps)), np.nan)
         for r in rows:
-            D[ti[int(r[col])], ei[int(r['epoch'])]] = (float(r['delay_us']) if self.by_model
-                                                       else float(r['t_ready_us']) - float(r['t_gen_us']))
+            D[ti[int(r[col])], ei[int(r['period'])]] = (float(r['delay_us']) if self.by_model
+                                                       else float(r['t_ready_us']) - float(r['t_host_us']))
         if np.isnan(D).any():
             D = np.where(np.isnan(D), np.nanmedian(D, 1, keepdims=True), D)
         half = max(1, len(eps) // 2)
@@ -180,7 +180,7 @@ class TraceJitter(Jitter):
         self.max_us = float(self.calib.max())
 
     def draw(self, seed, n, K):
-        """행·주기를 돌려 쓴다. 묶음 표는 seed마다 다른 주기부터. 난수는 쓰지 않는다"""
+        """행·주기를 돌려 쓴다. 모델 그룹 지연 표는 seed마다 다른 주기부터. 난수는 쓰지 않는다"""
         T, E = self.replay.shape
         s = seed * K if self.by_model else 0
         return self.replay[np.arange(n)[:, None] % T, (s + np.arange(K))[None, :] % E]

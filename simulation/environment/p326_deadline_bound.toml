@@ -1,13 +1,13 @@
-# P3.26 E6 deadline 분석의 조건부 응답 시간(sim_mode = "bound", 05 §6.1). 시뮬레이션 없이 식으로 계산한다.
-# R_single = N·C_dense + M·L_weight + N_DDR·C_state(모델·주기마다 단일 적재 가정), R_cond = H + d_in,max + R_single + d_out,max,
-# H = G_max(host_group_trace 표의 최대) + J. 링크 지연은 PCIe 64 B 표본 최대(Ethernet 미측정). C_dense는 모든 입력 spike 1,205 cycle
+# P3.26 E6 deadline 분석의 조건부 response time(sim_mode = "bound", 05 §6.1). Simulation 없이 식으로 계산한다.
+# R_single = N·C_dense + M·L_weight + N_DDR3·C_state(모델·주기마다 단일 적재 가정), R_cond = H + d_in,max + R_single + d_out,max,
+# H = G_max(host_model_group_delay_trace 표의 최대) + J. 링크 지연은 PCIe 64 B 표본 최대(Ethernet 미측정). C_dense는 모든 입력 spike 1,205 cycle
 # 송신: 즉시 | 모아 보내기(D = G_max + J). packet 분할과 cache 초기 상태는 식에 들어가지 않는다. 탐색은 p326_deadline_adversarial
 
 sim_mode = "bound"
-sim_scenarios = ["U", "K"]
+sim_scenarios = ["uniform", "skewed"]
 sim_seeds = 1
 sim_seed0 = 0
-sim_warm_periods = 4
+sim_warmup_periods = 4
 sim_meas_periods = 16
 model_size = "L"
 model_count = 40
@@ -18,13 +18,13 @@ compute_ctrl_scale = 1.0
 membrane_place = "split"
 membrane_bits = 12
 bram_reserve_tiles = 25.5
-ddr_bw_mbps = 3015.0
+ddr3_bandwidth_mbps = 3015.0
 track_count = 1024
-host_offset = "model"
+host_offset = "offset_assignment"
 host_jitter_ms = 0.8
 host_jitter_dist = "uniform"
 host_jitter_trace = ""
-host_group_trace = "hardware/board_test/p325_meas/result/m3_group_pin3_load0.csv.gz"
+host_model_group_delay_trace = "hardware/board_test/p325_meas/result/m3_group_pin3_load0.csv.gz"
 host_gather_ms = 0.0
 host_gather_to_max = false
 host_packet_gap_us = 0.0
@@ -44,10 +44,10 @@ tune_conds = []
 
 [sweep]
 host = [
-  {label = "M3 CPU 고정·부하 8", host_group_trace = "hardware/board_test/p325_meas/result/m3_group_pin3_load8.csv.gz"},
-  {label = "M3 CPU 고정·부하 없음", host_group_trace = "hardware/board_test/p325_meas/result/m3_group_pin3_load0.csv.gz"},
-  {label = "M3 CPU 고정 없음·부하 8", host_group_trace = "hardware/board_test/p325_meas/result/m3_group_pin-none_load8.csv.gz"},
-  {label = "M3 CPU 고정 없음·부하 없음", host_group_trace = "hardware/board_test/p325_meas/result/m3_group_pin-none_load0.csv.gz"},
+  {label = "M3 CPU 고정·부하 8", host_model_group_delay_trace = "hardware/board_test/p325_meas/result/m3_group_pin3_load8.csv.gz"},
+  {label = "M3 CPU 고정·부하 없음", host_model_group_delay_trace = "hardware/board_test/p325_meas/result/m3_group_pin3_load0.csv.gz"},
+  {label = "M3 CPU 고정 없음·부하 8", host_model_group_delay_trace = "hardware/board_test/p325_meas/result/m3_group_pin-none_load8.csv.gz"},
+  {label = "M3 CPU 고정 없음·부하 없음", host_model_group_delay_trace = "hardware/board_test/p325_meas/result/m3_group_pin-none_load0.csv.gz"},
 ]
 host_jitter_ms = [0.0, 0.8, 3.2]
 cache_entries = [2, 4]

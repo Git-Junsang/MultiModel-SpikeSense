@@ -13,7 +13,7 @@
   (옛 결과 파일의 tag L·XL·L_aug·XL_aug가 차례로 이 이름이다)
 
 판정 (결과를 보기 전에 정함):
-  XL 채택 = T1에서 XL_mixed_aug − L_mixed_aug 평균 ≥ +0.01, 95 % 신뢰구간 하한 > 0, 그리고 T0에서 XL_mixed_aug ≥ L_normal_noaug − 0.005
+  XL 채택 = T1에서 XL_mixed_aug − L_mixed_aug 평균 ≥ +0.01, 95% 신뢰구간 하한 > 0, 그리고 T0에서 XL_mixed_aug ≥ L_normal_noaug − 0.005
 
 결과: train_result/eval/overlap/{results.csv, summary.md}
     python3 model/eval/overlap.py --tags L_normal_noaug XL_normal_noaug L_mixed_aug XL_mixed_aug
@@ -110,8 +110,8 @@ def summary(rows, tags):
            "|---|" + "---:|" * len(CONDS)]
     for t in tags:
         out.append(f"| {t} | " + " | ".join(f"{v(t, c).mean():.4f} ({v(t, c, valve).mean():.3f})" for c in CONDS) + " |")
-    out += ["\n## 짝지은 비교 (같은 장비끼리, 95 % 신뢰구간, Wilcoxon)\n",
-            "| 비교 | 조건 | 차 | 95 % 신뢰구간 | p | 나음 / 나쁨 |", "|---|---|---:|---|---:|---:|"]
+    out += ["\n## 짝지은 비교 (같은 장비끼리, 95% 신뢰구간, Wilcoxon)\n",
+            "| 비교 | 조건 | 차 | 95% 신뢰구간 | p | 나음 / 나쁨 |", "|---|---|---:|---|---:|---:|"]
     comps = [(a, b) for a, b in ((LA, L), (XL, L), (XLA, LA), (XLA, L)) if a in tags and b in tags]
     if L in tags:
         for c in CONDS[1:]:

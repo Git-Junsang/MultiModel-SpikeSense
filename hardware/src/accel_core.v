@@ -1,19 +1,19 @@
-// accel_core.v — compute_array, weight_cache, membrane_storage, dma를 묶은 연산 경로 (03_ARCHITECTURE.md §2·§3)
+// accel_core.v — compute_array, weight_cache, membrane_storage, DMA를 묶은 연산 경로 (03_ARCHITECTURE.md §2·§3)
 //
-// scheduler(track_scheduler, P4.5)가 쓰는 port:
-//   교체 계획 pl_*   weight_cache 그대로. batch i를 연산하는 동안 batch i+1의 모델을 알리면 miss일 때 dma가
-//                   그 entry에 적재한다(prefetch). batch i+1이 시작된 뒤에 batch i+2를 알린다(연산 중 entry 보호).
+// Scheduler(track_scheduler, P4.5)가 쓰는 port:
+//   교체 계획 pl_*   weight_cache 그대로. Batch i를 연산하는 동안 batch i+1의 모델을 알리면 miss일 때 DMA가
+//                   그 entry에 적재한다(prefetch). Batch i+1이 시작된 뒤에 batch i+2를 알린다(연산 중 entry 보호).
 //   준비 pf_*        membrane_storage 그대로. DDR3 트랙은 연산 전에 준비한다.
-//   추론 go_*        go_valid를 올리고 그 batch의 entry(pl_entry), 트랙, 입력을 둔다. compute array가 비고,
+//   추론 go_*        go_valid를 올리고 그 batch의 entry(pl_entry), 트랙, 입력을 둔다. Compute array가 비고,
 //                   그 entry의 적재가 끝났고, membrane potential이 준비되면 받는다(go_ready, 그 cycle에 시작).
 //   결과            done·out_mem은 compute_array, wb_done은 DDR3 트랙의 되쓰기 응답(결과는 그 뒤에 보낸다).
-// compute array가 비었는데 적재나 membrane potential 준비 때문에 go를 받지 못한 cycle을 stall_cyc로 센다
-// (CMP_STALL, 06_HOST_INTERFACE.md §7). DDR3는 dma의 AXI4 master 하나로 MIG에 붙는다.
+// Compute array가 비었는데 적재나 membrane potential 준비 때문에 go를 받지 못한 cycle을 stall_cyc로 센다
+// (CMP_STALL, 06_HOST_INTERFACE.md §7). DDR3는 DMA의 AXI4 master 하나로 MIG에 붙는다.
 
 module accel_core #(
     parameter E        = 4,
     parameter N_MODELS = 40,
-    parameter N_ONCHIP = 768,
+    parameter N_ON_CHIP = 768,
     parameter EW       = (E > 1) ? $clog2(E) : 1
 )(
     input  wire                clk,
@@ -23,8 +23,8 @@ module accel_core #(
     // predictor 시각·설정·도착·queue
     input  wire [31:0]         now_us,
     input  wire [14:0]         phase_us,
-    input  wire [15:0]         epoch,
-    input  wire                first_epoch,
+    input  wire [15:0]         period,
+    input  wire                first_period,
     input  wire                cfg_we,
     input  wire [10:0]         cfg_addr,
     input  wire [15:0]         cfg_data,
@@ -42,7 +42,7 @@ module accel_core #(
     output wire                pl_hit,
     output wire                pl_evict,
     output wire [5:0]          pl_victim,
-    // membrane potential 준비
+    // Membrane potential 준비
     input  wire                pf_valid,
     input  wire [9:0]          pf_track,
     input  wire                pf_reset,
@@ -130,7 +130,7 @@ module accel_core #(
 
     weight_cache #(.E(E), .N_MODELS(N_MODELS)) u_wc (
         .clk(clk), .rst(rst),
-        .now_us(now_us), .phase_us(phase_us), .epoch(epoch), .first_epoch(first_epoch),
+        .now_us(now_us), .phase_us(phase_us), .period(period), .first_period(first_period),
         .cfg_we(cfg_we), .cfg_addr(cfg_addr), .cfg_data(cfg_data),
         .arr_valid(arr_valid), .arr_model(arr_model), .arr_t_host(arr_t_host), .arr_n_expect(arr_n_expect),
         .q_ne(q_ne),
@@ -153,7 +153,7 @@ module accel_core #(
         .sat16(sat16), .dbg_cur(), .dbg_mem_sat(), .dbg_spk()
     );
 
-    membrane_storage #(.N_ONCHIP(N_ONCHIP)) u_ms (
+    membrane_storage #(.N_ON_CHIP(N_ON_CHIP)) u_ms (
         .clk(clk), .rst(rst), .state_base(state_base),
         .track(go_track), .can_start(can_start), .start(start), .done(done),
         .wb_done(wb_done), .wb_track(wb_track),

@@ -63,7 +63,7 @@ def write_vector(npz_path, out, v):
     x = d["input"].astype(np.uint8)
     (out / f"v{v:02d}_x.hex").write_text(hex_lines(x))
 
-    # 뉴런 706개를 row 45개 × 16 lane으로 편다(layer 4 lane 2~15는 0)
+    # 뉴런 706개를 row 45개 × 16 lane으로 편다(layer 4 lane 2–15는 0)
     def rows(key):
         a = np.concatenate([d[f"{key}_l{l + 1}"] for l in range(4)], axis=1).astype(np.int64)
         a = np.concatenate([a, np.zeros((T, ROWS * 16 - a.shape[1]), np.int64)], axis=1)

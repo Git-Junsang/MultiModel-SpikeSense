@@ -7,7 +7,7 @@ W=hardware/sim/eth
 M=$HOME/mmss_build/verilator_eth
 IP=hardware/ip/verilog-ethernet
 VEN="$(ls $IP/rtl/*.v $IP/lib/axis/rtl/*.v)"
-SRC="hardware/src/eth_link.v hardware/src/ctrl.v"
+SRC="hardware/src/mdio_master.v hardware/src/eth_link.v hardware/src/ctrl.v"
 TB=hardware/testbench/tb_eth.sv
 SIMS="${SIMS:-xsim verilator}"
 mkdir -p "$W"
@@ -15,7 +15,7 @@ printf '`verilator_config\nlint_off -file "*/verilog-ethernet/*"\nlint_off -rule
 
 L="verilator --lint-only -Wall -Wno-DECLFILENAME -Wno-UNUSEDSIGNAL"
 $L --top-module ctrl hardware/src/ctrl.v
-$L -Wno-PINCONNECTEMPTY --top-module eth_link "$W/vendor.vlt" hardware/src/eth_link.v $VEN
+$L -Wno-PINCONNECTEMPTY --top-module eth_link "$W/vendor.vlt" hardware/src/mdio_master.v hardware/src/eth_link.v $VEN
 echo "LINT OK"
 
 for s in $SIMS; do

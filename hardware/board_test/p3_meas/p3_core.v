@@ -1,10 +1,10 @@
 // ============================================================
-// p3_core.v — P3 측정 설계의 레지스터 블록 + DDR3 트래픽 생성기
+// p3_core.v — P3 측정 설계의 register 블록 + DDR3 traffic 생성기
 // ============================================================
 // ui_clk(100 MHz) 도메인. AXI4-Lite 슬레이브(32 bit, 64 KiB)는 XDMA BAR0와
 // JTAG-AXI가 SmartConnect를 거쳐 접근한다. 쓰기는 32 bit 전체만 지원한다.
 //
-// 레지스터 지도 (바이트 offset)
+// register 지도 (바이트 offset)
 //   0x0000 R   ID = 0x4D4D5033 ("MMP3")
 //   0x0004 R   VERSION
 //   0x0008 R   STATUS  [0] init_calib_complete [1] user_lnk_up [2] tgen busy
@@ -15,12 +15,12 @@
 //   0x0018 W   MARK    쓰면 도착 시각을 MARK_TS에, 값을 MARK_VAL에 남긴다
 //   0x001C R   MARK_TS_LO   0x0020 R MARK_TS_HI   0x0024 R MARK_VAL
 //   0x0040 W   CTRL    [0] start  [1] abort  [2] narrow 플래그 지우기 (쓰기 펄스)
-//   0x0044 RW  DDR_SEL 0 = 트래픽 생성기, 1 = Host(XDMA) — 둘 다 쉬고 있을 때만 바꾼다
+//   0x0044 RW  DDR_SEL 0 = traffic 생성기, 1 = Host(XDMA) — 둘 다 쉬고 있을 때만 바꾼다
 //   0x0048 RW  OPMODE  [0] write [1] verify [3:2] addr_mode [4] pipelined
 //   0x004C RW  BASE        0x0050 RW XFER_BEATS   0x0054 RW BURST_MAX
 //   0x0058 RW  N_XFERS     0x005C RW MAX_OUTST    0x0060 RW STRIDE
 //   0x0064 RW  SLOT_CNT    0x0068 RW SLOT_MASK    0x006C RW ADDR_MASK
-//   0x0070 RW  WRAP        0x0074 RW SEED         0x0078 RW GAP
+//   0x0070 RW  WRAP        0x0074 RW seed         0x0078 RW GAP
 //   0x007C RW  LOG_MASK
 //   0x0100 R   CYCLES_LO/HI(0x0104)   0x0108 R BEATS_LO/HI(0x010C)
 //   0x0110 R   XFERS
@@ -98,7 +98,7 @@ module p3_core #(
     reg [1:0] lnk_s;
     always @(posedge clk) lnk_s <= {lnk_s[0], lnk_up};
 
-    // ---------------- 설정 레지스터 ----------------
+    // ---------------- 설정 register ----------------
     reg [31:0] scratch;
     reg [63:0] mark_ts;
     reg [31:0] mark_val;
@@ -106,10 +106,10 @@ module p3_core #(
     reg [31:0] slot_cnt, slot_mask, addr_mask, wrap, seed, gap, log_mask;
     reg        tg_start, tg_abort;
 
-    // ---------------- 트래픽 생성기 ----------------
+    // ---------------- Traffic 생성기 ----------------
     wire          tg_done;
-    wire [63:0]   r_cycles, r_beats, r_lat_sum, r_fst_sum;
-    wire [31:0]   r_xfers, r_lat_min, r_lat_max, r_fst_min, r_fst_max;
+    wire [63:0]   r_cycles, r_beats, r_delay_sum, r_fst_sum;
+    wire [31:0]   r_xfers, r_delay_min, r_delay_max, r_fst_min, r_fst_max;
     wire [31:0]   r_err_cnt, r_proto_err, r_ax_stall, r_w_stall;
     wire [29:0]   r_err_addr;
     wire [LOG_AW:0] r_log_n;
@@ -126,7 +126,7 @@ module p3_core #(
         .cfg_addr_mask(addr_mask[24:0]), .cfg_wrap(wrap[29:0]), .cfg_seed(seed),
         .cfg_gap(gap[15:0]), .cfg_log_mask(log_mask),
         .r_cycles(r_cycles), .r_beats(r_beats), .r_xfers(r_xfers),
-        .r_lat_min(r_lat_min), .r_lat_max(r_lat_max), .r_lat_sum(r_lat_sum),
+        .r_delay_min(r_delay_min), .r_delay_max(r_delay_max), .r_delay_sum(r_delay_sum),
         .r_fst_min(r_fst_min), .r_fst_max(r_fst_max), .r_fst_sum(r_fst_sum),
         .r_err_cnt(r_err_cnt), .r_err_addr(r_err_addr), .r_proto_err(r_proto_err),
         .r_ax_stall(r_ax_stall), .r_w_stall(r_w_stall), .r_log_n(r_log_n),
@@ -273,10 +273,10 @@ module p3_core #(
                           13'h0042: s_rdata <= r_beats[31:0];
                           13'h0043: s_rdata <= r_beats[63:32];
                           13'h0044: s_rdata <= r_xfers;
-                          13'h0045: s_rdata <= r_lat_min;
-                          13'h0046: s_rdata <= r_lat_max;
-                          13'h0047: s_rdata <= r_lat_sum[31:0];
-                          13'h0048: s_rdata <= r_lat_sum[63:32];
+                          13'h0045: s_rdata <= r_delay_min;
+                          13'h0046: s_rdata <= r_delay_max;
+                          13'h0047: s_rdata <= r_delay_sum[31:0];
+                          13'h0048: s_rdata <= r_delay_sum[63:32];
                           13'h0049: s_rdata <= r_fst_min;
                           13'h004A: s_rdata <= r_fst_max;
                           13'h004B: s_rdata <= r_fst_sum[31:0];

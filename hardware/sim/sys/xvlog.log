@@ -106,6 +106,8 @@ INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙
 INFO: [VRFC 10-311] analyzing module regs
 INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/src/ctrl.v" into library work
 INFO: [VRFC 10-311] analyzing module ctrl
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/src/mdio_master.v" into library work
+INFO: [VRFC 10-311] analyzing module mdio_master
 INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/src/eth_link.v" into library work
 INFO: [VRFC 10-311] analyzing module eth_link
 INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/src/accel_sys.v" into library work

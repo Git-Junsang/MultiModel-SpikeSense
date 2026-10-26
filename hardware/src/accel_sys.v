@@ -4,8 +4,8 @@
 // 제어: Ethernet → eth_link → ctrl → regs(AXI4-Lite) 또는 DDR3 창(AXI4). 응답은 같은 길로 되돌아간다.
 // reset: rst는 전원·MIG reset이고 제어 경로(eth_link, ctrl, regs의 설정)만 받는다. SOFT_RESET이 제어 packet으로 오므로
 //        frontend·accel_core·시각·counter는 regs가 내는 core_rst를 받는다.
-// MIG 입구: run = 1이면 dma, 0이면 ctrl의 DDR3 master. run은 IDLE에서만 바꾼다(06 §6). size 32 B, INCR, wstrb 전부 1,
-//           ID 위 bit 0은 top이 묶는다. dma는 읽기 data를 ID bit 0으로 나누므로 m_axi_rid를 꼭 연결한다.
+// MIG 입구: run = 1이면 DMA, 0이면 ctrl의 DDR3 master. run은 IDLE에서만 바꾼다(06 §6). size 32 B, INCR, wstrb 전부 1,
+//           ID 위 bit 0은 top이 묶는다. DMA는 읽기 데이터를 ID bit 0으로 나누므로 m_axi_rid를 꼭 연결한다.
 
 module accel_sys #(
     parameter        TARGET      = "GENERIC",
@@ -15,7 +15,7 @@ module accel_sys #(
     parameter        E           = 4,
     parameter        N_TRACKS    = 1024,
     parameter        N_MODELS    = 40,
-    parameter        N_ONCHIP    = 768,
+    parameter        N_ON_CHIP    = 768,
     parameter [31:0] VERSION     = 32'h0001_0000,
     parameter        EW          = (E > 1) ? $clog2(E) : 1
 )(
@@ -65,13 +65,13 @@ module accel_sys #(
 );
 
     // ---------------- 신호 ----------------
-    wire         core_rst, cnt_clear, cfg_we, first_epoch;
+    wire         core_rst, cnt_clear, cfg_we, first_period;
     wire [10:0]  n_tracks, cfg_addr, pending_n;
     wire [5:0]   n_models;
     wire [31:0]  model_base, state_base, deadline_us, margin_us, now_us, link_tune;
     wire [63:0]  now_cyc, stall_cyc;
     wire [14:0]  phase_us;
-    wire [15:0]  epoch, cfg_data;
+    wire [15:0]  period, cfg_data;
 
     wire         rq_valid, rq_ready, rs_valid, rs_ready, len_err_valid;
     wire [511:0] rq_data;
@@ -101,7 +101,7 @@ module accel_sys #(
     wire [3:0]   fe_err_code;
     wire [31:0]  fe_err_info;
 
-    // dma(d_*)와 ctrl(c_*) DDR3 master
+    // DMA(d_*)와 ctrl(c_*) DDR3 master
     wire [31:0]  d_araddr, d_awaddr, c_araddr, c_awaddr;
     wire [7:0]   d_arlen, d_awlen, c_arlen, c_awlen;
     wire [255:0] d_wdata, c_wdata;
@@ -110,6 +110,10 @@ module accel_sys #(
 
     assign sys_idle = fe_idle && dma_idle && !busy;
     assign tx_ps    = link_tune[31:16];
+    wire [383:0] link_dbg;                   // eth_link 진단 counter → regs 0x0440–0x046C
+    wire         md_valid, md_busy;          // MDIO 명령(regs 0x0108) → eth_link
+    wire [31:0]  md_cmd;
+    wire [15:0]  md_rdata;
 
     // ---------------- 제어 경로 ----------------
     eth_link #(.TARGET(TARGET), .RX_IDELAY(RX_IDELAY), .PHY_RST_CYC(PHY_RST_CYC)) u_eth (
@@ -121,7 +125,10 @@ module accel_sys #(
         .len_err_valid(len_err_valid), .len_err_info(len_err_info),
         .rs_valid(rs_valid), .rs_ready(rs_ready), .rs_data(rs_data),
         .cq_tdata(cq_tdata), .cq_tvalid(cq_tvalid), .cq_tready(cq_tready), .cq_tlast(cq_tlast),
-        .cr_tdata(cr_tdata), .cr_tvalid(cr_tvalid), .cr_tready(cr_tready), .cr_tlast(cr_tlast), .cr_len(cr_len)
+        .cr_tdata(cr_tdata), .cr_tvalid(cr_tvalid), .cr_tready(cr_tready), .cr_tlast(cr_tlast), .cr_len(cr_len),
+        .md_valid(md_valid), .md_op(md_cmd[31:30]), .md_phy(md_cmd[25:21]), .md_reg(md_cmd[20:16]), .md_wdata(md_cmd[15:0]),
+        .md_busy(md_busy), .md_rdata(md_rdata),
+        .dbg_clr(cnt_clear || core_rst), .dbg_cnt(link_dbg)
     );
 
     ctrl u_ctrl (
@@ -140,7 +147,7 @@ module accel_sys #(
         .m_bresp(m_axi_bresp), .m_bvalid(m_axi_bvalid && !run), .m_bready(c_bready)
     );
 
-    regs #(.N_ENTRY(E), .N_ONCHIP(N_ONCHIP), .VERSION(VERSION), .LINK_TUNE0({TX_PS, 11'd0, RX_IDELAY[4:0]})) u_regs (
+    regs #(.N_ENTRY(E), .N_ON_CHIP(N_ON_CHIP), .VERSION(VERSION), .LINK_TUNE0({TX_PS, 11'd0, RX_IDELAY[4:0]})) u_regs (
         .clk(clk), .rst(rst),
         .s_axil_awaddr(l_awaddr), .s_axil_awvalid(l_awvalid), .s_axil_awready(l_awready),
         .s_axil_wdata(l_wdata), .s_axil_wstrb(l_wstrb), .s_axil_wvalid(l_wvalid), .s_axil_wready(l_wready),
@@ -149,20 +156,21 @@ module accel_sys #(
         .s_axil_rdata(l_rdata), .s_axil_rresp(l_rresp), .s_axil_rvalid(l_rvalid), .s_axil_rready(l_rready),
         .mig_calib(mig_calib), .sys_idle(sys_idle),
         .run(run), .core_rst(core_rst), .cnt_clear(cnt_clear),
+        .md_valid(md_valid), .md_cmd(md_cmd), .md_busy(md_busy), .md_rdata(md_rdata),
         .n_tracks(n_tracks), .n_models(n_models), .model_base(model_base), .state_base(state_base),
         .deadline_us(deadline_us), .margin_us(margin_us), .link_tune(link_tune),
         .cfg_we(cfg_we), .cfg_addr(cfg_addr), .cfg_data(cfg_data),
-        .now_us(now_us), .now_cyc(now_cyc), .phase_us(phase_us), .epoch(epoch), .first_epoch(first_epoch),
+        .now_us(now_us), .now_cyc(now_cyc), .phase_us(phase_us), .period(period), .first_period(first_period),
         .ev_req_in(ev_req_in), .ev_req_drop(ev_req_drop), .ev_res_out(ev_res_out), .ev_late(ev_late),
         .ev_batch(ev_batch), .ev_load(ev_load), .ev_sat(ev_sat), .ev_state_xfer(ev_state_xfer),
-        .pending_n(pending_n), .cmp_busy(busy), .stall_cyc(stall_cyc),
+        .pending_n(pending_n), .cmp_busy(busy), .stall_cyc(stall_cyc), .link_dbg(link_dbg),
         .err0_valid(fe_err_valid), .err0_code(fe_err_code), .err0_info(fe_err_info),
         .err1_valid(dma_err), .err1_info(dma_err_addr),
         .err2_valid(len_err_valid), .err2_info(len_err_info)
     );
 
     // ---------------- 연산 경로 ----------------
-    frontend #(.N_TRACKS(N_TRACKS), .N_MODELS(N_MODELS), .N_ONCHIP(N_ONCHIP), .EW(EW)) u_fe (
+    frontend #(.N_TRACKS(N_TRACKS), .N_MODELS(N_MODELS), .N_ON_CHIP(N_ON_CHIP), .EW(EW)) u_fe (
         .clk(clk), .rst(core_rst), .run(run), .n_tracks(n_tracks), .n_models(n_models),
         .deadline_us(deadline_us), .margin_us(margin_us), .now_us(now_us),
         .rq_valid(rq_valid), .rq_ready(rq_ready), .rq_data(rq_data),
@@ -177,9 +185,9 @@ module accel_sys #(
         .err_valid(fe_err_valid), .err_code(fe_err_code), .err_info(fe_err_info), .idle(fe_idle)
     );
 
-    accel_core #(.E(E), .N_MODELS(N_MODELS), .N_ONCHIP(N_ONCHIP)) u_core (
+    accel_core #(.E(E), .N_MODELS(N_MODELS), .N_ON_CHIP(N_ON_CHIP)) u_core (
         .clk(clk), .rst(core_rst), .model_base(model_base), .state_base(state_base),
-        .now_us(now_us), .phase_us(phase_us), .epoch(epoch), .first_epoch(first_epoch),
+        .now_us(now_us), .phase_us(phase_us), .period(period), .first_period(first_period),
         .cfg_we(cfg_we), .cfg_addr(cfg_addr), .cfg_data(cfg_data),
         .arr_valid(arr_valid), .arr_model(arr_model), .arr_t_host(arr_t_host), .arr_n_expect(arr_n_expect), .q_ne(q_ne),
         .pl_valid(pl_valid), .pl_model(pl_model), .pl_ready(pl_ready), .pl_done(pl_done),

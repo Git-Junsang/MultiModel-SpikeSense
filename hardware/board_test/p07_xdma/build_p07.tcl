@@ -7,7 +7,7 @@
 # 기본 프로젝트 위치: ~/mmss_build/p07_xdma (공백 없는 경로, build_p06.tcl 참고)
 #
 # 구성: 블록 디자인 p07_bd = XDMA(Gen2 ×2, AXI-MM 64 bit, 125 MHz, H2C 1·C2H 1)
-#       + AXI BRAM 컨트롤러 + 64 KiB BRAM. 탑은 p07_top.v.
+#       + AXI BRAM controller + 64 KiB BRAM. 탑은 p07_top.v.
 # ============================================================
 
 set script_dir [file normalize [file dirname [info script]]]
@@ -62,7 +62,7 @@ make_bd_intf_pins_external -name pcie_mgt [get_bd_intf_pins xdma_0/pcie_mgt]
 foreach p {sys_clk sys_rst_n user_lnk_up} {
     make_bd_pins_external -name $p [get_bd_pins xdma_0/$p]
 }
-# axi_aclk는 BRAM 컨트롤러에 이미 연결되어 있어 make_bd_pins_external이 포트를
+# axi_aclk는 BRAM controller에 이미 연결되어 있어 make_bd_pins_external이 포트를
 # 만들지 않는다. 출력 포트를 직접 만들어 연결한다.
 create_bd_port -dir O -type clk axi_aclk
 connect_bd_net [get_bd_ports axi_aclk] [get_bd_pins xdma_0/axi_aclk]

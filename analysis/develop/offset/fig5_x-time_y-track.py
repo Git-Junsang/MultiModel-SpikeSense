@@ -1,10 +1,10 @@
-"""논문용 offset 배정 개념도 (analysis/discards/develop/alignment/fig3의 사본: 영문, 그림 안 제목 없음, 단 폭 3.5 in, 흰 배경, mic 입력 단 생략). simulation 결과를 쓰지 않는다
+"""논문용 Offset Assignment 개념도 (analysis/discards/develop/alignment/fig3의 사본: 영문, 그림 안 제목 없음, 단 폭 3.5 in, 흰 배경, mic 입력 단 생략). Simulation 결과를 쓰지 않는다
 
 트랙마다 64 ms mel 창이 32 ms(T)마다 끝나고, 창이 끝나는 시각에 추론 요청이 나간다. 이웃 창은 반씩 겹치므로 두 줄로 엇갈려 그린다.
 계속 돌고 있는 stream의 한 구간이라 0 ms 앞의 오디오도 창에 들어간다(버리는 오디오 없음)
-(c)는 (b)의 추론 요청이 FPGA에 도착하는 시각이다(P3.26 §2.1). frame 끝은 O_m에 그대로 있고, Host 처리 지연이 두 부분으로 붙는다.
-모델·주기 묶음 지연 G는 그 모델의 모든 트랙에 같이 붙고 주기마다 바뀐다. 그 위에 추론 요청별 지연 j(0 ≤ j < J)가 붙고, jitter J는 이 퍼짐이다.
-주기 하나만 그린다. 이 주기에 모델 C는 묶음 전체가 5 ms 늦다(jitter는 그대로 작다). 고정 seed의 설명용 예시이고 simulation 값이 아니다.
+(c)는 (b)의 추론 요청이 FPGA에 도착하는 시각이다(P3.26 §2.1). Frame 끝은 O_m에 그대로 있고, Host 처리 지연이 두 부분으로 붙는다.
+모델·주기 모델 그룹 지연 G는 그 모델의 모든 트랙에 같이 붙고 주기마다 바뀐다. 그 위에 추론 요청별 지연 j(0 ≤ j < J)가 붙고, jitter J는 이 퍼짐이다.
+주기 하나만 그린다. 이 주기에 모델 C는 모델 그룹 전체가 5 ms 늦다(jitter는 그대로 작다). 고정 seed의 설명용 예시이고 simulation 값이 아니다.
 교체 전 그림은 analysis/discards/figure/offset/fig5_x-time_y-track*.*에 있다(_p325 = 추론 요청별 지연만 그린 P3.25 판, _3period = 주기 3개를 겹친 판)
 """
 import os
@@ -25,7 +25,7 @@ plt.rcParams.update({"font.family": "serif", "font.serif": ["Liberation Serif"],
 
 FAMILY = ["Liberation Serif", "FreeSerif"]   # ①②는 Liberation Serif에 없어 FreeSerif로 채운다
 T, END, WIN = 32.0, 98.0, 64.0             # 주기(hop), 그릴 시간, mel 창 (ms)
-TRACKS = "ABADCEEACD"                      # 트랙 0~9의 모델. 모델 5개만 그린다
+TRACKS = "ABADCEEACD"                      # 트랙 0–9의 모델. 모델 5개만 그린다
 N, M = len(TRACKS), 5
 COLOR = dict(zip("ABCDE", list(cm.TYPE_COLOR.values())[:5]))
 _r = np.random.default_rng(5)              # 옛 fig3과 같은 무작위 offset
@@ -123,8 +123,8 @@ ax_b.set_xticks([0, 32, 64, MARK[1][1], 96], ["0", "32", "64", f"{MARK[1][1]:g}"
 ax_b.tick_params(axis="x", pad=1)
 ax_b.set_xlabel("Time (ms)", labelpad=1)
 
-# (c) 실제 도착: frame 끝 O_m + kT 뒤에 묶음 지연 G(모델·주기마다 하나) + 추론 요청별 지연 j(0 ≤ j < J)
-J, LATE = 0.8, ("C", 5.0)                   # 이 주기에 모델 C 묶음 전체가 5 ms 늦다
+# (c) 실제 도착: frame 끝 O_m + kT 뒤에 모델 그룹 지연 G(모델·주기마다 하나) + 추론 요청별 지연 j(0 ≤ j < J)
+J, LATE = 0.8, ("C", 5.0)                   # 이 주기에 모델 C의 모델 그룹 전체가 5 ms 늦다
 rg = np.random.default_rng(11)
 G = rg.uniform(0.4, 1.6, M)
 G["ABCDE".index(LATE[0])] = LATE[1]
@@ -143,7 +143,7 @@ for i, m in enumerate("ABCDE"):
     ax_c.text(o, -0.95, f"$O_{m}$", color=COLOR[m], fontsize=7, ha="center", va="center")
 rows_c = [row for row, t in enumerate(order) if TRACKS[t] == LATE[0]]
 x_late = T / M * "ABCDE".index(LATE[0]) + LATE[1]
-ax_c.annotate(f"model {LATE[0]}: the whole group\nis {LATE[1]:g} ms late ($G$), spread stays < $J$", (x_late + J / 2, min(rows_c) - 0.3),
+ax_c.annotate(f"model {LATE[0]}: the whole model group\nis {LATE[1]:g} ms late ($G(m, k)$), spread stays < $J$", (x_late + J / 2, min(rows_c) - 0.3),
               xytext=(T, 1.3), ha="right", va="center", fontsize=6.3, color=COLOR[LATE[0]],
               bbox=dict(facecolor="white", edgecolor="none", pad=0.6),   # 위를 지나는 O_m 점선이 글자를 가르지 않게
               arrowprops=dict(arrowstyle="->", color=COLOR[LATE[0]], linewidth=0.6, shrinkA=0, shrinkB=1, mutation_scale=6))
@@ -154,8 +154,8 @@ for row, t in enumerate(order):
 ax_c.set_xticks([T / M * i for i in range(M)] + [T], [f"{T / M * i:g}" for i in range(M)] + [f"{T:g}"])
 ax_c.tick_params(axis="x", pad=1)
 ax_c.set_xlabel("Time after the period start (ms)", labelpad=1)
-ax_c.set_title(f"(c) Arrival at the FPGA: group delay $G$ and jitter $J$ = {J:g} ms", loc="left", fontsize=7.5, fontweight="bold", pad=2)
-ax_c.text(0.5, -0.2, "arrival = $O_m + kT + G_{m,k}$ (same for a model's tracks) $+\\,j$ ($0 \\leq j < J$)",
+ax_c.set_title(f"(c) Arrival at the FPGA: model-group delay $G(m, k)$ and jitter $J$ = {J:g} ms", loc="left", fontsize=7.2, fontweight="bold", pad=2)
+ax_c.text(0.5, -0.2, "arrival = $O_m + kT + G(m, k)$ (same for a model's tracks) $+\\,j(i, k)$ ($0 \\leq j(i, k) < J$)",
           transform=ax_c.transAxes, ha="center", va="top", fontsize=6.5)
 
 fig.legend(handles=[Patch(facecolor=cm.GRAY + "55", edgecolor=cm.MUTED, linewidth=0.5,

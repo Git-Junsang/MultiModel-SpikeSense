@@ -1,13 +1,13 @@
 """장비 1대(모델 1개) 학습 — 정상/이상 2진 분류.
 
-선행 train.py의 학습 흐름(FocalLoss, 출력 membrane potential 시간평균, Adam, grad clip,
+선행 train.py의 학습 흐름(focal loss, 출력 membrane potential 시간평균, Adam, grad clip,
 SpecAugment 마스킹)을 따른다. 이상 샘플의 출처를 세 가지 중에서 고른다:
 
   other_id : 같은 기종의 다른 ID 정상 소리를 이상으로 쓴다.
-  mix      : 대상 ID 정상 세그먼트의 일부 시간·주파수 영역(패치 마스크)에
+  mix      : 대상 ID 정상 segment의 일부 시간·주파수 영역(패치 마스크)에
              같은 기종 다른 ID 소리를 전력 합으로 섞는다.
 
-  supervised : [기본] test 이상 파일의 절반을 학습에 쓰고, 나머지 절반과 test 정상
+  지도학습 : [기본] test 이상 파일의 절반을 학습에 쓰고, 나머지 절반과 test 정상
              전체로 평가한다. 정상만으로 학습하는 DCASE 원래 조건과 다르므로 공식
              순위표와 직접 비교하지 않는다. 선행 SpikeSense-Edge와 같은 지도학습 조건이며,
              other_id·mix로는 실제 이상을 탐지하지 못한 결과가 이 선택의 근거다
@@ -117,15 +117,15 @@ def split_by_file_idx(d, val_files):
 
 
 def _aug_segments(mel, off, files, hop):
-    """증강 mel [K, ΣT, 40](파일마다 off 구간)에서 files 순서로 hop 간격 세그먼트를 잘라 [K, S, 31, 40] float16"""
+    """증강 mel [K, ΣT, 40](파일마다 off 구간)에서 files 순서로 hop 간격 segment를 잘라 [K, S, 31, 40] float16"""
     return np.stack([np.concatenate([dd._segments(mel[k, off[f]:off[f + 1]].astype(np.float32), hop)
                                      for f in files]).astype(np.float16) for k in range(mel.shape[0])])
 
 
 def prepare(machine, mid, method, val_frac, seed, device, hop=None, aug=None):
     """hop을 주면 학습용 풀만 구간을 겹쳐 자른다. val·test는 항상 기본 분할이다.
-    aug(dcase_augmented 경로)를 주면 학습 풀과 같은 순서의 겹침 증강 세그먼트 train_pool_aug [K, S, 31, 40]를
-    함께 만든다(supervised만). val·test는 깨끗한 원본 그대로다."""
+    aug(dcase_augmented 경로)를 주면 학습 풀과 같은 순서의 겹침 증강 segment train_pool_aug [K, S, 31, 40]를
+    함께 만든다(지도학습만). val·test는 깨끗한 원본 그대로다."""
     rng = np.random.RandomState(seed)
     tgt = dd.load_unit(machine, mid, "train")
     val_files = rng.choice(np.unique(tgt["file_idx"]),
@@ -140,7 +140,7 @@ def prepare(machine, mid, method, val_frac, seed, device, hop=None, aug=None):
     h = hop or dd.SEG_FRAMES
     aug_pool = None
     if aug:
-        assert method == "supervised", "겹침 증강은 supervised 학습만 지원"
+        assert method == "supervised", "겹침 증강은 지도학습 학습만 지원"
         a = np.load(dd.aug_path(aug, dd.unit_name(machine, mid), "train.npz"))
         vset = set(val_files.tolist())
         aug_pool = [_aug_segments(a["mel"], a["off"], [f for f in np.unique(tgt["file_idx"]) if f not in vset], h)]
@@ -188,21 +188,21 @@ def prepare(machine, mid, method, val_frac, seed, device, hop=None, aug=None):
         "train_other_file": np.concatenate(tr_of),
         "test_seg": T(te_seg), "test_label": te_lab, "test_file": te_file,
         "bal_idx": balanced_idx(te_lab, rng),
-        "test_keep": keep,                     # 전체 test 세그먼트(기본 분할) 중 평가에 쓰는 것
+        "test_keep": keep,                     # 전체 test segment(기본 분할) 중 평가에 쓰는 것
         **({"train_pool_aug": torch.tensor(np.concatenate(aug_pool, axis=1), dtype=torch.float16, device=device)}
            if aug else {}),
     }
 
 
 def balanced_idx(y, rng):
-    """정상과 이상 세그먼트 수를 맞춘 인덱스. F1을 선행 연구(균형 데이터)와 비교하기 위함."""
+    """정상과 이상 segment 수를 맞춘 인덱스. F1을 선행 연구(균형 데이터)와 비교하기 위함."""
     n0, n1 = np.flatnonzero(y == 0), np.flatnonzero(y == 1)
     k = min(len(n0), len(n1))
     return np.sort(np.concatenate([rng.choice(n0, k, replace=False), rng.choice(n1, k, replace=False)]))
 
 
 def group_by_file(file_idx):
-    """파일 번호 배열 → 파일별 세그먼트 인덱스 목록"""
+    """파일 번호 배열 → 파일별 segment 인덱스 목록"""
     order = np.argsort(file_idx, kind="stable")
     bounds = np.flatnonzero(np.diff(file_idx[order])) + 1
     return np.split(order, bounds)
@@ -231,7 +231,7 @@ def clip_batches(groups, data, method, batch_size, gen):
         cid_t = torch.tensor(np.concatenate(cid), dtype=torch.long, device=dev)
         x = data["train_pool"][gi]
         if "train_pool_aug" in data:
-            # 겹침 증강: 파일마다 확률 aug_p로 K가지 섞음 중 하나로 바꾼다(파일 안 세그먼트는 같은 섞음)
+            # 겹침 증강: 파일마다 확률 aug_p로 K가지 섞음 중 하나로 바꾼다(파일 안 segment는 같은 섞음)
             A = data["train_pool_aug"]
             use = torch.rand(len(chunk), generator=gen, device=dev) < data["aug_p"]
             kk = torch.randint(0, A.shape[0], (len(chunk),), generator=gen, device=dev)
@@ -268,7 +268,7 @@ def evaluate(model, data, val_x, val_y, loss_fn):
     b = data["bal_idx"]
     r["test_f1_bal"] = f1_score(y[b], pred[b], zero_division=0)
     r["test_acc_bal"] = float((pred[b] == y[b]).mean())
-    # 파일 단위 점수 = 세그먼트 P(이상) 평균 (DCASE는 파일 단위 AUC)
+    # 파일 단위 점수 = segment P(이상) 평균 (DCASE는 파일 단위 AUC)
     nf = f.max() + 1
     clip_score = np.bincount(f, prob, nf) / np.bincount(f, minlength=nf)
     clip_y = np.bincount(f, y, nf) / np.bincount(f, minlength=nf)
@@ -288,7 +288,7 @@ def main(argv=None):
     ap.add_argument("--sched", choices=["cosine", "const"], default="cosine")
     ap.add_argument("--mask_p", type=float, default=0.5)
     ap.add_argument("--clip_loss", action="store_true",
-                    help="파일 단위 손실: 한 파일의 세그먼트 출력을 평균해 손실을 계산한다(추론과 같은 합치기)")
+                    help="파일 단위 손실: 한 파일의 segment 출력을 평균해 손실을 계산한다(추론과 같은 합치기)")
     ap.add_argument("--hop", type=int, default=None,
                     help="학습 구간을 겹쳐 자를 때의 frame 간격(예: 16). val·test는 겹치지 않는다")
     ap.add_argument("--val_frac", type=float, default=0.1)
@@ -371,7 +371,7 @@ def main(argv=None):
         if args.clip_loss:
             batches = clip_batches(clip_groups, data, args.method, args.batch_size, gen)
         else:
-            # 에포크마다 정상 전체 + 같은 수의 학습용 이상을 새로 생성
+            # epoch마다 정상 전체 + 같은 수의 학습용 이상을 새로 생성
             anom = make_anomaly(args.method, data["train_normal"], data["train_other"], n_norm, gen)
             x_all = torch.cat([data["train_normal"], anom])
             y_all = torch.cat([torch.zeros(n_norm), torch.ones(n_norm)]).long().to(device)
@@ -385,7 +385,7 @@ def main(argv=None):
             _, mem, _ = model(x)
             logits = mem.mean(dim=1)[:, :N_CLASS]
             if clip_id is not None:
-                # 파일 안 세그먼트 출력을 평균 → 파일 하나가 표본 하나 (파일 수 = len(y), GPU 대기 없음)
+                # 파일 안 segment 출력을 평균 → 파일 하나가 표본 하나 (파일 수 = len(y), GPU 대기 없음)
                 logits = torch.zeros(len(y), N_CLASS, device=device).index_add_(
                     0, clip_id, logits) / torch.bincount(clip_id).unsqueeze(1)
             loss = loss_fn(logits, y)

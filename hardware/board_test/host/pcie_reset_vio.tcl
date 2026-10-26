@@ -2,7 +2,7 @@
 # pcie_reset_vio.tcl — VIO probe_out0으로 PCIe 코어를 리셋하고 상태를 읽는다 (P0.7)
 # ============================================================
 #   vivado -mode batch -source pcie_reset_vio.tcl -tclargs -ltx <file.ltx> [-bit <file.bit>]
-# 비트스트림을 주면 먼저 다운로드한다. 리셋을 0.5초 걸었다 풀고 2초 뒤 상태를 읽는다.
+# bitstream을 주면 먼저 다운로드한다. 리셋을 0.5초 걸었다 풀고 2초 뒤 상태를 읽는다.
 # ============================================================
 set opt(ltx) ""; set opt(bit) ""
 for {set i 0} {$i < [llength $argv]} {incr i 2} { set opt([string range [lindex $argv $i] 1 end]) [lindex $argv [expr {$i+1}]] }

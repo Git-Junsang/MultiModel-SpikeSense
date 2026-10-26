@@ -1,4 +1,4 @@
-// plif_array.v — PLIF 16뉴런/cycle, latency 2 (plift_core 안 1단 + 출력 register)
+// plif_array.v — PLIF 16뉴런/cycle, 지연 2 (plift_core 안 1단 + 출력 register)
 //
 // cycle마다 row 하나(뉴런 16개)를 받는다. lane k = 뉴런 16 × row + k.
 // 묶음 bus는 lane k가 [W×k +: W]다. params는 {vth, beta} 16 bit (params.hex 순서).

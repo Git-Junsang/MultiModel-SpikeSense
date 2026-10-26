@@ -1,16 +1,16 @@
-# P3.26 E5 재실험: 최종 방법 비교. Host 처리 지연 = 모델 묶음 지연(M3 Xeon 측정 재생) + 추론 요청별 지연 U(0, J)
-# M3 표(p326_m3_group.py)는 모델·주기마다 한 값이다. 앞 절반 주기는 PNU의 묶음 지연 분포, 뒤 절반을 seed마다 다른 구간부터 재생한다.
-# 모든 방법에 같은 (모델, 주기) 지연을 넣는다. M3는 모델당 25.6트랙·offset 배정 Host에서 쟀으므로 편중(K·SK)과 Global alignment·Unaligned의
-# 실제 Host 지연 모양은 다를 수 있다. 같은 트랙의 이전 추론 요청이 안 끝났으면 새 추론 요청을 버린다(fpga_drop_busy, 06 §4.3).
-# 나머지 조건: L·64 lane @100 MHz, 1,024트랙, 모델 40개, rtl67, DDR3 3,015 MB/s, entry 4, 12 bit membrane potential,
-# 즉시 송신. deadline = t_host + 32 ms. 시나리오 6개 × seed 30. Dysta Method η = 0.0001, DeepRT Method window 14.9 ms·flush off
+# P3.26 E5 재실험: 최종 방법 비교. Host 처리 지연 = 모델 그룹 지연(M3 Xeon 측정 재생) + 추론 요청별 지연 U(0, J)
+# M3 표(p326_m3_group.py)는 모델·주기마다 한 값이다. 앞 절반 주기는 PNU의 모델 그룹 지연 분포, 뒤 절반을 seed마다 다른 구간부터 재생한다.
+# 모든 방법에 같은 (모델, 주기) 지연을 넣는다. M3는 모델당 25.6트랙·Offset Assignment Host에서 쟀으므로 편중(K·SK)과 global alignment·unaligned의
+# 실제 Host 처리 지연 모양은 다를 수 있다. 같은 트랙의 이전 추론 요청이 안 끝났으면 새 추론 요청을 버린다(fpga_drop_busy, 06 §4.3).
+# 나머지 조건: L·64-lane @100 MHz, 1,024트랙, 모델 40개, rtl67, DDR3 3,015 MB/s, entry 4, 12 bit membrane potential,
+# 즉시 송신. Deadline = t_host + 32 ms. 시나리오 6개 × seed 30. Dysta Method η = 0.0001, DeepRT Method window 14.9 ms·flush off
 # 키 설명은 template.toml
 
 sim_mode = "run"
-sim_scenarios = ["U", "K", "S", "I", "SK", "R"]
+sim_scenarios = ["uniform", "skewed", "synchronized", "intermittent", "skewed_synchronized", "fluctuating"]
 sim_seeds = 30
 sim_seed0 = 0
-sim_warm_periods = 16
+sim_warmup_periods = 16
 sim_meas_periods = 64
 model_size = "L"
 model_count = 40
@@ -21,13 +21,13 @@ compute_ctrl_scale = 1.0
 membrane_place = "split"
 membrane_bits = 12
 bram_reserve_tiles = 25.5
-ddr_bw_mbps = 3015.0
+ddr3_bandwidth_mbps = 3015.0
 track_count = 1024
-host_offset = "model"
+host_offset = "offset_assignment"
 host_jitter_ms = 0.8
 host_jitter_dist = "uniform"
 host_jitter_trace = ""
-host_group_trace = "hardware/board_test/p325_meas/result/m3_group_pin3_load0.csv.gz"
+host_model_group_delay_trace = "hardware/board_test/p325_meas/result/m3_group_pin3_load0.csv.gz"
 host_gather_ms = 0.0
 host_gather_to_max = false
 host_packet_gap_us = 0.0
@@ -47,17 +47,17 @@ tune_conds = []
 
 [sweep]
 method = [
-  {label = "Dysta Method (unaligned, LRU)", host_offset = "none", cache_policy = "lru", scheduler = "dysta", scheduler_attrs = {eta = 0.0001}},
-  {label = "DeepRT Method (unaligned, LRU)", host_offset = "none", cache_policy = "lru", scheduler = "deeprt", scheduler_attrs = {window = [14900.0, false]}},
-  {label = "Global + Grouping (LRU)", host_offset = "global", cache_policy = "lru", scheduler = "grouping"},
-  {label = "Global + Dysta (LRU)", host_offset = "global", cache_policy = "lru", scheduler = "dysta", scheduler_attrs = {eta = 0.0001}},
-  {label = "Global + DeepRT (LRU)", host_offset = "global", cache_policy = "lru", scheduler = "deeprt", scheduler_attrs = {window = [14900.0, false]}},
-  {label = "Model-Grouped + Grouping + PNU-count (제안)", host_offset = "model", cache_policy = "pnu_count", scheduler = "grouping"},
-  {label = "Model-Grouped + Dysta + PNU-count", host_offset = "model", cache_policy = "pnu_count", scheduler = "dysta", scheduler_attrs = {eta = 0.0001}},
-  {label = "Model-Grouped + DeepRT + PNU-count", host_offset = "model", cache_policy = "pnu_count", scheduler = "deeprt", scheduler_attrs = {window = [14900.0, false]}},
+  {label = "Dysta Method (unaligned, LRU)", host_offset = "unaligned", cache_policy = "lru", scheduler = "dysta_method", scheduler_attrs = {eta = 0.0001}},
+  {label = "DeepRT Method (unaligned, LRU)", host_offset = "unaligned", cache_policy = "lru", scheduler = "deeprt_method", scheduler_attrs = {window = [14900.0, false]}},
+  {label = "global alignment + Grouping (LRU)", host_offset = "global_alignment", cache_policy = "lru", scheduler = "grouping"},
+  {label = "global alignment + Dysta Method (LRU)", host_offset = "global_alignment", cache_policy = "lru", scheduler = "dysta_method", scheduler_attrs = {eta = 0.0001}},
+  {label = "global alignment + DeepRT Method (LRU)", host_offset = "global_alignment", cache_policy = "lru", scheduler = "deeprt_method", scheduler_attrs = {window = [14900.0, false]}},
+  {label = "Model-Grouped Offset Assignment + Grouping + PNU-Count (제안)", host_offset = "offset_assignment", cache_policy = "pnu_count", scheduler = "grouping"},
+  {label = "Model-Grouped Offset Assignment + Dysta Method + PNU-Count", host_offset = "offset_assignment", cache_policy = "pnu_count", scheduler = "dysta_method", scheduler_attrs = {eta = 0.0001}},
+  {label = "Model-Grouped Offset Assignment + DeepRT Method + PNU-Count", host_offset = "offset_assignment", cache_policy = "pnu_count", scheduler = "deeprt_method", scheduler_attrs = {window = [14900.0, false]}},
 ]
 host = [
-  {label = "M3 CPU 고정·부하 없음", host_group_trace = "hardware/board_test/p325_meas/result/m3_group_pin3_load0.csv.gz"},
-  {label = "M3 CPU 고정 없음·부하 없음", host_group_trace = "hardware/board_test/p325_meas/result/m3_group_pin-none_load0.csv.gz"},
+  {label = "M3 CPU 고정·부하 없음", host_model_group_delay_trace = "hardware/board_test/p325_meas/result/m3_group_pin3_load0.csv.gz"},
+  {label = "M3 CPU 고정 없음·부하 없음", host_model_group_delay_trace = "hardware/board_test/p325_meas/result/m3_group_pin-none_load0.csv.gz"},
 ]
 host_jitter_ms = [0.0, 0.8, 3.2]

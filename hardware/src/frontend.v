@@ -7,7 +7,7 @@
 module frontend #(
     parameter N_TRACKS = 1024,
     parameter N_MODELS = 40,
-    parameter N_ONCHIP = 768,
+    parameter N_ON_CHIP = 768,
     parameter EW       = 2
 )(
     input  wire                clk,
@@ -105,7 +105,7 @@ module frontend #(
         .free_valid(free_valid), .free_track(free_track), .n_pend(n_pend)
     );
 
-    track_scheduler #(.N_MODELS(N_MODELS), .N_ONCHIP(N_ONCHIP), .EW(EW)) u_sch (
+    track_scheduler #(.N_MODELS(N_MODELS), .N_ON_CHIP(N_ON_CHIP), .EW(EW)) u_sch (
         .clk(clk), .rst(rst), .now_us(now_us),
         .q_total(q_total), .sc_model(sc_model), .sc_ne(sc_ne), .sc_hseq(sc_hseq),
         .hd_model(hd_model), .hd_head(hd_head), .dt_valid(dt_valid), .dt_model(dt_model), .dt_cnt(dt_cnt),

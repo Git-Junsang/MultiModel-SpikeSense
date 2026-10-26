@@ -21,13 +21,13 @@ RESULT = os.path.join(ROOT, 'simulation', 'result')
 sys.path.insert(0, os.path.join(ROOT, 'simulation', 'engine'))
 import engine  # noqa: E402
 
-# simulation 그림 색 (옛 plot_target·plot_p311과 같다. 범주 4색은 인접 CVD ΔE ≥ 9.1로 검증)
+# Simulation 그림 색 (옛 plot_target·plot_p311과 같다. 범주 4색은 인접 CVD ΔE ≥ 9.1로 검증)
 INK, MUTED, GRAY, SURF = '#0b0b0b', '#52514e', '#b4b2a9', '#fcfcfb'
 SERIES = ['#2a78d6', '#eb6834', '#1baf7a', '#eda100']
-BLUE = ['#cde2fb', '#9ec5f4', '#6da7ec', '#3987e5', '#256abf', '#184f95', '#0d366b']   # 순차 ramp 100~700
+BLUE = ['#cde2fb', '#9ec5f4', '#6da7ec', '#3987e5', '#256abf', '#184f95', '#0d366b']   # 순차 ramp 100–700
 
 
-# 방법 비교(compare) 그림의 행 순서: 비교군 → ablation(offset 배정 없음 → HW만 → SW만 → SW+HW)
+# 방법 비교(compare) 그림의 행 순서: 비교군 → ablation(Offset Assignment 없음 → HW만 → SW만 → SW+HW)
 METHOD_ORDER = ['Dysta Method', 'DeepRT Method', 'Grouping(offset 배정 없음)', 'HW만: offset-order cache', 'SW만: Host offset 배정', 'SW+HW: 제안']
 
 

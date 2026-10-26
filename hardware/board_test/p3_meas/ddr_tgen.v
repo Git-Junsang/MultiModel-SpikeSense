@@ -1,5 +1,5 @@
 // ============================================================
-// ddr_tgen.v — P3.1 DDR3 실효 대역폭·지연 측정용 AXI4 트래픽 생성기
+// ddr_tgen.v — P3.1 DDR3 실효 bandwidth·지연 측정용 AXI4 traffic 생성기
 // ============================================================
 // MIG AXI 슬레이브(256 bit, ui_clk 100 MHz)에 직접 붙는 마스터다.
 // 한 번의 실행(start)은 "전송(transfer)" n개로 이루어진다. 전송 하나는
@@ -68,9 +68,9 @@ module ddr_tgen #(
     output reg  [63:0]       r_cycles,
     output reg  [63:0]       r_beats,
     output reg  [31:0]       r_xfers,
-    output reg  [31:0]       r_lat_min,
-    output reg  [31:0]       r_lat_max,
-    output reg  [63:0]       r_lat_sum,
+    output reg  [31:0]       r_delay_min,
+    output reg  [31:0]       r_delay_max,
+    output reg  [63:0]       r_delay_sum,
     output reg  [31:0]       r_fst_min,
     output reg  [31:0]       r_fst_max,
     output reg  [63:0]       r_fst_sum,
@@ -360,7 +360,7 @@ module ddr_tgen #(
 
     // 통계 단계 (1 cycle 뒤)
     reg        s_vld;
-    reg [31:0] s_lat, s_fst;
+    reg [31:0] s_delay, s_fst;
     // 검증 단계
     reg          v_vld;
     reg [255:0]  v_data;
@@ -383,7 +383,7 @@ module ddr_tgen #(
             end
             if (xfer_end) begin
                 s_vld <= 1'b1;
-                s_lat <= now - xf_dout;
+                s_delay <= now - xf_dout;
                 s_fst <= c_write ? (now - xf_dout) : (fst_now - xf_dout);
             end
         end
@@ -395,7 +395,7 @@ module ddr_tgen #(
 
     always @(posedge clk) begin
         log_rdata <= log_mem[log_raddr];
-        if (s_vld && log_sel) log_mem[r_log_n[LOG_AW-1:0]] <= {s_fst, s_lat};
+        if (s_vld && log_sel) log_mem[r_log_n[LOG_AW-1:0]] <= {s_fst, s_delay};
     end
 
     wire inc_b = issue;
@@ -421,9 +421,9 @@ module ddr_tgen #(
             r_cycles    <= 64'd0;
             r_beats     <= 64'd0;
             r_xfers     <= 32'd0;
-            r_lat_min   <= 32'hFFFFFFFF;
-            r_lat_max   <= 32'd0;
-            r_lat_sum   <= 64'd0;
+            r_delay_min   <= 32'hFFFFFFFF;
+            r_delay_max   <= 32'd0;
+            r_delay_sum   <= 64'd0;
             r_fst_min   <= 32'hFFFFFFFF;
             r_fst_max   <= 32'd0;
             r_fst_sum   <= 64'd0;
@@ -459,10 +459,10 @@ module ddr_tgen #(
             if (s_vld) begin
                 xf_done   <= xf_done + 32'd1;
                 r_xfers   <= r_xfers + 32'd1;
-                r_lat_sum <= r_lat_sum + {32'd0, s_lat};
+                r_delay_sum <= r_delay_sum + {32'd0, s_delay};
                 r_fst_sum <= r_fst_sum + {32'd0, s_fst};
-                if (s_lat < r_lat_min) r_lat_min <= s_lat;
-                if (s_lat > r_lat_max) r_lat_max <= s_lat;
+                if (s_delay < r_delay_min) r_delay_min <= s_delay;
+                if (s_delay > r_delay_max) r_delay_max <= s_delay;
                 if (s_fst < r_fst_min) r_fst_min <= s_fst;
                 if (s_fst > r_fst_max) r_fst_max <= s_fst;
                 if (log_sel) r_log_n <= r_log_n + 1'b1;

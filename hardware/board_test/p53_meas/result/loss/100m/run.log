@@ -1,0 +1,2 @@
+FPGA 시각 차이 302939248 µs, 왕복 232 µs
+summary sent=5330965 recv=5330965 late=0 lost=0 deadline_miss=0 judged=171008 missing_cycles=0 unmatched=0 resp_mean_us=5152.2 resp_max_us=13840.4 overrun=18050 send_err=0 sync_ok=167 sync_fail=0 sync_rtt_max_us=260 audio_s=166.656

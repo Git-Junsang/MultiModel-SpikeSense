@@ -1,9 +1,9 @@
-"""P4.5: simulator(Grouping + PNU-count) 실행 하나를 tb_frontend.sv가 읽는 사건 기록으로 낸다.
+"""P4.5: simulator(Grouping + PNU-Count) 실행 하나를 tb_frontend.sv가 읽는 사건 기록으로 낸다.
 
-p326_final_compare의 제안 구성(Model-Grouped Offset Assignment, Grouping, PNU-count, entry 4, Xeon CPU 고정·부하 없음 묶음 지연)에서
-J·시나리오·seed·주기 수와 offset 배정(--offset model/global/none)만 바꿔 돌린다. global·none은 여러 모델이 함께 대기해
+p326_final_compare의 제안 구성(Model-Grouped Offset Assignment, Grouping, PNU-Count, entry 4, Xeon CPU 고정·부하 없음 모델 그룹 지연)에서
+J·시나리오·seed·주기 수와 Offset Assignment(--offset offset_assignment/global_alignment/unaligned)만 바꿔 돌린다. global_alignment·unaligned는 여러 모델이 함께 대기해
 가장 오래된 추론 요청 고르기를 시험한다. 사건은 시각 순서이고 같은 시각이면 연산 완료 → 도착 → 연산 시작 순서다.
-simulator 규칙과 같다: 완료 시각 ≤ 도착이면 drop이 아니고, 도착 ≤ batch 시작 s면 그 batch에 든다.
+Simulator 규칙과 같다: 완료 시각 ≤ 도착이면 drop이 아니고, 도착 ≤ batch 시작 s면 그 batch에 든다.
 
 출력 hardware/sim/frontend/t<번호>/
   n.hex        줄 1 = 사건 수, 줄 2 = batch 수
@@ -13,7 +13,7 @@ simulator 규칙과 같다: 완료 시각 ≤ 도착이면 drop이 아니고, �
   batch.hex    batch마다 128 bit. [127:120] 모델, [119] hit, [118:103] 크기, [102:63] 계획할 때 모델별 queue 있음(40 bit)
 
 프로젝트 루트에서:
-  python3 hardware/testbench/export_sched_trace.py --id 0 --jitter 0.8 --scn U --seed 0
+  python3 hardware/testbench/export_sched_trace.py --id 0 --jitter 0.8 --scn uniform --seed 0
 """
 
 import argparse
@@ -32,18 +32,18 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--id", type=int, required=True)
     ap.add_argument("--jitter", type=float, default=0.8)
-    ap.add_argument("--scn", default="U")
+    ap.add_argument("--scn", default="uniform")
     ap.add_argument("--seed", type=int, default=0)
-    ap.add_argument("--warm", type=int, default=8)
+    ap.add_argument("--warmup", type=int, default=8)
     ap.add_argument("--meas", type=int, default=16)
-    ap.add_argument("--offset", default="model", choices=["model", "global", "none"])
+    ap.add_argument("--offset", default="offset_assignment", choices=["offset_assignment", "global_alignment", "unaligned"])
     a = ap.parse_args()
 
     env = E.load(str(ROOT / "simulation/environment/p326_final_compare.toml"))
     e = next(e for _, e in E.points(env)
-             if e["scheduler"] == "grouping" and e["cache_policy"] == "pnu_count" and e["host_offset"] == "model"
-             and e["host_group_trace"].endswith("pin3_load0.csv.gz"))
-    e = dict(e, host_jitter_ms=a.jitter, sim_warm_periods=a.warm, sim_meas_periods=a.meas, host_offset=a.offset)
+             if e["scheduler"] == "grouping" and e["cache_policy"] == "pnu_count" and e["host_offset"] == "offset_assignment"
+             and e["host_model_group_delay_trace"].endswith("pin3_load0.csv.gz"))
+    e = dict(e, host_jitter_ms=a.jitter, sim_warmup_periods=a.warmup, sim_meas_periods=a.meas, host_offset=a.offset)
     s = E.Setup(e)
     cache, sched, comp, M = s.cache, s.scheduler, s.compute, s.hw.models
     wl = s.workload(a.scn, a.seed)
@@ -75,11 +75,11 @@ def main():
     served = np.zeros(n, bool)
     for idx in mems:
         served[idx] = True
-    ne = Counter(zip(wl.model.tolist(), wl.epoch.tolist()))
+    ne = Counter(zip(wl.model.tolist(), wl.period.tolist()))
 
     ev = []                                                     # (시각, 순서, 줄)
     for i in range(n):
-        tr, m, k = int(wl.track[i]), int(wl.model[i]), int(wl.epoch[i])
+        tr, m, k = int(wl.track[i]), int(wl.model[i]), int(wl.period[i])
         line = (1 << 254) | (int(wl.t_arr[i]) << 222) | (i << 190) | (tr << 180) | (m << 174) | (int(wl.t_host[i]) << 142) \
             | ((k & 0xFFFF) << 126) | (int(k % 31 == 0) << 125) | (ne[(m, k)] << 109) | (int(not served[i]) << 50)
         ev.append((float(wl.t_arr[i]), 1, len(ev), line))
@@ -100,7 +100,7 @@ def main():
         f"{(m << 120) | (int(hit) << 119) | (len(idx) << 103) | (qne << 63):032x}\n"
         for (m, hit, qne), idx in zip(plans, mems)))
     sizes = [len(x) for x in mems]
-    print(f"t{a.id}: offset {a.offset}, J {a.jitter} ms, {a.scn} seed {a.seed}, {a.warm}+{a.meas} 주기: 추론 요청 {n}, drop {int((~served).sum())}, "
+    print(f"t{a.id}: offset {a.offset}, J {a.jitter} ms, {a.scn} seed {a.seed}, {a.warmup}+{a.meas} 주기: 추론 요청 {n}, drop {int((~served).sum())}, "
           f"batch {len(mems)}(평균 {np.mean(sizes):.1f}, 최대 {max(sizes)}), miss {sum(not p[1] for p in plans)}, "
           f"계획 때 여러 모델 대기 {sum(bin(p[2]).count('1') > 1 for p in plans)}, 사건 {len(ev)}, simulator 최대 응답 {res['max_ms']:.2f} ms")
 

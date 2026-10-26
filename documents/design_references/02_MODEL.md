@@ -15,7 +15,7 @@
 | 갱신 순서 | 누설 → 적분 → 발화 → soft reset (발화하면 vth만큼 뺌) |
 | 출력 | layer 4 membrane potential 2개. 0 = 정상, 1 = 이상 |
 
-크기는 P3.6에서 정했다. L보다 작은 모델 4개(XS, P, S, M)는 40대 평균 AUC가 0.007~0.029 낮았다. XL은 평균 +0.005였지만 신뢰구간이 0을 포함했고 미리 정한 채택 기준(소리 겹침에서 +0.01)을 넘지 못했다([P3.6~P3.8 보고서](<../reports/P3.6~3.8 Research Report.md>), [P3.9 보고서](<../reports/P3.9 Research Report.md>)).
+크기는 P3.6에서 정했다. L보다 작은 모델 4개(XS, P, S, M)는 40대 평균 AUC가 0.007–0.029 낮았다. XL은 평균 +0.005였지만 신뢰구간이 0을 포함했고 미리 정한 채택 기준(소리 겹침에서 +0.01)을 넘지 못했다([P3.6~P3.8 보고서](<../reports/P3.6~3.8 Research Report.md>), [P3.9 보고서](<../reports/P3.9 Research Report.md>)).
 
 ## 3. 데이터와 학습
 
@@ -62,7 +62,7 @@ membrane potential  mem   = sat16(((β_q · mem) >> 8) + cur)
 
 누산기는 layer 1에 부호 포함 21 bit 이상이 필요하다(40 × 127 × 128). 선행 `plift_core.v`는 16 bit를 넘으면 wrap-around되므로 포화로 바꿨다(P4.1).
 
-membrane potential은 16 bit 포화 연산으로 계산하고 다음 추론으로 넘기려고 저장할 때만 12 bit로 포화한다. 10 bit는 평균 −0.0002, 8 bit(아래 2 bit 버림)는 −0.0008이지만 4대가 0.01~0.02 떨어졌다([P3.13 보고서](<../reports/P3.13 Research Report.md>) §4).
+Membrane potential은 16 bit 포화 연산으로 계산하고 다음 추론으로 넘기려고 저장할 때만 12 bit로 포화한다. 10 bit는 평균 −0.0002, 8 bit(아래 2 bit 버림)는 −0.0008이지만 4대가 0.01–0.02 떨어졌다([P3.13 보고서](<../reports/P3.13 Research Report.md>) §4).
 
 ## 5. 판정
 
@@ -78,11 +78,36 @@ membrane potential은 16 bit 포화 연산으로 계산하고 다음 추론으�
 
 판정 주기 992 ms와 frame 하나의 deadline 32 ms는 다른 시간이다.
 
-학습 특징은 파일 단위로 정규화했다(`ref=max`). 실제 stream에서는 파일 전체의 최대값을 미리 알 수 없다. 실시간 정규화 방법과 그 정확도는 따로 검증해야 한다(미정).
+학습 특징은 파일 단위로 정규화했다(`ref=max`). 실제 stream에서는 파일 전체의 최대값을 미리 알 수 없다. 그래서 Host는 트랙마다 정규화 기준(mel dB 최대·최소)을 이어 간다.
+
+1. Mel dB를 트랙의 하한 F 아래로 자른다. Mic 바닥 잡음과 0 샘플은 모두 F가 된다. 기본 F = −80 dB이고, mic는 장비 끈 채 잰 바닥 잡음 위로 정한다. DCASE 소리는 −65 dB 아래로 내려가지 않아 F = −80 dB는 학습 특징을 바꾸지 않는다.
+2. Frame 최대가 F + 6 dB 이하면 무음 frame이다. 무음 frame은 기준을 갱신하지 않는다. 처음 소리가 난 frame에서 기준을 시작한다.
+3. Frame 최대가 기준 최대 − 15 dB보다 작으면 조용한 frame이다. 소리가 켜지거나 꺼지는 경계 frame이 여기 든다. 조용한 frame은 최소를 갱신하지 않고 최대만 잊는다. DCASE 정상 소리의 frame 최대는 기준 최대보다 99.9%가 15.5 dB 안쪽이다.
+4. Frame의 최대·최소가 기준을 넘으면 바로 받고, 아니면 기준이 그 값 쪽으로 시간 상수 τ = 5 s로 돌아간다. 판정 주기가 바뀌어도 기준을 지우지 않는다.
+
+지난 frame만 쓰므로 frame, deadline, 계산 시작 시각은 그대로다. Membrane potential은 판정 주기마다 `RESET_STATE`로 새로 시작한다.
+
+```text
+d    = max(dB, F)                                 frame k의 d 최대·최소 = m_k, n_k
+m_k ≤ F + 6이면 hi_k = hi_(k−1), lo_k = lo_(k−1)   (무음 frame)
+hi_k = max(m_k, a·hi_(k−1) + (1 − a)·m_k)          a = e^(−32 ms / τ), τ = 5 s
+lo_k = min(n_k, a·lo_(k−1) + (1 − a)·n_k)          m_k < hi_(k−1) − 15이면 lo_k = lo_(k−1)  (조용한 frame)
+l    = max(lo_k, hi_k − 80)
+x    = clip((d − l) / (hi_k − l), 0, 1)           x_q = clip(rint(127x), 0, 127)
+```
+
+| 정규화 (`L_normal_noaug`, 재학습 없음) | 평균 ROC-AUC | AUC 0.9 이상 |
+|---|---:|---:|
+| 파일 단위(학습 특징, 실시간 불가), software | 0.9554 | 35/40 |
+| 판정 주기마다 새로 시작(seg, 이전 Host): software / 보드 | 0.9401 / 0.9383 | 33 / 33 |
+| 위 규칙, software: 파일마다 새로 시작 / 파일을 이어 한 트랙으로 / 이어 듣되 파일 사이 무음 | 0.9560 / 0.9539 / 0.9539 | 37 / 36 / 36 |
+| 위 규칙, 보드(P5.3 입력, 파일 사이 무음) | 0.9531 | 35 |
+
+잊지 않으면(τ = ∞) 파일을 이어 들을 때 0.8639로 떨어진다. 무음 frame 처리가 없으면 보드에서 0.8734, 조용한 frame 처리가 없으면 0.9305다. 근거는 [P2.9 보고서](<../reports/P2.9 Research Report.md>)에 있다.
 
 ## 6. Export 형식
 
-DDR3에 올리는 형식은 64 lane slot(L)이다. slot 하나는 256 KiB이고 앞의 131,648 B가 유효 data다. 모든 section은 32 B로 정렬한다. weight 적재는 이 131,648 B를 DMA 한 번으로 읽는다.
+DDR3에 올리는 형식은 64-lane slot(L)이다. slot 하나는 256 KiB이고 앞의 131,648 B가 유효 데이터다. 모든 section은 32 B로 정렬한다. weight 적재는 이 131,648 B를 DMA 한 번으로 읽는다.
 
 | Section | 시작 주소 | 크기 (B) | 배치 |
 |---|---:|---:|---|
@@ -92,7 +117,7 @@ DDR3에 올리는 형식은 64 lane slot(L)이다. slot 하나는 256 KiB이고 
 | L3 | `0x1C1C0` | 16,384 | `i × 64 + j` = `W3[j][i]` |
 | L4 | `0x201C0` | 128 | `k × 64 + j` = `W4[k][j]` |
 
-params의 layer 시작은 0, 768, 1,280, 1,408 B이고 뉴런 n은 `시작 + 2n`에 있다. `model_id` 0~39는 [dcase_data.py](../../software/dataset/dcase_data.py)의 `UNITS` 순서다.
+params의 layer 시작은 0, 768, 1,280, 1,408 B이고 뉴런 n은 `시작 + 2n`에 있다. `model_id` 0–39는 [dcase_data.py](../../software/dataset/dcase_data.py)의 `UNITS` 순서다.
 
 | 파일 (`hardware/data/models_l64/<장비>/`) | 크기 | 내용 |
 |---|---:|---|
@@ -102,7 +127,7 @@ params의 layer 시작은 0, 768, 1,280, 1,408 B이고 뉴런 n은 `시작 + 2n`
 | `params.hex` | 706줄 | 한 줄 16 bit = `{vth, β}` |
 | `metadata.json` | | ID, 주소, scale, SHA-256 |
 
-`models.ddr.bin`은 slot 40개를 ID 순서로 붙인 10,485,760 B image다. golden vector는 `hardware/data/golden_l64/`(16 bit 저장)와 `golden_l64_m12/`(12 bit 저장)에 있다. 각각 test 입력 80개(장비마다 정상·이상 1개)와 포화 시험 2개이고 layer마다 전류, 포화 전 membrane potential, spike, reset 뒤 membrane potential을 담는다.
+`models.ddr3.bin`은 slot 40개를 ID 순서로 붙인 10,485,760 B image다. golden vector는 `hardware/data/golden_l64/`(16 bit 저장)와 `golden_l64_m12/`(12 bit 저장)에 있다. 각각 test 입력 80개(장비마다 정상·이상 1개)와 포화 시험 2개이고 layer마다 전류, 포화 전 membrane potential, spike, reset 뒤 membrane potential을 담는다.
 
 ```bash
 python3 software/model/export_models.py --format l64

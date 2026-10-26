@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # weight_cache testbench (xsim, Verilator) + Verilator lint. 저장소 루트에서 실행한다.
-# simulator(engine.PNURTL) 실행 3개를 기록해 재생한다. 기록 = (번호, entry, J ms, 시나리오, seed).
+# Simulator(engine.PNURTL) 실행 3개를 기록해 재생한다. 기록 = (번호, entry, J ms, 시나리오, seed).
 set -euo pipefail
 W=hardware/sim/weight_cache
 M=$HOME/mmss_build/verilator_weight_cache
 SRC="hardware/src/weight_entry.v hardware/src/next_use_predictor.v hardware/src/weight_cache.v"
 TB=hardware/testbench/tb_weight_cache.sv
-TRACES="0,4,3.2,U,0 1,4,0.8,SK,1 2,6,3.2,K,2"
+TRACES="0,4,3.2,uniform,0 1,4,0.8,skewed_synchronized,1 2,6,3.2,skewed,2"
 mkdir -p "$W"
 for t in $TRACES; do
   IFS=, read -r id e j s sd <<< "$t"

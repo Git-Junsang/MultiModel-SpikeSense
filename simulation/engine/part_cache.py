@@ -11,13 +11,13 @@ from part_result import PRED_ERR_BIN_US
 
 
 class Cache(Part):
-    """cache 정책 공통: weight entry 여러 벌. hit면 적재 0, miss면 모델 전체를 빈 entry에 적재한다. entry가 차면
+    """Cache 정책 공통: weight entry 여러 벌. hit면 적재 0, miss면 모델 전체를 빈 entry에 적재한다. Entry가 차면
     연산 중인 entry를 뺀 entry 중 다음 사용 점수(predict)가 가장 큰 모델을 내보낸다. 점수가 같으면 queue가 빈 모델,
     그다음 오래 안 쓴 모델. 측정 구간의 교체마다 실제 다음 사용과 비교해 진단 값을 센다(결정에는 쓰지 않는다)"""
-    meta_tiles = 0.0                 # 예측 metadata BRAM tile
+    meta_tiles = 0.0                 # 예측 메타데이터 BRAM tile
     queue_first = True               # 점수가 같으면 대기 추론 요청이 있는 모델을 지킨다
     scored = True                    # predict가 다음 사용 시각을 낸다(예측 오차를 센다)
-    queue = now = None               # plan이 받은 대기열과 시각(predict와 진단이 쓴다)
+    queue = now = None               # plan이 받은 queue와 시각(predict와 진단이 쓴다)
 
     def __init__(self, hw, entries=None, budget=None, **attrs):
         super().__init__(hw, **attrs)
@@ -38,7 +38,7 @@ class Cache(Part):
         return 0 if m in self.loaded else self.hw.model_bytes
 
     def plan(self, m, queue, now):
-        """시각 now에 모델 m을 연산할 때 적재 B(0 = on-chip에 있음). entry 상태를 바꾼다"""
+        """시각 now에 모델 m을 연산할 때 적재 B(0 = on-chip에 있음). Entry 상태를 바꾼다"""
         self.queue, self.now = queue, now
         if m in self.loaded:
             self.loaded.move_to_end(m)
@@ -102,7 +102,7 @@ class OracleMIN(Cache):
 
 
 class OffsetOnly(Cache):
-    """offset-only: 모델 묶음(모델, nominal offset)과 지금 queue만 안다. 대기 추론 요청이 없으면 다음 nominal offset을 다음 사용으로 본다"""
+    """Offset-only: 모델 그룹(모델, nominal offset)과 지금 queue만 안다. 대기 추론 요청이 없으면 다음 nominal offset을 다음 사용으로 본다"""
     name = 'offset-only'
 
     def reset(self, wl):
@@ -112,8 +112,8 @@ class OffsetOnly(Cache):
         inv = np.asarray(inv).ravel()
         self.group_model, self.group_offset = pairs[:, 0].astype(int), pairs[:, 1]
         self.groups_of_model = [np.flatnonzero(self.group_model == m) for m in range(self.hw.models)]
-        self.track_group = inv                                       # 트랙 → 모델 묶음
-        self.group_tracks = np.bincount(inv, minlength=len(pairs))   # 모델 묶음의 등록 트랙 수
+        self.track_group = inv                                       # 트랙 → 모델 그룹
+        self.group_tracks = np.bincount(inv, minlength=len(pairs))   # 모델 그룹의 등록 트랙 수
 
     def predict(self, cand):
         out = []
@@ -129,15 +129,15 @@ class OffsetOnly(Cache):
 
 
 class PNU(OffsetOnly):
-    """PNU-count: 모델 묶음마다 지금 주기에 남은 추론 요청 수와 nominal offset(또는 첫 도착) 뒤 경과 시간으로 다음 사용을 예측한다.
+    """PNU-Count: 모델 그룹마다 지금 주기에 남은 추론 요청 수와 nominal offset(또는 첫 도착) 뒤 경과 시간으로 다음 사용을 예측한다.
     예상 추론 요청 수는 Host가 packet에 싣는 값이고 받은 수는 FPGA가 센다. 미래 도착·난수는 읽지 않는다"""
     name = 'PNU-count'
-    count = True                     # False면 PNU-timeout(예상 추론 요청 수를 모른다)
+    count = True                     # False면 PNU-Timeout(예상 추론 요청 수를 모른다)
     pred = 'exact'                   # δ 계산: exact(조건부 기대값) | lut(bin_us 칸 × 남은 수 6칸 표)
     bin_us = 200.0
     tau_q = 1.0                      # τ = 추론 요청별 지연 분포의 이 분위수
     meta_tiles = 0.5
-    group_aware = True               # 모델 묶음 지연 분포를 쓴다(False = P3.25 식)
+    model_group_delay_aware = True               # 모델 그룹 지연 분포를 쓴다(False = P3.25 식)
     REMAIN_EDGES = (1, 2, 3, 5, 9, 17)                     # 남은 추론 요청 수 칸 아래 끝: 1, 2, 3–4, 5–8, 9–16, 17 이상
     REMAIN_VALUES = (1.0, 2.0, 3.5, 6.5, 12.5, 24.0)       # 칸 대표값(17 이상은 모델당 평균 트랙 수 약 25)
 
@@ -145,18 +145,18 @@ class PNU(OffsetOnly):
         super().reset(wl)
         self.jitter = wl.jitter if wl.jitter is not None else Jitter.of('none')
         self.tau_us = self.jitter.quantile(self.tau_q)
-        self.req_group, self.req_epoch = self.track_group[wl.track], np.asarray(wl.epoch)    # 추론 요청 → 모델 묶음, 주기
-        K = int(self.req_epoch.max()) + 1 if self.req_epoch.size else 1
+        self.req_group, self.req_period = self.track_group[wl.track], np.asarray(wl.period)    # 추론 요청 → 모델 그룹, 주기
+        K = int(self.req_period.max()) + 1 if self.req_period.size else 1
         self.expected = np.zeros((self.group_offset.size, K), np.int64)
-        np.add.at(self.expected, (self.req_group, self.req_epoch), 1)   # Host가 packet에 싣는 주기별 추론 요청 수(seen이 된 칸만 읽는다)
+        np.add.at(self.expected, (self.req_group, self.req_period), 1)   # Host가 packet에 싣는 주기별 추론 요청 수(seen이 된 칸만 읽는다)
         self.received = np.zeros_like(self.expected)
         self.seen = np.zeros(self.expected.shape, bool)
-        self.last_expected, self.last_epoch = self.group_tracks.copy(), np.full(self.group_offset.size, -1)
+        self.last_expected, self.last_period = self.group_tracks.copy(), np.full(self.group_offset.size, -1)
         self.n_counted = 0
-        self.group_jitter = wl.group if self.group_aware and wl.group is not None and wl.group.max_us > 0 else None
-        if self.group_jitter is not None:
-            self.group_tau_us, self.group_mean_us = self.group_jitter.quantile(self.tau_q), self.group_jitter.delta(0.0, 1)
-            self.first_arrival = np.full(self.expected.shape, np.nan)   # (모델 묶음, 주기) 첫 도착 시각
+        self.model_group_delay = wl.model_group_delay if self.model_group_delay_aware and wl.model_group_delay is not None and wl.model_group_delay.max_us > 0 else None
+        if self.model_group_delay is not None:
+            self.model_group_delay_tau_us, self.model_group_delay_mean_us = self.model_group_delay.quantile(self.tau_q), self.model_group_delay.delta(0.0, 1)
+            self.first_arrival = np.full(self.expected.shape, np.nan)   # (모델 그룹, 주기) 첫 도착 시각
         if self.pred == 'lut':
             nb = max(1, math.ceil(self.jitter.max_us / self.bin_us))
             self.lut = np.array([[self.jitter.delta((i + 0.5) * self.bin_us, r) for r in self.REMAIN_VALUES] for i in range(nb)])
@@ -175,14 +175,14 @@ class PNU(OffsetOnly):
         """지금까지 도착한 추론 요청만 센다"""
         q = self.queue.next_idx
         if q > self.n_counted:
-            g, k = self.req_group[self.n_counted:q], self.req_epoch[self.n_counted:q]
+            g, k = self.req_group[self.n_counted:q], self.req_period[self.n_counted:q]
             np.add.at(self.received, (g, k), 1)
             self.seen[g, k] = True
-            if self.group_jitter is not None:
+            if self.model_group_delay is not None:
                 np.fmin.at(self.first_arrival, (g, k), self.wl.t_arr[self.n_counted:q])
             for gg, kk in zip(g.tolist(), k.tolist()):
-                if kk > self.last_epoch[gg]:
-                    self.last_epoch[gg], self.last_expected[gg] = kk, self.expected[gg, kk]
+                if kk > self.last_period[gg]:
+                    self.last_period[gg], self.last_expected[gg] = kk, self.expected[gg, kk]
             self.n_counted = q
 
     def _delta(self, el, r):
@@ -195,9 +195,9 @@ class PNU(OffsetOnly):
         return v
 
     def _next_use(self, g, now):
-        """모델 묶음 g의 다음 사용 시각"""
+        """모델 그룹 g의 다음 사용 시각"""
         off, kn, n_next, r = self._period(g, now)
-        if self.group_jitter is not None:
+        if self.model_group_delay is not None:
             return self._next_use_grouped(g, now, off, kn, n_next, r)
         if kn < 0:
             return off + self._delta(0.0, n_next)
@@ -207,8 +207,8 @@ class PNU(OffsetOnly):
         return off + (kn + 1) * PERIOD_US + self._delta(0.0, n_next)
 
     def _period(self, g, now):
-        """모델 묶음 g의 (nominal offset, offset이 지난 마지막 주기 kn, 다음 주기 예상 수, 이번 주기 남은 추론 요청 수 r).
-        PNU-timeout은 예상 수를 몰라 r = 1"""
+        """모델 그룹 g의 (nominal offset, offset이 지난 마지막 주기 kn, 다음 주기 예상 수, 이번 주기 남은 추론 요청 수 r).
+        PNU-Timeout은 예상 수를 몰라 r = 1"""
         off, K = self.group_offset[g], self.expected.shape[1]
         kn = math.floor((now - off) / PERIOD_US)
         n_next = max(1, int(self.last_expected[g])) if self.count else 1
@@ -218,38 +218,38 @@ class PNU(OffsetOnly):
         return off, kn, n_next, int(n - (self.received[g, kn] if kn < K else 0))
 
     def _next_use_grouped(self, g, now, off, kn, n_next, r):
-        """모델 묶음 지연이 있을 때의 다음 사용(P3.26). 첫 도착 전에는 묶음 지연 분포, 뒤에는 추론 요청별 지연 분포로 본다"""
-        nxt = off + (kn + 1) * PERIOD_US + self.group_mean_us + self._delta(0.0, n_next)
+        """모델 그룹 지연이 있을 때의 다음 사용(P3.26). 첫 도착 전에는 모델 그룹 지연 분포, 뒤에는 추론 요청별 지연 분포로 본다"""
+        nxt = off + (kn + 1) * PERIOD_US + self.model_group_delay_mean_us + self._delta(0.0, n_next)
         if kn < 0:
             return nxt
         a = self.first_arrival[g, kn] if kn < self.expected.shape[1] else np.nan
-        if np.isnan(a):                                    # 이번 주기 첫 추론 요청 전: 모델 묶음이 늦어지는 중일 수 있다
+        if np.isnan(a):                                    # 이번 주기 첫 추론 요청 전: 모델 그룹이 늦어지는 중일 수 있다
             el = now - off - kn * PERIOD_US
-            if r > 0 and el < self.group_tau_us:
-                return now + self.group_jitter.delta(el, 1)
-        elif r > 0 and now - a < self.tau_us:              # 첫 추론 요청 뒤: 그 시각을 모델 묶음 시작으로
+            if r > 0 and el < self.model_group_delay_tau_us:
+                return now + self.model_group_delay.delta(el, 1)
+        elif r > 0 and now - a < self.tau_us:              # 첫 추론 요청 뒤: 그 시각을 모델 그룹 시작으로
             return now + self._delta(now - a, r)
         return nxt
 
 
 class PNUTimeout(PNU):
-    """PNU-timeout: 예상 추론 요청 수 없이 nominal offset 뒤 τ 동안은 추론 요청이 더 온다고 본다(r = 1)"""
+    """PNU-Timeout: 예상 추론 요청 수 없이 nominal offset 뒤 τ 동안은 추론 요청이 더 온다고 본다(r = 1)"""
     name, count = 'PNU-timeout', False
 
 
 class PNURTL(PNU):
-    """next_use_predictor.v(P4.3)와 같은 PNU-count. 시각은 µs 정수로 내리고 δ를 LUT_BIN_US 칸 표로 읽는다. 모델 묶음마다
+    """next_use_predictor.v(P4.3)와 같은 PNU-Count. 시각은 µs 정수로 내리고 δ를 LUT_BIN_US 칸 표로 읽는다. 모델 그룹마다
     가장 최근 주기 하나의 (예상 수, 도착 수, 첫 도착)만 둔다. 추론 요청의 주기는 RTL처럼 도착 시각과 t_host로 정한다"""
     name, pred = 'PNU-count RTL', 'rtl'
     LUT_BIN_US, LUT_BINS = 256, 128
-    log = None                       # list면 도착을 (도착 µs, 모델 묶음, t_host µs, 예상 수)로 남긴다
+    log = None                       # list면 도착을 (도착 µs, 모델 그룹, t_host µs, 예상 수)로 남긴다
 
     def reset(self, wl):
         super().reset(wl)
         self.tables = self._tables()
         n = self.group_offset.size
         self.offset_us = np.rint(self.group_offset).astype(np.int64)
-        self.valid, self.epoch_tag = np.zeros(n, bool), np.zeros(n, np.int64)
+        self.valid, self.period_tag = np.zeros(n, bool), np.zeros(n, np.int64)
         self.n_expected, self.n_received, self.first_us = np.zeros(n, np.int64), np.zeros(n, np.int64), np.zeros(n, np.int64)
 
     def plan(self, m, queue, now):
@@ -265,7 +265,7 @@ class PNURTL(PNU):
 
     def _tables(self):
         """Host가 next_use_predictor.v에 쓰는 정수 µs 표. δ는 칸 가운데 값(lut와 같은 규칙), τ는 올림"""
-        jt, gt, B, NB = self.jitter, self.group_jitter, self.LUT_BIN_US, self.LUT_BINS
+        jt, gt, B, NB = self.jitter, self.model_group_delay, self.LUT_BIN_US, self.LUT_BINS
         return dict(lut_u=[[int(round(jt.delta((i + 0.5) * B, r))) for r in self.REMAIN_VALUES] for i in range(NB)],
                     lut_g=[int(round(gt.delta((i + 0.5) * B, 1))) if gt is not None else 0 for i in range(NB)],
                     tau_u=int(math.ceil(jt.quantile(1.0))), tau_g=int(math.ceil(gt.quantile(1.0))) if gt is not None else 0,
@@ -281,12 +281,12 @@ class PNURTL(PNU):
         q = self.queue.next_idx
         for i in range(self.n_counted, q):
             g, ta, th = int(self.req_group[i]), int(math.floor(self.wl.t_arr[i])), int(round(self.wl.t_host[i]))
-            n_exp = int(self.expected[g, self.req_epoch[i]])
+            n_exp = int(self.expected[g, self.req_period[i]])
             kn, el = self._phase(g, ta)
             k = kn if el - (ta - th) >= -int(PERIOD_US) // 2 else kn - 1   # t_host가 반 주기 넘게 앞서면 앞 주기
-            if not self.valid[g] or k > self.epoch_tag[g]:
-                self.valid[g], self.epoch_tag[g], self.n_expected[g], self.n_received[g], self.first_us[g] = True, k, n_exp, 1, ta
-            elif k == self.epoch_tag[g]:
+            if not self.valid[g] or k > self.period_tag[g]:
+                self.valid[g], self.period_tag[g], self.n_expected[g], self.n_received[g], self.first_us[g] = True, k, n_exp, 1, ta
+            elif k == self.period_tag[g]:
                 self.n_received[g] += 1
             if self.log is not None:
                 self.log.append((ta, g, th, n_exp))
@@ -296,14 +296,14 @@ class PNURTL(PNU):
         return int(np.searchsorted(self.REMAIN_EDGES, r, 'right')) - 1
 
     def _next_delay(self, g, now):
-        """모델 묶음 g의 다음 사용까지 남은 µs(정수 표)"""
+        """모델 그룹 g의 다음 사용까지 남은 µs(정수 표)"""
         tb, Pi = self.tables, int(PERIOD_US)
         kn, el = self._phase(g, now)
         est = int(self.n_expected[g]) if self.valid[g] else int(self.group_tracks[g])
         nxt = (Pi - el) + tb['eg'] + tb['lut_u'][0][self._remain_bin(max(1, est))]
         if kn < 0:
             return nxt
-        seen = bool(self.valid[g]) and self.epoch_tag[g] == kn
+        seen = bool(self.valid[g]) and self.period_tag[g] == kn
         r = est - (int(self.n_received[g]) if seen else 0)
         if not seen:
             if r > 0 and el < tb['tau_g']:

@@ -1,8 +1,8 @@
-"""학습 기록 폴더(train_result/<학습 이름>) 아래 학습 기록(history.csv)을 모아 에포크·batch 판단 자료를 만든다.
+"""학습 기록 폴더(train_result/<학습 이름>) 아래 학습 기록(history.csv)을 모아 epoch·batch 판단 자료를 만든다.
 
 출력: <분석폴더>/summary.csv, <분석폴더>/curves_<그룹>.png
-  - best_val_ep : val loss 최소 에포크(체크포인트 선택 기준, test 라벨 미사용)
-  - plateau_ep  : val loss 5에포크 이동평균이 최종 최소값의 +2% 이내로 처음 들어온 에포크
+  - best_val_ep : val loss 최소 epoch(체크포인트 선택 기준, test 라벨 미사용)
+  - plateau_ep  : val loss 5epoch 이동평균이 최종 최소값의 +2% 이내로 처음 들어온 epoch
   - test_auc@best_val / test_pauc@best_val : 선택된 체크포인트의 실제 test 성능
   - max_test_auc(ep) : 참고용 상한(test 라벨로 고른 값, 모델 선택에 쓰면 안 됨)
 """

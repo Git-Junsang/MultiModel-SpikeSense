@@ -3,13 +3,14 @@
 
 입력은 모두 합성이고 측정값이 아니다. 파일은 임시 폴더에만 쓴다.
   1 mel: p325_mel_load.mel_db = librosa melspectrogram(power 2) + power_to_db(ref 1) (DCASE wav, 없으면 noise).
-    seg 정규화를 frame씩 한 값 = realtime_norm.py의 seg 식을 한꺼번에 계산한 값. 0~127 입력은 1 차이까지
-  2 M3: 8트랙 10 epoch를 실제로 돌려 묶음 수와 시각 순서(t_frame ≤ t_compute_start ≤ t_ready)
-  3 M1: drift +40·−25 ppm, 전달 지연 2 ms + 지수분포 0.3 ms, xrun 1번(160 샘플 빠짐)인 합성 block → Recorder → analyze.
+    Frame 100–159를 무음(−100 dB), 200–203을 40 dB 작게 바꾸고 TrackNorm을 frame씩 한 값 = realtime_norm.py의 gated_ref(평가한 규칙).
+    0–127 입력은 1 차이까지
+  2 M3: 8트랙 10 period를 실제로 돌려 모델 그룹 수와 시각 순서(t_frame ≤ t_compute_start ≤ t_ready)
+  3 M1: drift +40·−25 ppm, 전달 지연 2 ms + 지수분포 0.3 ms, xrun 1번(160샘플 빠짐)인 합성 block → Recorder → analyze.
     drift ±0.2 ppm, frame 끝 offset 오차의 증가 = drift × 시간(+ xrun으로 빠진 시간), xrun frame 표시
   4 M4: packet byte 위치(06 §4.1·§4.2), 32 bit µs 되감기, 받는 쪽 clock offset 5 s·drift 30 ppm·편도 45 µs + 지수분포 3 µs
     (대칭)인 합성 packet → 편도 오차 ±3 µs, clock drift ±0.5 ppm
-  5 trace: M1 + M4 합성 로그로 만든 trace를 engine의 TraceJitter(part_jitter.py)가 읽고 뒤 절반 epoch를 재생한다
+  5 trace: M1 + M4 합성 로그로 만든 trace를 engine의 TraceJitter(part_jitter.py)가 읽고 뒤 절반 period를 재생한다
 
     python3 hardware/board_test/host/test_p325.py
 """
@@ -25,13 +26,14 @@ import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.normpath(os.path.join(HERE, '..', '..', '..'))
-sys.path[:0] = [HERE, os.path.join(ROOT, 'simulation', 'engine')]
+sys.path[:0] = [HERE, os.path.join(ROOT, 'simulation', 'engine'), os.path.join(ROOT, 'software', 'model', 'eval')]
 import p325_mel_load as ml  # noqa: E402  (BLAS thread 1, software/ 경로)
+import realtime_norm as rn  # noqa: E402
 import librosa  # noqa: E402
 import snn_int8 as si  # noqa: E402
 import analyze_p325 as an  # noqa: E402
 import p325_audio_rec as ar  # noqa: E402
-import p325_udp_lat as ul  # noqa: E402
+import p325_udp_delay as ul  # noqa: E402
 from p325_common import M, OFF_NS, P_NS, SEG  # noqa: E402
 from part_jitter import TraceJitter  # noqa: E402
 
@@ -44,7 +46,7 @@ def check(name, cond, detail=''):
     print(('ok   ' if cond else 'FAIL ') + name + (f'  ({detail})' if detail else ''))
 
 
-# ---- 1. mel 식 ----
+# ---- 1. Mel 식 ----
 w, src = ml.load_audio(ml.WAV)
 K = (w.size - 1024) // 512 + 1
 ours = ml.mel_db(np.lib.stride_tricks.sliding_window_view(w, 1024)[::512][:K])
@@ -52,14 +54,16 @@ ref = librosa.power_to_db(librosa.feature.melspectrogram(y=w.astype(np.float64),
                                                          n_mels=40), ref=1.0, top_db=None).T[1:K + 1]   # center=True라 한 칸 밀림
 d = np.abs(ours - ref).max()
 check('1a mel dB = librosa', d < 0.01, f'{src}, frame {K}개, 최대 차 {d:.1e} dB')
-n = K // SEG * SEG
-seg = ref[:n].reshape(-1, SEG, 40)
-hi = np.maximum.accumulate(seg.max(2), 1)[..., None]
-lo = np.maximum(np.minimum.accumulate(seg.min(2), 1)[..., None], hi - 80.0)
-q_ref = si.quantize_input(np.clip((seg - lo) / np.maximum(hi - lo, 1e-8), 0, 1)).reshape(n, 40)
-for name, db in (('1b seg 정규화 frame씩 = 한꺼번에(같은 dB)', ref), ('1c 0~127 입력: float32 mel과 librosa', ours)):
-    norm = ml.SegNorm(1)
-    q = np.concatenate([si.quantize_input(norm(db[k:k + 1], np.array([0]), k % SEG == 0)) for k in range(n)])
+n = K
+ref, ours = ref.copy(), ours.copy()
+ref[100:160] = ours[100:160] = -100.0                                    # 무음: 기준을 멈춰야 한다
+ref[200:204] -= 40.0                                                     # 조용한 frame: 최소를 멈춰야 한다
+ours[200:204] -= 40.0
+a_f, hi, lo, _ = rn.gated_ref(ref, ml.TAU_S, quiet_db=ml.QUIET_DB)
+q_ref = si.quantize_input(np.clip((a_f - lo) / np.maximum(hi - lo, 1e-8), 0, 1))
+for name, db in (('1b TrackNorm frame씩 = realtime_norm.gated_ref(같은 dB, 무음 포함)', ref), ('1c 0~127 입력: float32 mel과 librosa', ours)):
+    norm = ml.TrackNorm(1)
+    q = np.concatenate([si.quantize_input(norm(db[k:k + 1], np.array([0]))) for k in range(n)])
     diff = np.abs(q - q_ref)
     check(name, diff.max() == 0 if db is ref else diff.max() <= 1 and (diff > 0).mean() < 1e-3,
           f'{n} frame, 다른 칸 {(diff > 0).mean():.1e}, 최대 차 {diff.max()}')
@@ -70,7 +74,7 @@ t0 = time.monotonic_ns() + 50_000_000
 log, groups = ml.run(8, E, 1, [], w, t0)
 tf = t0 + np.arange(E)[:, None] * P_NS + np.arange(M)[None, :] * OFF_NS
 has = log[..., 0] >= 0
-check('2 M3 8트랙 10 epoch: 묶음 80개, t_frame ≤ 시작 ≤ 끝',
+check('2 M3 8트랙 10 period: 묶음 80개, t_frame ≤ 시작 ≤ 끝',
       has.sum() == E * 8 and (log[..., 0][has] >= tf[has]).all() and (log[..., 1][has] >= log[..., 0][has]).all(),
       f'묶음 {has.sum()}개')
 
@@ -92,7 +96,7 @@ arr, dev, xr = (np.concatenate(v) for v in (arr, dev, xr))
 rec = ar.Recorder(2, 1, rate, 1, 2 * nb + 10, T0)
 for i in np.argsort(arr, kind='stable'):
     t = int(arr[i])
-    rec.now = lambda t=t: t + 2000                                  # frame 넘김 = 도착 + 2 µs
+    rec.now = lambda t=t: t + 2000                                  # Frame 넘김 = 도착 + 2 µs
     rec.block(int(dev[i]), B, t, int(xr[i]))
 p1 = os.path.join(tmp, 'm1.csv')
 with open(p1, 'w') as f:
@@ -139,7 +143,7 @@ t4 = t1 + fwd + 10e3 + back
 gone = rng.random(N) < 1e-3
 t2[gone] = t3[gone] = t4[gone] = -1
 p4 = os.path.join(tmp, 'm4.csv')
-cols = dict(seq=k & 0xFFFF, track_id=tr, model_id=tr % M, epoch=k, t_send_host_ns=t1, t_arr_fpga_ns=t2, t_done_fpga_ns=t3,
+cols = dict(seq=k & 0xFFFF, track_id=tr, model_id=tr % M, period=k, t_send_host_ns=t1, t_arr_fpga_ns=t2, t_done_fpga_ns=t3,
             t_recv_host_ns=t4, lost=gone, reordered=np.zeros(N), retransmitted=np.zeros(N), t_sched_host_ns=ts)
 with open(p4, 'w') as f:
     f.write(ul.COLS + '\n')
@@ -154,20 +158,20 @@ check('4d M4 clock drift, 결과 없음 수', abs(i4['clock_drift_ppm'] - 30) < 
 
 # ---- 5. trace → engine ----
 pt = os.path.join(tmp, 'trace.csv')
-track, epoch, model, t, status = an.compose({'m1': g1, 'm4': g4})
-an.write_trace(pt, track, epoch, model, t, status, 0)
+track, period, model, t, status = an.compose({'m1': g1, 'm4': g4})
+an.write_trace(pt, track, period, model, t, status, 0)
 rows = list(csv.DictReader(open(pt)))
 check('5a trace 열', list(rows[0]) == an.TRACE_COLS.split(','), f'{len(rows)}줄')
 jt = TraceJitter(pt)
-eps = sorted({int(x['epoch']) for x in rows})
+eps = sorted({int(x['period']) for x in rows})
 tid = sorted({int(x['track_id']) for x in rows})
 D = np.full((len(tid), len(eps)), np.nan)
 for x in rows:
-    D[tid.index(int(x['track_id'])), eps.index(int(x['epoch']))] = float(x['t_ready_us']) - float(x['t_gen_us'])
+    D[tid.index(int(x['track_id'])), eps.index(int(x['period']))] = float(x['t_ready_us']) - float(x['t_host_us'])
 h = len(eps) // 2
 same = np.isfinite(D[:, h:])
 check('5b engine trace 재생 = 뒤 절반', jt.replay.shape == D[:, h:].shape and np.allclose(jt.replay[same], D[:, h:][same]),
-      f'트랙 {len(tid)}, epoch {len(eps)}')
+      f'트랙 {len(tid)}, period {len(eps)}')
 shutil.rmtree(tmp)
 print('PASS' if ok else 'FAIL')
 sys.exit(0 if ok else 1)

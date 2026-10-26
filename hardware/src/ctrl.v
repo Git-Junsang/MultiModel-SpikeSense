@@ -1,18 +1,18 @@
 // ctrl.v — 제어 packet 처리: 주소 공간 읽기·쓰기 (06_HOST_INTERFACE.md §7, §7.6)
 //
-// 요청 {magic 0x5C, op(1 읽기, 2 쓰기), tag, addr, count, status, data}를 cq_*로 받아 다 모은 뒤 실행하고 응답
-// {같은 머리, status, (읽기 성공이면) data}를 cr_*로 낸다. 요청 하나에 응답은 늘 하나다(eth_link가 이를 믿고 기다린다).
-// data는 1 KiB 버퍼에 모은다. 쓰기는 길이까지 맞아야 시작하므로 반만 쓰는 일이 없다. 읽기도 다 읽은 뒤 status를 정한다.
+// 요청 {magic 0x5C, op(1 읽기, 2 쓰기), tag, addr, count, status, 데이터}를 cq_*로 받아 다 모은 뒤 실행하고 응답
+// {같은 머리, status, (읽기 성공이면) 데이터}를 cr_*로 낸다. 요청 하나에 응답은 늘 하나다(eth_link가 이를 믿고 기다린다).
+// 데이터는 1 KiB 버퍼에 모은다. 쓰기는 길이까지 맞아야 시작하므로 반만 쓰는 일이 없다. 읽기도 다 읽은 뒤 status를 정한다.
 // status (먼저 맞는 것):
-//   3  머리 12 B 미만, magic ≠ 0x5C, op ∉ {1, 2}, count ∉ 1~256, 길이 ≠ 12 + 4 × count(쓰기) 또는 12(읽기)
-//   1  addr 4 B 정렬 아님, 끝 주소가 다른 블록(regs ↔ DDR3, DDR3 창 0x8000_0000~0xBFFF_FFFF 밖)으로 넘어감
+//   3  머리 12 B 미만, magic ≠ 0x5C, op ∉ {1, 2}, count ∉ 1–256, 길이 ≠ 12 + 4 × count(쓰기) 또는 12(읽기)
+//   1  addr 4 B 정렬 아님, 끝 주소가 다른 블록(regs ↔ DDR3, DDR3 창 0x8000_0000–0xBFFF_FFFF 밖)으로 넘어감
 //   2  DDR3 창이고 run = 1
 //   1  DDR3 창이고 addr 32 B 정렬 아님
 //   3  DDR3 창이고 count % 8 ≠ 0
 //   1  실행 중 AXI 오류 응답(SLVERR·DECERR)
 // addr < 0x8000_0000: AXI4-Lite로 word 하나씩 addr + 4i. 나가 있는 거래는 하나. run 검사는 regs 몫이다.
 // DDR3 창: MIG 주소 = addr − 0x8000_0000. AXI4 burst(32 B beat, 4 KiB 경계에서 나눔)를 하나씩 낸다.
-//   쓰기 data는 주소 handshake 뒤에만 낸다. data는 word 순서대로 little-endian(beat byte k = data[8k+7:8k]).
+//   쓰기 데이터는 주소 handshake 뒤에만 낸다. 데이터는 word 순서대로 little-endian(beat byte k = 데이터[8k+7:8k]).
 // run 입력은 DDR3 창 거부(status 2) 조건이다. ctrl은 DDR3 응답을 시간 제한 없이 기다리므로 top은 MIG 보정 전에도
 //   거부하도록 run || !mig_calib를 넣는다.
 // rst는 idle일 때만 준다. 나가 있는 거래가 있으면 그 응답을 다음 거래의 것으로 잘못 센다.
@@ -77,7 +77,7 @@ module ctrl (
 
     reg  [3:0]   st;
     reg  [15:0]  n;                          // 받은 요청 byte
-    reg  [95:0]  hdr;                        // 요청 byte 0~11
+    reg  [95:0]  hdr;                        // 요청 byte 0–11
     reg  [1:0]   stat;
     reg  [10:0]  p;                          // 버퍼 byte 위치, S_TX에서는 응답 byte 위치
     reg  [4:0]   k;                          // word·beat 안 byte
@@ -92,7 +92,7 @@ module ctrl (
     wire [31:0] addr  = hdr[63:32];
     wire [15:0] cnt   = hdr[79:64];
     wire        ddr   = addr[31];
-    wire [10:0] tb    = {cnt[8:0], 2'b00};   // data byte 수(count ≤ 256일 때)
+    wire [10:0] tb    = {cnt[8:0], 2'b00};   // 데이터 byte 수(count ≤ 256일 때)
     wire [31:0] aend  = addr + {21'd0, tb} - 32'd1;
     wire [4:0]  ulast = ddr ? 5'd31 : 5'd3;
 

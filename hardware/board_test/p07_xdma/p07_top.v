@@ -111,18 +111,18 @@ module p07_top (
     end
 
     // ---- 후보 핀 래치 (글리치 방지: 64 클럭(0.32 us) 연속 같은 값일 때만 반영) ----
-    wire       lat_clr;
-    reg [1:0]  lat_clr_s;
+    wire       delay_clr;
+    reg [1:0]  delay_clr_s;
     reg [13:0] cand_prev;
     reg [5:0]  stable_cnt;
     reg [13:0] ever_high, ever_low;
     always @(posedge clk200) begin
-        lat_clr_s <= {lat_clr_s[0], lat_clr};
+        delay_clr_s <= {delay_clr_s[0], delay_clr};
         cand_prev <= cand_s1;
         if (cand_s1 != cand_prev) stable_cnt <= 6'd0;
         else if (stable_cnt != 6'h3F) stable_cnt <= stable_cnt + 6'd1;
 
-        if (lat_clr_s[1]) begin
+        if (delay_clr_s[1]) begin
             ever_high <= 14'd0;
             ever_low  <= 14'd0;
         end else if (stable_cnt == 6'h3F) begin
@@ -140,7 +140,7 @@ module p07_top (
         .probe_in4 (ever_high),
         .probe_in5 (ever_low),
         .probe_out0(vio_rst),
-        .probe_out1(lat_clr)
+        .probe_out1(delay_clr)
     );
 
     // ---- LED ----

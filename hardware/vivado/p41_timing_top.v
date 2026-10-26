@@ -3,7 +3,7 @@
 // ============================================================
 // compute_array + weight_entry 4개 + entry 출력 4:1 mux + membrane potential RAM(1트랙).
 // 03_ARCHITECTURE.md §6의 위험(entry 출력 mux, adder tree)을 첫 합성에서 본다.
-// cache 교체·dma는 없다(P4.3, P4.4). 적재 port는 밖에서 바로 쓴다.
+// Cache 교체·DMA는 없다(P4.3, P4.4). 적재 port는 밖에서 바로 쓴다.
 // ============================================================
 `timescale 1ns / 1ps
 

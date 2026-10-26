@@ -3,9 +3,9 @@
 평가 분할은 train_1unit.prepare와 동일하다(학습에 쓴 이상 파일 절반 제외). 따라서 여기서
 계산한 AUC는 train_result/L_normal_noaug/results.csv의 test_auc와 같아야 한다.
 
-학습된 40대 모델로 test 세그먼트를 추론해
+학습된 40대 모델로 test segment를 추론해
   1) 파일 단위 이상 점수·정답  → train_result/eval/scores/scores.npz
-  2) layer별 membrane potential 최대치(하드웨어 정수 단위) → train_result/eval/scores/membrane_headroom.csv
+  2) layer별 membrane potential 최대치(hardware 정수 단위) → train_result/eval/scores/membrane_headroom.csv
 를 저장한다. 그림 생성(analysis/develop)은 GPU 없이 이 파일들만 읽는다.
 
 사용: python3 scores.py

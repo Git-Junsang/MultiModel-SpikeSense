@@ -2,7 +2,7 @@
 //
 // 64 B 추론 요청 하나 = rq_data 하나(byte k = bit [8k+7:8k]). 2 cycle에 하나씩 받는다.
 // 검사 순서(첫 오류 하나만 err로 낸다): magic ≠ 0xA5(1, 정보 = 받은 순번), track_id ≥ N_TRACKS(2), model_id ≥ N_MODELS(3),
-// x 중 하나 > 127(4), 같은 트랙의 이전 추론 요청이 아직 결과 전(5, drop). 정보는 2~5에서 track_id.
+// x 중 하나 > 127(4), 같은 트랙의 이전 추론 요청이 아직 결과 전(5, drop). 정보는 2–5에서 track_id.
 // 통과하면 req_table에 넣고 모델 목록 끝에 붙이며 predictor에 도착을 알린다. run = 0이면 오류 없이 버린다.
 // n_expect(4 B)는 predictor 폭 11 bit로 포화한다.
 

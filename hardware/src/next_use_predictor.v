@@ -1,7 +1,7 @@
-// next_use_predictor.v — PNU-count: 모델마다 다음 사용까지 남은 시간 예측 (04_MEMORY.md §3.1)
+// next_use_predictor.v — PNU-Count: 모델마다 다음 사용까지 남은 시간 예측 (04_MEMORY.md §3.1)
 //
 // 모델 m의 nominal offset off = OFFSET_NUM[m] × 800 µs. 시각은 µs 정수.
-//   kn, el = 지금 주기와 그 주기 nominal offset 뒤 경과 (el = phase − off, 음수면 + 32,000, kn = epoch − 1)
+//   kn, el = 지금 주기와 그 주기 nominal offset 뒤 경과 (el = phase − off, 음수면 + 32,000, kn = period − 1)
 //   est    = 가장 최근 주기의 예상 추론 요청 수(packet n_expect). 아직 없으면 N_REG[m]
 //   r      = est − (이번 주기 kn의 도착 수)
 //   Δ_nxt  = (32,000 − el) + EG + LUT_U[0][rb(max(1, est))]
@@ -11,7 +11,7 @@
 //            LUT_G[el / 256]        이번 주기 첫 추론 요청 전, r > 0, el < TAU_G
 //            LUT_U[x / 256][rb(r)]  첫 추론 요청 뒤(x = 지금 − 첫 도착), r > 0, x < TAU_U
 //            Δ_nxt                  그 밖
-// rb: 남은 수 칸 1, 2, 3~4, 5~8, 9~16, 17 이상 → 0~5. 표 값은 칸 가운데의 기대값(engine.rtl_tables).
+// rb: 남은 수 칸 1, 2, 3–4, 5–8, 9–16, 17 이상 → 0–5. 표 값은 칸 가운데의 기대값(engine.rtl_tables).
 // 모델마다 가장 최근 주기 하나의 (주기 번호, 예상 수, 도착 수, 첫 도착 시각)만 둔다.
 // 도착한 추론 요청의 주기: t_host − (지금 주기 nominal 시작)이 −16,000 µs보다 작으면 앞 주기.
 // engine.PNURTL과 같은 식이다.
@@ -28,8 +28,8 @@ module next_use_predictor #(
     // 시각
     input  wire [31:0]         now_us,
     input  wire [14:0]         phase_us,      // 0 ~ 31,999
-    input  wire [15:0]         epoch,
-    input  wire                first_epoch,   // 시작 뒤 첫 주기(core_rst 뒤 첫 phase 넘김 전)
+    input  wire [15:0]         period,
+    input  wire                first_period,   // 시작 뒤 첫 주기(core_rst 뒤 첫 phase 넘김 전)
     // 설정
     input  wire                cfg_we,
     input  wire [10:0]         cfg_addr,
@@ -39,7 +39,7 @@ module next_use_predictor #(
     input  wire [5:0]          arr_model,
     input  wire [31:0]         arr_t_host,
     input  wire [10:0]         arr_n_expect,
-    // queue
+    // Queue
     input  wire [N_MODELS-1:0] q_ne,
     // 질의
     input  wire                qy_valid,
@@ -83,7 +83,7 @@ module next_use_predictor #(
     reg  [10:0] n_r  [0:63];
     reg  [31:0] a1   [0:63];
 
-    // 주기 안 위치: {pl, el}. pl = phase < off(이번 주기 offset 전이라 kn = epoch − 1)
+    // 주기 안 위치: {pl, el}. pl = phase < off(이번 주기 offset 전이라 kn = period − 1)
     function automatic [31:0] where(input [14:0] ph, input [14:0] off);
         reg pl;
         reg [15:0] el;
@@ -111,7 +111,7 @@ module next_use_predictor #(
         a_n1   <= arr_n_expect;
         a_now1 <= now_us;
         a_el1  <= wa[15:0];
-        a_kn1  <= epoch - {15'd0, wa[16]};
+        a_kn1  <= period - {15'd0, wa[16]};
         a_d1   <= now_us - arr_t_host;                    // 도착 − t_host (clock 차이로 음수일 수 있다)
         a_v2   <= !rst && a_v1;
         a_m2   <= a_m1;
@@ -167,7 +167,7 @@ module next_use_predictor #(
             r_inf  <= (n_reg[qm] == 11'd0);
             r_pl   <= wq[16];
             r_el   <= wq[15:0];
-            r_kn   <= epoch - {15'd0, wq[16]};
+            r_kn   <= period - {15'd0, wq[16]};
             r_tv   <= tv[qm];
             r_tag  <= tag[qm];
             r_ne   <= n_e[qm];
@@ -179,7 +179,7 @@ module next_use_predictor #(
         2'd2: begin
             s_zero   <= r_zero;
             s_inf    <= r_inf;
-            s_before <= first_epoch && r_pl;
+            s_before <= first_period && r_pl;
             s_g      <= !q_seen && q_r > 0 && r_el < tau_g;
             s_u      <= q_seen && q_r > 0 && r_x < {16'd0, tau_u};
             s_nxt    <= {1'b0, PER - r_el} + {1'b0, eg} + {1'b0, lut_u0[rb((q_est == 11'd0) ? 11'd1 : q_est)]};

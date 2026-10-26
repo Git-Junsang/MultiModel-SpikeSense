@@ -68,7 +68,7 @@ def _spin(avoid):
 
 class CpuLoad:
     """CPU 부하 process n개(순수 Python 무한 루프). avoid = 부하를 두지 않을 CPU(--pin으로 고정한 측정 thread의 CPU).
-    shortcut: 계산 부하만 준다. 메모리 대역폭·interrupt 부하가 필요하면 stress-ng 등으로 바꾼다"""
+    shortcut: 계산 부하만 준다. 메모리 bandwidth·interrupt 부하가 필요하면 stress-ng 등으로 바꾼다"""
 
     def __init__(self, n, avoid=()):
         self.ps = [mp.get_context('fork').Process(target=_spin, args=(tuple(avoid),), daemon=True) for _ in range(n)]

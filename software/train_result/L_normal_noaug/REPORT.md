@@ -11,10 +11,10 @@ Checkpoint: `software/weights/L_normal_noaug/<unit>/last.pth`
 |---|---|
 | 모델 | PLIF-T `40→384→256→64→2` |
 | 입력 | 16 kHz, 40 mel, 31 frame, 약 992 ms |
-| 학습 | supervised, 실제 이상 절반 사용 |
-| Batch / epoch | 512 / 60 |
+| 학습 | 지도학습, 실제 이상 절반 사용 |
+| batch / epoch | 512 / 60 |
 | Optimizer | Adam, lr 0.002, cosine decay |
-| Loss | Focal loss, gamma 2, file 단위 |
+| Loss | focal loss, gamma 2, file 단위 |
 | Augmentation | time·frequency mask |
 | Checkpoint | 마지막 epoch |
 | GPU | RTX 3090 Ti |
@@ -25,7 +25,7 @@ Validation 이상 file이 20개 안팎이라 validation loss가 많이 흔들렸
 
 단일 장비 예비 실험에서 batch를 32→512로 키우면 epoch 시간이 13.7→0.86초로 줄었다. Validation AUC 차이는 0.006 이하였다. 그래서 batch 512를 썼다.
 
-Validation AUC는 30~50 epoch에서 거의 포화했다. 여유를 두고 60 epoch와 cosine decay를 썼다.
+Validation AUC는 30–50 epoch에서 거의 포화했다. 여유를 두고 60 epoch와 cosine decay를 썼다.
 
 이 예비 실험은 나중에 제외한 `fan_id00`, 8출력, 가짜 이상 조건이었다. Training speed와 대략적인 수렴 시점만 참고했다.
 
@@ -70,9 +70,9 @@ Valve가 가장 약했다. 하위 장비는 `valve_id06` 0.8175, `ToyCar_id05` 0
 |---|---:|---:|---:|---:|
 | Spike rate | 0.21 | 0.46 | 0.47 | — |
 | 정수 환산 membrane 최대 | 3,446 | 8,544 | 16,707 | 4,276 |
-| INT16 대비 | 10.5 % | 26.1 % | 51.0 % | 13.0 % |
+| INT16 대비 | 10.5% | 26.1% | 51.0% | 13.0% |
 
-INT16 범위를 넘은 모델은 없었다. Threshold도 모두 127 이하였다. 막전위는 16 bit를 유지했다.
+INT16 범위를 넘은 모델은 없었다. Threshold도 모두 127 이하였다. Membrane potential은 16 bit를 유지했다.
 
 출력 layer soft reset을 끄면 평균 AUC가 0.9563→0.9543으로 떨어졌다. 기존 뉴런 규칙을 유지했다.
 

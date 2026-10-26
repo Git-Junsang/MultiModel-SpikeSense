@@ -25,8 +25,8 @@ module tb_weight_cache #(
 
     reg  [31:0]  now_us = 32'd0;
     wire [14:0]  phase_us = now_us % 32000;
-    wire [15:0]  epoch = 16'(now_us / 32000);
-    wire         first_epoch = (now_us < 32000);
+    wire [15:0]  period = 16'(now_us / 32000);
+    wire         first_period = (now_us < 32000);
     reg          cfg_we = 1'b0;
     reg  [10:0]  cfg_addr = 11'd0;
     reg  [15:0]  cfg_data = 16'd0;
@@ -55,7 +55,7 @@ module tb_weight_cache #(
 
     weight_cache #(.E(E), .N_MODELS(N_MODELS)) dut (
         .clk(clk), .rst(rst),
-        .now_us(now_us), .phase_us(phase_us), .epoch(epoch), .first_epoch(first_epoch),
+        .now_us(now_us), .phase_us(phase_us), .period(period), .first_period(first_period),
         .cfg_we(cfg_we), .cfg_addr(cfg_addr), .cfg_data(cfg_data),
         .arr_valid(arr_valid), .arr_model(arr_model), .arr_t_host(arr_t_host), .arr_n_expect(arr_n_expect),
         .q_ne(q_ne),
@@ -98,7 +98,7 @@ module tb_weight_cache #(
         reg [143:0] x;
         bit have_prev;
 
-        // ---------------- 1) entry 경로 ----------------
+        // ---------------- 1) Entry 경로 ----------------
         repeat (4) @(negedge clk);
         rst = 1'b0;
         for (i = 0; i < E; i = i + 1) begin

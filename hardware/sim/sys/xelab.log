@@ -40,6 +40,7 @@ Completed static elaboration
 Starting simulation data flow analysis
 Completed simulation data flow analysis
 Time Resolution for simulation is 1ps
+Compiling module work.mdio_master_default
 Compiling module work.sync_reset(N=4)
 Compiling module work.iddr(IODDR_STYLE="IODDR",WIDTH=5...
 Compiling module work.ssio_ddr_in(IODDR_STYLE="IODDR",...

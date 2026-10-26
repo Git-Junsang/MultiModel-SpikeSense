@@ -4,7 +4,7 @@ membrane_bits.py와 같은 정수 연산에서 다음 timestep으로 넘기는 m
 형식 이름은 membrane_bits와 같다(b{n}: n bit 포화, b{n}s{k}: 아래 k bit 버림 + n bit 포화).
 조합 이름은 L1~L4 형식을 '-'로 잇는다. 예: b8s2-b8s1-b10-b12. 기준은 모두 b16(snn_int8.forward와 같음).
 
-  1단계(기본): 한 layer만 b{6~11}s{0~3}로 바꾸고 나머지는 b12(손실 없음, P3.13). layer마다 bit별 최선의 버림 수를 찾는다
+  1단계(기본): 한 layer만 b{6–11}s{0–3}로 바꾸고 나머지는 b12(손실 없음, P3.13). layer마다 bit별 최선의 버림 수를 찾는다
   2단계(--combos): 고른 조합을 함께 넣어 본다
 
     python3 model/eval/membrane_layer_bits.py [--ckpt L_normal_noaug] [--combos b8s2-b8s1-b10-b12 ...] [--jobs 10]

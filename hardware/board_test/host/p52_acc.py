@@ -2,17 +2,18 @@
 """p52_acc.py — 음원 → mel(Host) → FPGA → 판정(Host) 정확도와 속도 (P5.2). 개발 서버에서 준비·비교, 보드 실행은 FPGA Host
 
 평가 파일(40개 모델, 학습에 쓰지 않은 test 파일, 02 §3)을 1,024트랙에 나눠 1,024채널 raw(S16LE, 머리말 없음) 하나로 만든다.
-WAV 머리말의 data 크기는 32 bit라 4 GiB를 넘을 수 있어 raw로 둔다(mmss_host --channels 1024).
-파일마다 판정 주기 12개 칸(12 × 31 × 512 = 190,464 샘플)을 준다. 학습 평가와 같은 수의 앞 주기(10 s 파일 10개,
+WAV 머리말의 데이터 크기는 32 bit라 4 GiB를 넘을 수 있어 raw로 둔다(mmss_host --channels 1024).
+파일마다 판정 주기 12개 칸(12 × 31 × 512 = 190,464샘플)을 준다. 학습 평가와 같은 수의 앞 주기(10 s 파일 10개,
 ToyCar 11 s 파일 11개)의 frame은 모두 파일 안에 들고, 나머지 주기는 버린다. 모델 m의 frame k는 샘플 [O_m + 512k, O_m + 512k + 1,024)다(06 §2).
+정규화 기준은 Host처럼 트랙 첫 frame부터 이어 간다(02 §5). 칸 끝 무음 frame은 기준을 바꾸지 않으므로 앞 파일의 기준이 다음 파일로 이어진다.
 
   prep  평가 목록, 트랙 배정, <out>/eval.s16(1,024채널 S16LE raw), <out>/map.txt, <out>/layout.json
   ref   보드 실행 산출물(<run>/board_result.csv, board_judge.csv, req.pcap)과 비교:
         1) FPGA: Host가 실제로 보낸 입력(pcap)에 snn_int8.forward(12 bit 저장)를 쓴 값 = 보드 out0·out1
-        2) Host 특징: Python 특징(p325_mel_load.mel_db + SegNorm + quantize_input) = 보낸 입력
+        2) Host 특징: Python 특징(p325_mel_load.mel_db + TrackNorm + quantize_input, 트랙 전체 frame을 차례로) = 보낸 입력
         3) 판정: Host 판정 = 보드 출력으로 Python이 구한 판정
-        4) AUC(파일 단위, 02 §3): 보드, Python 전체 경로, 학습 특징(파일 정규화)·seg 정규화 software 값
-        5) 속도: 응답 시간(Host 수신 − t_host), FPGA 시간(t_done − t_in), deadline miss
+        4) AUC(파일 단위, 02 §3): 보드, Python 전체 경로, software 평가 값(학습 특징, seg, track_5s, stream_5s)
+        5) 속도: response time(Host 수신 − t_host), FPGA 시간(t_done − t_in), deadline miss
 
     python3 hardware/board_test/host/p52_acc.py prep --out <dir> [--jobs 4]
     python3 hardware/board_test/host/p52_acc.py ref  --out <dir> --run <dir>
@@ -35,8 +36,9 @@ sys.path[:0] = [HERE, os.path.join(SW, 'model'), os.path.join(SW, 'train'), os.p
 
 N_TRACKS, SEG, HOP, FRAME, SR = 1024, 31, 512, 1024, 16000
 SLOT_CYC = 12                                # 파일 하나의 칸 = 판정 주기 12개, 앞 (파일의 학습 구간 수)개만 쓴다
-SLOT = SLOT_CYC * SEG * HOP                  # 190,464 샘플
+SLOT = SLOT_CYC * SEG * HOP                  # 190,464샘플
 MANIFEST = os.path.join(ROOT, 'hardware', 'data', 'models_l64', 'manifest.json')
+SW_METHODS = ('file', 'seg', 'track_5s', 'stream_5s')    # 비교할 software 평가(realtime_norm.py) 값
 
 
 def offset(m):
@@ -96,8 +98,18 @@ def prep(a):
           f'트랙 {N_TRACKS}, 칸 {ns}, 길이 {L / SR:.1f} s, {path} {os.path.getsize(path) / 2**30:.2f} GiB')
 
 
+def track_features(ml, si, wav, trs, m, kmax):
+    """같은 모델 트랙들의 frame 0~kmax−1 → Python 특징 uint8 [트랙, frame, 40]. Host처럼 기준을 트랙 첫 frame부터 이어 간다"""
+    idx = np.arange(kmax)[:, None] * HOP + offset(m) + np.arange(FRAME)
+    db = np.stack([ml.mel_db(wav[idx, tr].astype(np.float32) / 32768.0) for tr in trs])
+    norm, rows, out = ml.TrackNorm(len(trs)), np.arange(len(trs)), np.zeros(db.shape, np.uint8)   # 하한 기본 −80 dB(Host와 같음)
+    for k in range(kmax):
+        out[:, k] = si.quantize_input(norm(db[:, k], rows))
+    return out
+
+
 def read_pcap(path, nk):
-    """Host → FPGA 추론 요청 → x[트랙, frame, 40](uint8), 있는지[트랙, frame]. frame = seq(이 시험은 65,536 미만)"""
+    """Host → FPGA 추론 요청 → x[트랙, frame, 40](uint8), 있는지[트랙, frame]. Frame = seq(이 시험은 65,536 미만)"""
     x = np.zeros((N_TRACKS, nk, 40), np.uint8)
     have = np.zeros((N_TRACKS, nk), bool)
     d = open(path, 'rb').read()
@@ -127,7 +139,7 @@ def ref(a):
     man = json.load(open(MANIFEST))['models']
     model_of, slots = np.array(lay['model_of']), lay['slots']
     nk = (lay['n_slots'] + 1) * lay['slot_cycles'] * SEG
-    # track_id,seq,epoch,model_id,flags,batch_n,t_host_us,t_in_us,t_start_us,t_done_us,out0,out1,t_host_ns,t_recv_ns,resp_us
+    # track_id,seq,period,model_id,flags,batch_n,t_host_us,t_in_us,t_start_us,t_done_us,out0,out1,t_host_ns,t_recv_ns,response_time_us
     r = np.loadtxt(os.path.join(a.run, 'board_result.csv'), delimiter=',', skiprows=1, usecols=(0, 2, 5, 7, 8, 9, 10, 11, 14))
     tr_r, k_r = r[:, 0].astype(int), r[:, 1].astype(int)
     out_b = np.zeros((N_TRACKS, nk, 2), np.int64)
@@ -142,10 +154,13 @@ def ref(a):
     wav = np.memmap(os.path.join(a.out, 'eval.s16'), np.int16, 'r').reshape(-1, N_TRACKS)
     st = dict(cyc=0, fpga_bad=0, fpga_bad_val=0, x_diff_val=0, x_diff_req=0, x_vals=0, judge_bad=0, missing=0)
     score = {'board': {}, 'python': {}}          # (모델, 파일 경로) → [라벨, cycle 점수]
+    kmax = lay['n_slots'] * lay['slot_cycles'] * SEG          # 마지막 빈 칸 앞까지. 이 frame들은 모두 eval.s16 안에 든다
     for m in range(40):
         q = si.quantize(snn_fp32.load_params(os.path.join(ROOT, man[m]['checkpoint'])))
         sc = man[m]['weight_scales'][3]
-        for tr in np.flatnonzero(model_of == m):
+        trs = np.flatnonzero(model_of == m)
+        feat = track_features(ml, si, wav, trs, m, kmax)
+        for ti, tr in enumerate(trs):
             cyc, K = [], []                       # 트랙의 판정 주기를 모아 forward 한 번
             for j, (path, lab, ncyc) in enumerate(slots[tr]):
                 for c in range(ncyc):
@@ -159,11 +174,7 @@ def ref(a):
                 continue
             K = np.array(K)
             X, G = x_b[tr, K].astype(np.int64), out_b[tr, K]
-            w = wav[K[..., None] * HOP + offset(m) + np.arange(FRAME), tr].astype(np.float32) / 32768.0
-            db = ml.mel_db(w.reshape(-1, FRAME)).reshape(len(K), SEG, -1)
-            hi = np.maximum.accumulate(db.max(2), axis=1)          # SegNorm과 같은 누적 최대·최소(판정 주기마다 새로)
-            lo = np.maximum(np.minimum.accumulate(db.min(2), axis=1), hi - 80.0)
-            XP = si.quantize_input(np.clip((db - lo[..., None]) / np.maximum(hi - lo, 1e-8)[..., None], 0, 1)).astype(np.int64)
+            XP = feat[ti][K].astype(np.int64)
             out = si.forward(q, X, store_bits=12)
             op = si.forward(q, XP, store_bits=12)
             st['cyc'] += len(cyc)
@@ -190,12 +201,12 @@ def ref(a):
             auc.setdefault(k, []).append(roc_auc_score([l for l, _ in v], [s_ for _, s_ in v]))
     off = {}
     for row in csv.DictReader(open(os.path.join(SW, 'train_result', 'eval', 'realtime_norm', 'results.csv'))):
-        if row['ckpt'] == 'L_normal_noaug' and row['method'] in ('file', 'seg'):
+        if row['ckpt'] == 'L_normal_noaug' and row['method'] in SW_METHODS:
             off.setdefault(row['method'], {})[row['unit']] = float(row['auc'])
-    for meth in ('file', 'seg'):
+    for meth in SW_METHODS:
         auc['sw_' + meth] = [off[meth][man[m]['unit']] for m in range(40)]
 
-    lat = r[:, 8]
+    response_time = r[:, 8]
     fpga = (r[:, 5].astype(np.int64) - r[:, 3].astype(np.int64)) & 0xFFFF_FFFF
     wait = (r[:, 4].astype(np.int64) - r[:, 3].astype(np.int64)) & 0xFFFF_FFFF
     pc = lambda v, p_: float(np.percentile(v, p_))
@@ -203,11 +214,11 @@ def ref(a):
                auc_ge_0_9={k: int(np.sum(np.array(v) >= 0.9)) for k, v in auc.items()},
                auc_per_model={k: [round(x_, 6) for x_ in v] for k, v in auc.items()},
                n_files=len(score['board']), lost=lost.tolist(),
-               resp_us={p_: pc(lat, p_) for p_ in (50, 99, 99.9, 100)}, fpga_us={p_: pc(fpga, p_) for p_ in (50, 99, 99.9, 100)},
+               response_time_us={p_: pc(response_time, p_) for p_ in (50, 99, 99.9, 100)}, fpga_us={p_: pc(fpga, p_) for p_ in (50, 99, 99.9, 100)},
                wait_us={p_: pc(wait, p_) for p_ in (50, 99, 100)}, batch_n_mean=float(r[:, 2].mean()), n_results=len(r),
-               late_32ms=int((lat > 32000).sum()))
+               late_32ms=int((response_time > 32000).sum()))
     json.dump(out, open(os.path.join(a.run, 'acc_summary.json'), 'w'), indent=1, ensure_ascii=False)
-    print(json.dumps({k: out[k] for k in ('stats', 'auc_mean', 'auc_ge_0_9', 'n_files', 'resp_us', 'fpga_us', 'wait_us',
+    print(json.dumps({k: out[k] for k in ('stats', 'auc_mean', 'auc_ge_0_9', 'n_files', 'response_time_us', 'fpga_us', 'wait_us',
                                          'batch_n_mean', 'n_results', 'late_32ms')}, indent=1, ensure_ascii=False))
     print('결과가 없는 요청 (트랙, frame):', lost.tolist()[:40])
 

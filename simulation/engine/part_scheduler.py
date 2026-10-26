@@ -6,7 +6,7 @@ from part_workload import LINK_OUT_FILE, link_samples
 
 
 class Scheduler(Part):
-    """scheduler 공통. pick(queue, T, cache, busy_until) → (다음 모델, 기준 추론 요청) 또는 (None, 다시 고를 시각),
+    """Scheduler 공통. pick(queue, T, cache, busy_until) → (다음 모델, 기준 추론 요청) 또는 (None, 다시 고를 시각),
     members(queue, m, head, s) → 연산 시작 시각 s에 batch에 넣을 추론 요청. busy_until = compute array가 비는 시각(진행 중인 batch의 끝)"""
 
     def pick(self, queue, T, cache, busy_until):
@@ -28,11 +28,11 @@ class Grouping(Scheduler):
         return list(queue.by_model[m])
 
 
-class Dysta(Scheduler):
+class DystaMethod(Scheduler):
     """Dysta Method: 점수 = 추론 요청당 남은 처리 시간 + η × deadline 여유가 가장 작은 모델의 추론 요청 전부. 기다리지 않는다.
     Sparse-DySta의 점수를 모델별 batch에 맞춘 것이다"""
     name = 'Dysta Method'
-    eta = 1e-4                       # deadline 여유 항의 비중 η(p325_dysta_tune에서 고른 값)
+    eta = 1e-4                       # Deadline 여유 항의 비중 η(p325_dysta_method_tune에서 고른 값)
     margin = None                    # 결과 회수 여유 µs. None = 결과 C2H 지연 표본 최대 + 20 µs
 
     def __init__(self, hw, **attrs):
@@ -60,15 +60,15 @@ class Dysta(Scheduler):
         return sorted(queue.by_model[m], key=lambda i: t_host[i])
 
     def _batch_us(self, load, n):
-        """batch 시간 = 남은 적재 + membrane potential DMA + n × 추론 요청당 연산"""
+        """Batch 시간 = 남은 적재 + membrane potential DMA + n × 추론 요청당 연산"""
         return load + self.hw.membrane_us(n) + n * self.hw.dense_req_us
 
 
-class DeepRT(Scheduler):
+class DeepRTMethod(Scheduler):
     """DeepRT Method(DisBatcher + EDF): 모델마다 길이 W의 window를 m·W/M씩 다르게 두고, window가 끝나면 그동안 온 추론 요청을
     job 하나로 묶어 job deadline 순서로 처리한다. flush면 compute array가 놀 때 window 끝을 기다리지 않는다"""
     name = 'DeepRT Method'
-    window = (14900.0, False)        # (window W µs, flush). p325_deeprt_tune에서 고른 값
+    window = (14900.0, False)        # (window W µs, flush). p325_deeprt_method_tune에서 고른 값
 
     def pick(self, queue, T, cache, busy_until):
         t_arr = queue.wl.t_arr
@@ -84,7 +84,7 @@ class DeepRT(Scheduler):
             end, m = min(jobs)
             self.job_end = end
             return m, queue.by_model[m][0]
-        if self.window[1] and T >= busy_until:             # compute array가 놂: window 끝을 기다리지 않고 보낸다
+        if self.window[1] and T >= busy_until:             # Compute array가 놂: window 끝을 기다리지 않고 보낸다
             end, m = min((self._window_end(m, t_arr[queue.by_model[m][0]]), m) for m in range(self.hw.models) if queue.by_model[m])
             self.job_end = float('inf')
             return m, queue.by_model[m][0]

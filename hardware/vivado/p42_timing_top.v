@@ -3,7 +3,7 @@
 // ============================================================
 // p41_timing_top에서 1트랙 RAM을 membrane_storage(on-chip 768트랙 + DDR3 buffer)로 바꿨다.
 // bank 주소 계산, 12 bit 변환, bank/buffer 선택이 compute_array 경로에 더해진다.
-// cache 교체·dma는 없다(P4.3, P4.4). 적재 port와 dma port는 밖으로 낸다.
+// Cache 교체·DMA는 없다(P4.3, P4.4). 적재 port와 DMA port는 밖으로 낸다.
 // ============================================================
 `timescale 1ns / 1ps
 
@@ -89,7 +89,7 @@ module p42_timing_top (
         .dbg_cur(), .dbg_mem_sat(), .dbg_spk()
     );
 
-    membrane_storage #(.N_ONCHIP(768)) u_ms (
+    membrane_storage #(.N_ON_CHIP(768)) u_ms (
         .clk(clk), .rst(rst), .state_base(state_base),
         .track(track), .can_start(can_start), .start(start), .done(done),
         .wb_done(wb_done), .wb_track(wb_track),

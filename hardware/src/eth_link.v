@@ -3,8 +3,8 @@
 // verilog-ethernet(hardware/ip/verilog-ethernet)의 eth_mac_1g_rgmii_fifo + udp_complete를 쓴다. RGMII 쪽만 gtx_clk
 // 125 MHz이고 나머지는 clk(100 MHz) 하나다. MAC RX frame FIFO가 FCS가 틀린 frame을 버린다.
 // 받기: 이 FPGA IP로 온 datagram만 본다. 그 밖의 port·IP는 버린다. IP 조각은 첫 조각만 머리를 보고 나머지는 버린다
-//   (udp_complete가 조각을 걸러 내지 않아 뒤 조각의 data를 UDP 머리로 읽는다).
-//   REQ_PORT: 조각나지 않았고 payload 길이가 64 B의 배수이고 64~1,472 B면 64 B마다 rq word 하나(byte k = rq_data[8k+7:8k])를 낸다.
+//   (udp_complete가 조각을 걸러 내지 않아 뒤 조각의 데이터를 UDP 머리로 읽는다).
+//   REQ_PORT: 조각나지 않았고 payload 길이가 64 B의 배수이고 64–1,472 B면 64 B마다 rq word 하나(byte k = rq_data[8k+7:8k])를 낸다.
 //     아니면(MF가 선 첫 조각 포함) datagram 전체를 버리고 len_err_valid 1 cycle, len_err_info = UDP 머리의 payload 길이 B.
 //     길이 0 datagram은 udp_complete가 머리 없이 버리므로 그 오류 신호와 남은 port·길이 값으로 알아챈다.
 //     정상 datagram이면 그 src IP·port를 결과 받는 곳으로 바꾼다.
@@ -12,12 +12,12 @@
 //     datagram은 버린다(Host가 같은 tag로 다시 보낸다, 06 §7.6). 머리를 붙잡아 받기를 멈추면 그 응답을 보내는 데
 //     필요한 ARP reply도 뒤에 막혀 ARP timeout(약 36 s)까지 link 전체가 선다.
 // MAC RX FIFO는 8 KiB다. clk 쪽은 1 B/cycle(100 MB/s)이라 1,472 B datagram이 선로 속도로 이어 오면 frame마다
-//   약 300 B씩 밀린다. 4 KiB면 23개짜리 datagram 11개(모델 묶음 약 240트랙, 06 §3)를 이어 받을 때 tb_eth에서 frame을 잃었다.
-// 보내기: 결과(rs 32 B)와 제어 응답(cr, 길이 cr_len)을 udp_complete 송신 하나로 보낸다. frame 사이마다 결과가 먼저다.
+//   약 300 B씩 밀린다. 4 KiB면 23개짜리 datagram 11개(모델 그룹 약 240트랙, 06 §3)를 이어 받을 때 tb_eth에서 frame을 잃었다.
+// 보내기: 결과(rs 32 B)와 제어 응답(cr, 길이 cr_len)을 udp_complete 송신 하나로 보낸다. Frame 사이마다 결과가 먼저다.
 //   UDP checksum은 0(IPv4에서 '계산 안 함')으로 보낸다. udp_complete의 checksum 생성기는 header FIFO(8개)가 찬 때
 //   들어온 header를 버리고 뒤 payload와 짝이 어긋나므로 끈다(결과가 밀리면 simulation에서 실제로 생겼다).
-//   frame은 MAC TX frame FIFO가 다 모은 뒤 내보내므로 응답이 중간에 멈춰도 선로로 끊겨 나가지 않는다.
-// phy_reset_n: rst 뒤 PHY_RST_CYC cycle 동안 0. MDIO는 쓰지 않는다(MDC 0, MDIO Z).
+//   Frame은 MAC TX frame FIFO가 다 모은 뒤 내보내므로 응답이 중간에 멈춰도 선로로 끊겨 나가지 않는다.
+// phy_reset_n: rst 뒤 PHY_RST_CYC cycle 동안 0. MDIO는 regs 0x0108 명령으로만 쓴다(mdio_master.v, 쉬는 동안 MDC 0, MDIO Z).
 // RX_IDELAY != 0이고 TARGET = "XILINX"면 rxd·rx_ctl에 IDELAYE2(VAR_LOAD, 처음 tap = RX_IDELAY)를 둔다. IDELAYCTRL은 top 몫.
 //   rx_tap(LINK_TUNE)이 바뀌면 그 값을 다시 싣는다. 보드에서 frame 오류를 보며 tap을 맞춘다(P4.10).
 
@@ -25,14 +25,14 @@
 
 module eth_link #(
     parameter        TARGET      = "GENERIC",          // board "XILINX", simulation "GENERIC"
-    parameter        RX_IDELAY   = 0,                  // IDELAYE2 tap 0~31, 0 = 두지 않음
+    parameter        RX_IDELAY   = 0,                  // IDELAYE2 tap 0–31, 0 = 두지 않음
     parameter [47:0] LOCAL_MAC   = 48'h02_00_00_00_00_01,
     parameter [31:0] LOCAL_IP    = {8'd192, 8'd168, 8'd10, 8'd2},
     parameter [31:0] GATEWAY_IP  = {8'd192, 8'd168, 8'd10, 8'd1},
     parameter [31:0] SUBNET_MASK = {8'd255, 8'd255, 8'd255, 8'd0},
     parameter [15:0] REQ_PORT    = 16'd5000,
     parameter [15:0] CTRL_PORT   = 16'd5001,
-    parameter        PHY_RST_CYC = 1_100_000           // 11 ms at 100 MHz. simulation은 짧게
+    parameter        PHY_RST_CYC = 1_100_000           // 11 ms at 100 MHz. Simulation은 짧게
 )(
     input  wire         clk,
     input  wire         rst,
@@ -68,11 +68,25 @@ module eth_link #(
     input  wire         cr_tvalid,
     output wire         cr_tready,
     input  wire         cr_tlast,
-    input  wire [10:0]  cr_len                         // 응답 payload B, cr_tvalid 동안 유지
+    input  wire [10:0]  cr_len,                        // 응답 payload B, cr_tvalid 동안 유지
+    // MDIO 명령(regs 0x0108). md_op 2'b01 쓰기, 2'b10 읽기
+    input  wire         md_valid,
+    input  wire [1:0]   md_op,
+    input  wire [4:0]   md_phy,
+    input  wire [4:0]   md_reg,
+    input  wire [15:0]  md_wdata,
+    output wire         md_busy,
+    output wire [15:0]  md_rdata,
+    // 진단 counter(P5.3 결과 손실 조사). 32 bit씩, dbg_clr로 0
+    input  wire         dbg_clr,
+    output wire [383:0] dbg_cnt
 );
 
-    assign phy_mdc  = 1'b0;
-    assign phy_mdio = 1'bz;
+    // MDIO: 쉬는 동안 MDC 0, MDIO Z. 보드 PHY register 읽기·쓰기(진단용)
+    mdio_master u_mdio (
+        .clk(clk), .rst(rst), .cmd_valid(md_valid), .cmd_op(md_op), .cmd_phy(md_phy), .cmd_reg(md_reg),
+        .cmd_data(md_wdata), .busy(md_busy), .rdata(md_rdata), .mdc(phy_mdc), .mdio(phy_mdio)
+    );
 
     // ---------------- PHY reset ----------------
     localparam PW = $clog2(PHY_RST_CYC + 1);
@@ -114,6 +128,8 @@ module eth_link #(
     endgenerate
 
     // ---------------- MAC ----------------
+    wire       d_tx_unf, d_tx_ovf, d_tx_bad, d_tx_good, d_rx_fcs, d_rx_ovf, d_ip_early, d_arp_fail, d_udp_early;
+    wire [1:0] d_speed;
     wire gtx_rst;
     sync_reset #(.N(4)) u_gtx_rst (.clk(gtx_clk), .rst(rst), .out(gtx_rst));
 
@@ -133,9 +149,9 @@ module eth_link #(
         .rx_axis_tlast(mrx_tlast), .rx_axis_tuser(mrx_tuser),
         .rgmii_rx_clk(rgmii_rx_clk), .rgmii_rxd(rx_dly[3:0]), .rgmii_rx_ctl(rx_dly[4]),
         .rgmii_tx_clk(rgmii_tx_clk), .rgmii_txd(rgmii_txd), .rgmii_tx_ctl(rgmii_tx_ctl),
-        .tx_error_underflow(), .tx_fifo_overflow(), .tx_fifo_bad_frame(), .tx_fifo_good_frame(),
-        .rx_error_bad_frame(), .rx_error_bad_fcs(), .rx_fifo_overflow(), .rx_fifo_bad_frame(), .rx_fifo_good_frame(),
-        .speed(), .cfg_ifg(8'd12), .cfg_tx_enable(1'b1), .cfg_rx_enable(1'b1)
+        .tx_error_underflow(d_tx_unf), .tx_fifo_overflow(d_tx_ovf), .tx_fifo_bad_frame(d_tx_bad), .tx_fifo_good_frame(d_tx_good),
+        .rx_error_bad_frame(), .rx_error_bad_fcs(d_rx_fcs), .rx_fifo_overflow(d_rx_ovf), .rx_fifo_bad_frame(), .rx_fifo_good_frame(),
+        .speed(d_speed), .cfg_ifg(8'd12), .cfg_tx_enable(1'b1), .cfg_rx_enable(1'b1)
     );
 
     // ---------------- Ethernet frame ↔ UDP ----------------
@@ -228,9 +244,9 @@ module eth_link #(
         .m_udp_payload_axis_tlast(urx_tlast), .m_udp_payload_axis_tuser(),
         .ip_rx_busy(), .ip_tx_busy(), .udp_rx_busy(), .udp_tx_busy(),
         .ip_rx_error_header_early_termination(), .ip_rx_error_payload_early_termination(),
-        .ip_rx_error_invalid_header(), .ip_rx_error_invalid_checksum(), .ip_tx_error_payload_early_termination(),
-        .ip_tx_error_arp_failed(), .udp_rx_error_header_early_termination(urx_hdr_err),
-        .udp_rx_error_payload_early_termination(), .udp_tx_error_payload_early_termination(),
+        .ip_rx_error_invalid_header(), .ip_rx_error_invalid_checksum(), .ip_tx_error_payload_early_termination(d_ip_early),
+        .ip_tx_error_arp_failed(d_arp_fail), .udp_rx_error_header_early_termination(urx_hdr_err),
+        .udp_rx_error_payload_early_termination(), .udp_tx_error_payload_early_termination(d_udp_early),
         .local_mac(LOCAL_MAC), .local_ip(LOCAL_IP), .gateway_ip(GATEWAY_IP), .subnet_mask(SUBNET_MASK),
         .clear_arp_cache(1'b0)
     );
@@ -361,5 +377,23 @@ module eth_link #(
                 end
         endcase
     end
+
+    // ---------------- 진단 counter ----------------
+    // 0 결과 받음(rs), 1 UDP 머리, 2 MAC FIFO good frame, 3 bad frame, 4 overflow, 5 송신 underflow,
+    // 6 IP payload 조기 종료, 7 ARP 실패, 8 UDP payload 조기 종료, 9 링크 속도 바뀜, 10 수신 FCS 오류, 11 수신 FIFO overflow
+    reg  [1:0]  spd_q;
+    wire [11:0] dev = {d_rx_ovf, d_rx_fcs, d_speed != spd_q, d_udp_early, d_arp_fail, d_ip_early,
+                       d_tx_unf, d_tx_ovf, d_tx_bad, d_tx_good, utx_hdr_valid && utx_hdr_ready, rs_valid && rs_ready};
+    reg  [31:0] dc [0:11];
+    integer     dci;
+    always @(posedge clk) begin
+        spd_q <= d_speed;
+        for (dci = 0; dci < 12; dci = dci + 1)
+            dc[dci] <= (rst || dbg_clr) ? 32'd0 : dc[dci] + {31'd0, dev[dci]};
+    end
+    genvar di;
+    generate for (di = 0; di < 12; di = di + 1) begin : g_dc
+        assign dbg_cnt[32*di +: 32] = dc[di];
+    end endgenerate
 
 endmodule

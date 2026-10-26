@@ -1,75 +1,75 @@
 # 실험 1개 = 환경 파일 1개. 이 파일을 복사해 값을 바꾼다. 키는 빼거나 더할 수 없다(engine이 멈춤).
 #   python3 simulation/engine/engine.py simulation/environment/<파일>.toml --jobs 11
 #   결과: simulation/result/<파일 이름>.csv(점별 요약), <파일 이름>_runs.csv.gz(실행별 원자료). 형식은 design_references/simulation_engine.md §7
-# 기본값 = 제안 구성(design_references 01 §2): L·64 lane @100 MHz·1,024트랙, Model-Grouped Offset Assignment, Grouping,
-#   PNU-count entry 4, 남는 BRAM에 12 bit membrane potential, 즉시 송신, drop 규칙,
-#   Host 처리 지연 = Xeon CPU 고정·부하 없음의 모델 묶음 지연 재생 + 추론 요청별 지연 U(0, 0.8 ms), 시나리오 6개 × seed 30
-# 키 이름 = 대상_속성[_단위]. 대상: sim(실행), model, compute(compute array), membrane(membrane potential), bram, ddr(DDR3),
-#   track, host(Host와 링크), fpga, cache(weight cache), scheduler, search, tune. 단위가 없는 시간 값(scheduler_attrs 등)은 µs
+# 기본값 = 제안 구성(design_references 01 §2): L·64-lane @100 MHz·1,024트랙, Model-Grouped Offset Assignment, Grouping,
+#   PNU-Count entry 4, 남는 BRAM에 12 bit membrane potential, 즉시 송신, drop 규칙,
+#   Host 처리 지연 = Xeon CPU 고정·부하 없음의 모델 그룹 지연 재생 + 추론 요청별 지연 U(0, 0.8 ms), 시나리오 6개 × seed 30
+# 키 이름 = 대상_속성[_단위]. 대상: sim(실행), model, compute(compute array), membrane(membrane potential), BRAM, ddr3(DDR3),
+#   track, Host(Host와 링크), FPGA, cache(weight cache), scheduler, search, tune. 단위가 없는 시간 값(scheduler_attrs 등)은 µs
 
 # ---- 실행 ----
 sim_mode = "run"           # run: 점마다 시나리오 × seed 실행 | search: miss 0인 마지막 값 찾기 | tune: scheduler 조절값 고르기
-                           # | bound: 조건부 응답 시간 계산(시뮬레이션 없음, 05 §6.1)
+                           # | bound: 조건부 response time 계산(simulation 없음, 05 §6.1)
                            # | adversarial: 지연 꼴을 바꿔 가며 송신 뒤 최대(t_recv − t_send)를 키움(05 §6.2)
-sim_scenarios = ["U", "K", "S", "I", "SK", "R"]   # U 균등, K 편중, S 동시 시작, I 간헐 추론 요청, SK 동시 시작 + 편중, R 활성 트랙 변화
+sim_scenarios = ["uniform", "skewed", "synchronized", "intermittent", "skewed_synchronized", "fluctuating"]   # uniform 균등 배정, skewed 편중 배정, synchronized 동시 시작, intermittent 간헐적 추론 요청, skewed_synchronized 동시 시작 + 편중 배정, fluctuating 운영 중 트랙 구성 변경
 sim_seeds = 30             # 시나리오마다 seed 수
 sim_seed0 = 0              # 첫 seed. 조정(tune)은 평가 seed와 겹치지 않게 100을 쓴다
-sim_warm_periods = 16      # 예열 주기 수
+sim_warmup_periods = 16      # 예열 주기 수
 sim_meas_periods = 64      # 측정 주기 수(32 ms × 64 = 2.048 s)
 
-# ---- 모델과 하드웨어 ----
+# ---- 모델과 hardware ----
 model_size = "L"           # L (40-384-256-64-2) | XL (40-768-512-128-2)
-model_count = 40           # 모델 수 M. offset 간격 = 32 ms / M. golden이 없는 모델(41번째)은 40모델 spike 표를 모아 쓴다
+model_count = 40           # 모델 수 M. Offset 간격 = 32 ms / M. golden이 없는 모델(41번째)은 40모델 spike 표를 모아 쓴다
 compute_lanes = 64         # compute array lane 수 = 한 cycle에 계산하는 뉴런 수
 compute_input = "golden"   # 추론 요청당 연산: golden(test 입력의 spike 수로, spike 0 건너뛰기) | dense(모든 입력이 spike, 1,205 cycle)
 compute_spikes_per_cycle = 2   # L2·L3에서 cycle마다 누산하는 spike 입력 수(RTL 2)
-compute_ctrl_scale = 1.0   # control overhead 67 cycle(P4.1 RTL)에 곱하는 배수(1.2 = 20 % 증가)
-membrane_place = "split"   # membrane potential 위치: split(남는 BRAM에 들어가는 트랙만 on-chip, 나머지 DDR3) | onchip(모두 BRAM) | ddr(모두 DDR3)
-membrane_bits = 12         # membrane potential 저장 bit: 12 | 16
-bram_reserve_tiles = 25.5  # 시뮬레이터 밖 BRAM 예약 tile(request table·ring 등)
-ddr_bw_mbps = 3015.0       # DDR3 유효 대역폭 MB/s(= B/µs). 3,015 = P3.1 실측. 부품 크기는 3,015 기준
+compute_ctrl_scale = 1.0   # control overhead 67 cycle(P4.1 RTL)에 곱하는 배수(1.2 = 20% 증가)
+membrane_place = "split"   # Membrane potential 위치: split(남는 BRAM에 들어가는 트랙만 on-chip, 나머지 DDR3) | on_chip(모두 BRAM) | ddr3(모두 DDR3)
+membrane_bits = 12         # Membrane potential 저장 bit: 12 | 16
+bram_reserve_tiles = 25.5  # simulator 밖 BRAM 예약 tile(request table·ring 등)
+ddr3_bandwidth_mbps = 3015.0       # DDR3 유효 bandwidth MB/s(= B/µs). 3,015 = P3.1 실측. 부품 크기는 3,015 기준
 track_count = 1024
 
 # ---- Host와 FPGA ----
-host_offset = "model"      # model(Model-Grouped Offset Assignment, offset 간격 0.8 ms) | none(Unaligned: 시나리오의 offset 그대로)
-                           # | global(Global alignment: 모든 트랙 nominal offset 0)
-host_jitter_ms = 0.8       # jitter J ms = 추론 요청별 지연의 상한
+host_offset = "offset_assignment"      # offset_assignment(Model-Grouped Offset Assignment, offset 간격 0.8 ms) | unaligned(시나리오의 offset 그대로)
+                           # | global_alignment(모든 트랙 nominal offset 0)
+host_jitter_ms = 0.8       # Jitter J ms = 추론 요청별 지연의 상한
 host_jitter_dist = "uniform"   # 추론 요청별 Host 처리 지연(Host 도착 → 준비): none | uniform(추론 요청·주기마다 U(0, J))
-                           # | tail(95 % U(0, min(0.8 ms, J)) + 5 % U(min(0.8 ms, J), J)) | tail1(같은 꼴로 1 %)
-                           # | burst(주기마다 5 % 확률로 모든 추론 요청에 공통 U(0, J) + 추론 요청마다 U(0, min(0.8 ms, J)))
+                           # | tail(95 % U(0, min(0.8 ms, J)) + 5 % U(min(0.8 ms, J), J)) | tail1(같은 꼴로 1%)
+                           # | burst(주기마다 5% 확률로 모든 추론 요청에 공통 U(0, J) + 추론 요청마다 U(0, min(0.8 ms, J)))
                            # | cd(주기 공통 U(0, J/2) + 추론 요청 U(0, J/2)) | static(트랙마다 고정 U(0, J), cache는 모름) | trace(host_jitter_trace 재생)
-host_jitter_trace = ""     # trace일 때 CSV(epoch, track_id, t_gen_us, t_ready_us 열. t_gen_us는 측정 기록의 시작 시각). 앞 절반 주기는 분포 추정, 뒤 절반은 재생
-host_group_trace = "hardware/board_test/p325_meas/result/m3_group_pin3_load0.csv.gz"
-                           # 모델 묶음 지연 표 CSV(epoch, model_id, delay_us 열, P3.26). 같은 모델·주기 추론 요청이 모두 같은 값을 받고
-                           # host_jitter_dist 지연이 그 위에 추론 요청마다 더해진다. 앞 절반 주기는 PNU의 묶음 지연 분포, 뒤 절반은 seed마다 다른 구간을 재생. "" = 없음
-host_gather_ms = 0.0       # 모아 보내기 대기 D ms(host_offset = model). 모델·주기마다 다 준비되거나 offset + D에 한꺼번에. 0 = 즉시 송신(host_gather_to_max = false일 때)
-host_gather_to_max = false # true = 모아 보내기 대기 D를 Host 처리 지연 최대(모델 묶음 지연 표의 최대 + J)로. host_gather_ms는 0으로 둔다
-host_packet_gap_us = 0.0   # 모아 보내기 packet 분할: 같은 모델·주기 묶음을 64 B 추론 요청 23개(MTU 1,500 B)씩 packet으로 나누고
+host_jitter_trace = ""     # trace일 때 CSV(period, track_id, t_host_us, t_ready_us 열. t_host_us는 측정 기록의 시작 시각). 앞 절반 주기는 분포 추정, 뒤 절반은 재생
+host_model_group_delay_trace = "hardware/board_test/p325_meas/result/m3_group_pin3_load0.csv.gz"
+                           # 모델 그룹 지연 표 CSV(period, model_id, delay_us 열, P3.26). 같은 모델·주기 추론 요청이 모두 같은 값을 받고
+                           # host_jitter_dist 지연이 그 위에 추론 요청마다 더해진다. 앞 절반 주기는 PNU의 모델 그룹 지연 분포, 뒤 절반은 seed마다 다른 구간을 재생. "" = 없음
+host_gather_ms = 0.0       # 모아 보내기 대기 D ms(host_offset = offset_assignment). 모델·주기마다 다 준비되거나 offset + D에 한꺼번에. 0 = 즉시 송신(host_gather_to_max = false일 때)
+host_gather_to_max = false # true = 모아 보내기 대기 D를 Host 처리 지연 최대(모델 그룹 지연 표의 최대 + J)로. host_gather_ms는 0으로 둔다
+host_packet_gap_us = 0.0   # 모아 보내기 packet 분할: 같은 모델·주기 모델 그룹을 64 B 추론 요청 23개(MTU 1,500 B)씩 packet으로 나누고
                            # j번째 packet을 j × 간격 µs 늦게 도착시킨다. 0 = 분할 없음
-host_fixed_delay_us = 0.0  # t_host 뒤 송신 전에 모든 추론 요청에 더하는 지연 µs. 응답 시간에 들어간다(mic–Host 지연 참고)
+host_fixed_delay_us = 0.0  # t_host 뒤 송신 전에 모든 추론 요청에 더하는 지연 µs. Response time에 들어간다(mic–Host 지연 참고)
 fpga_drop_busy = true      # true = 같은 트랙의 이전 추론 요청이 FPGA 연산을 마치기 전에 온 추론 요청을 버린다(06 §4.3 ERR_CODE 5). 버린 추론 요청은 miss이자 drop
 
 # ---- 부품 ----
-cache_policy = "pnu_count" # 교체 정책: lru | offset_only | pnu_timeout | pnu_count(제안) | oracle(Oracle MIN, 미래 도착을 앎)
-                           # | pnu_rtl(next_use_predictor.v와 같은 정수·표 PNU-count, P4.3)
+cache_policy = "pnu_count" # 교체 정책: lru | offset_only | pnu_timeout | pnu_count(제안) | oracle_min(Oracle MIN, 미래 도착을 앎)
+                           # | pnu_rtl(next_use_predictor.v와 같은 정수·표 PNU-Count, P4.3)
 cache_entries = 4          # weight entry 수. 0 = BRAM 예산에 들어가는 최대
-cache_attrs = {}           # cache 정책 속성. 예: PNU의 {pred = "lut", bin_us = 200.0, tau_q = 1.0, group_aware = false}
-scheduler = "grouping"     # grouping(제안) | dysta(Dysta Method) | deeprt(DeepRT Method)
-scheduler_attrs = {}       # scheduler 속성(µs). 기본값: dysta {eta = 1e-4, margin = 결과 C2H 표본 최대 + 20 µs}, deeprt {window = [14900.0, false]}(window W µs, flush)
+cache_attrs = {}           # cache 정책 속성. 예: PNU의 {pred = "lut", bin_us = 200.0, tau_q = 1.0, model_group_delay_aware = false}
+scheduler = "grouping"     # Grouping(제안) | dysta_method(Dysta Method) | deeprt_method(DeepRT Method)
+scheduler_attrs = {}       # Scheduler 속성(µs). 기본값: dysta_method {eta = 1e-4, margin = 결과 C2H 표본 최대 + 20 µs}, deeprt_method {window = [14900.0, false]}(window W µs, flush)
 
 # ---- sim_mode = "search" ----
 search_key = "track_count" # 바꿔 가며 찾을 키
-search_values = []         # 시험 순서(통과 → 실패로 단조라고 가정). 비우면 track_count는 search_step 단위로 연산 가동률 100 %까지
+search_values = []         # 시험 순서(통과 → 실패로 단조라고 가정). 비우면 track_count는 search_step 단위로 연산 가동률 100%까지
 search_step = 16
 
 # ---- sim_mode = "tune" ----
 tune_attr = ""             # scheduler_attrs에서 고를 속성
 tune_values = []           # 후보
-tune_conds = []            # 모든 후보가 함께 통과해야 하는 조건(덮어쓸 키 표). 예: [{}, {ddr_bw_mbps = 2000.0}]. 비우면 이 환경만
+tune_conds = []            # 모든 후보가 함께 통과해야 하는 조건(덮어쓸 키 표). 예: [{}, {ddr3_bandwidth_mbps = 2000.0}]. 비우면 이 환경만
 
 # ---- 여러 점 ----
 # 키 = 값 목록. 축의 곱마다 한 점. 축 이름이 위 키면 그 값을 바꾸고, 아니면 값이 표여야 하며 표의 키들을 한꺼번에 바꾼다
 # (표의 label은 결과 표의 이름). 예:
 #   host_jitter_ms = [0.0, 0.8, 3.2]
-#   policy = [{label = "PNU-count", cache_policy = "pnu_count"}, {label = "LRU", cache_policy = "lru"}]
+#   policy = [{label = "PNU-Count", cache_policy = "pnu_count"}, {label = "LRU", cache_policy = "lru"}]
 [sweep]

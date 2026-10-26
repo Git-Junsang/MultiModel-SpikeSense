@@ -1,13 +1,13 @@
-# P4.3: PNU-count를 RTL(next_use_predictor.v)과 같은 정수 µs·표(δ_G, δ_U, 256 µs 칸)로 계산하면 정확한 식과 얼마나 다른가.
-# cache_policy = pnu_rtl은 engine.PNURTL. 나머지는 p326_cache_policy와 같다(Host 처리 지연 = M3 CPU 고정·부하 없음 묶음 지연 + U(0, J),
-# L·64 lane, 1,024트랙, rtl67, Grouping, fpga_drop_busy, 시나리오 6 × seed 30). entry 4는 비교 구성, 6은 J = 3.2 ms에서 고른 값
+# P4.3: PNU-Count를 RTL(next_use_predictor.v)과 같은 정수 µs·표(δ_G, δ_U, 256 µs 칸)로 계산하면 정확한 식과 얼마나 다른가.
+# cache_policy = pnu_rtl은 engine.PNURTL. 나머지는 p326_cache_policy와 같다(Host 처리 지연 = M3 CPU 고정·부하 없음 모델 그룹 지연 + U(0, J),
+# L·64 lane, 1,024트랙, rtl67, Grouping, fpga_drop_busy, 시나리오 6 × seed 30). Entry 4는 비교 구성, 6은 J = 3.2 ms에서 고른 값
 # 키 설명은 template.toml
 
 sim_mode = "run"
-sim_scenarios = ["U", "K", "S", "I", "SK", "R"]
+sim_scenarios = ["uniform", "skewed", "synchronized", "intermittent", "skewed_synchronized", "fluctuating"]
 sim_seeds = 30
 sim_seed0 = 0
-sim_warm_periods = 16
+sim_warmup_periods = 16
 sim_meas_periods = 64
 model_size = "L"
 model_count = 40
@@ -18,13 +18,13 @@ compute_ctrl_scale = 1.0
 membrane_place = "split"
 membrane_bits = 12
 bram_reserve_tiles = 25.5
-ddr_bw_mbps = 3015.0
+ddr3_bandwidth_mbps = 3015.0
 track_count = 1024
-host_offset = "model"
+host_offset = "offset_assignment"
 host_jitter_ms = 0.8
 host_jitter_dist = "uniform"
 host_jitter_trace = ""
-host_group_trace = "hardware/board_test/p325_meas/result/m3_group_pin3_load0.csv.gz"
+host_model_group_delay_trace = "hardware/board_test/p325_meas/result/m3_group_pin3_load0.csv.gz"
 host_gather_ms = 0.0
 host_gather_to_max = false
 host_packet_gap_us = 0.0
@@ -44,8 +44,8 @@ tune_conds = []
 
 [sweep]
 policy = [
-  {label = "PNU-count", cache_policy = "pnu_count"},
-  {label = "PNU-count RTL 표", cache_policy = "pnu_rtl"},
+  {label = "PNU-Count", cache_policy = "pnu_count"},
+  {label = "PNU-Count RTL 표", cache_policy = "pnu_rtl"},
 ]
 cache_entries = [4, 6]
 host_jitter_ms = [0.0, 0.8, 1.6, 3.2]

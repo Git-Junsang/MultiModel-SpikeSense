@@ -1,11 +1,11 @@
-// weight_cache.v — weight cache: entry E개, PNU-count 교체 (04_MEMORY.md §3)
+// weight_cache.v — weight cache: entry E개, PNU-Count 교체 (04_MEMORY.md §3)
 //
-// scheduler가 다음 batch의 모델을 pl_model로 알리면(지금 batch를 연산하는 동안):
+// Scheduler가 다음 batch의 모델을 pl_model로 알리면(지금 batch를 연산하는 동안):
 //   hit   그 모델이 entry에 있다(적재 중 포함). 그 entry를 가장 최근으로 올린다
 //   fill  빈 entry가 있으면 거기에 적재한다
 //   evict 가장 최근 entry(지금 연산 중인 batch의 모델)를 뺀 entry를 오래된 순서로 predictor에 묻고,
 //         {다음 사용까지 남은 시간, queue가 빔}이 가장 큰 entry를 내보낸다. 같으면 오래된 entry
-// miss면 그 entry를 적재 중으로 두고 ld_entry·ld_model을 dma에 낸다. dma는 wr_*로 그 entry에 쓰고 ld_done을 준다.
+// miss면 그 entry를 적재 중으로 두고 ld_entry·ld_model을 DMA에 낸다. DMA는 wr_*로 그 entry에 쓰고 ld_done을 준다.
 // 적재가 끝날 때까지 다음 계획을 받지 않는다(pl_ready = 0). 그래서 적재 대상과 연산 중 entry는 victim 후보에 들지 않는다.
 // compute_array는 cmp_entry의 entry를 읽는다(port 2개). engine.PNURTL·NextUse.plan과 같은 결정을 낸다.
 
@@ -19,8 +19,8 @@ module weight_cache #(
     // 시각, predictor 설정·도착·queue
     input  wire [31:0]         now_us,
     input  wire [14:0]         phase_us,
-    input  wire [15:0]         epoch,
-    input  wire                first_epoch,
+    input  wire [15:0]         period,
+    input  wire                first_period,
     input  wire                cfg_we,
     input  wire [10:0]         cfg_addr,
     input  wire [15:0]         cfg_data,
@@ -60,7 +60,7 @@ module weight_cache #(
     output wire [255:0]        p_data
 );
 
-    // ---------------- entry ----------------
+    // ---------------- Entry ----------------
     wire [511:0] a_d [0:E-1];
     wire [511:0] b_d [0:E-1];
     wire [255:0] p_d [0:E-1];
@@ -97,7 +97,7 @@ module weight_cache #(
 
     next_use_predictor #(.N_MODELS(N_MODELS)) u_pred (
         .clk(clk), .rst(rst),
-        .now_us(now_us), .phase_us(phase_us), .epoch(epoch), .first_epoch(first_epoch),
+        .now_us(now_us), .phase_us(phase_us), .period(period), .first_period(first_period),
         .cfg_we(cfg_we), .cfg_addr(cfg_addr), .cfg_data(cfg_data),
         .arr_valid(arr_valid), .arr_model(arr_model), .arr_t_host(arr_t_host), .arr_n_expect(arr_n_expect),
         .q_ne(q_ne), .qy_valid(qy_valid), .qy_model(qy_model), .qy_done(qy_done), .qy_delta(qy_delta)

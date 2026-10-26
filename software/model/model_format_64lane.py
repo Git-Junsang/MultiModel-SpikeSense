@@ -5,7 +5,7 @@ word = LANES × INT8. 은닉 layer는 뉴런 그룹 g(LANES개)마다 입력 i �
   params      뉴런별 {β u8, vth u8}, L1 → 출력 layer 뉴런 순서, 64 B 단위로 올림
   은닉 layer  (g × fan_in + i) × LANES + j = W[LANES·g + j][i]      뉴런 수 ≥ LANES
               i × n + j                    = W[j][i]                뉴런 수 n < LANES (lane 0~n−1만)
-  출력 layer  [out, in] row-major. on-chip word로는 LANES byte씩 자른다
+  출력 layer  [out, in] row-major. On-chip word로는 LANES byte씩 자른다
 
 두 형식을 둔다. 함수 이름과 반환 형식은 model_format_1lane.py와 같다.
   L64   L `40→384→256→64→2`, 64 lane, slot 256 KiB  (P3.9 구현 기준)
@@ -126,7 +126,7 @@ class LaneFormat:
                                        data[self.PARAM_OFFSET:self.PARAM_OFFSET + self.PARAM_BYTES], scales)
 
     def entry_words(self, weights):
-        """64lane weights → on-chip entry image uint8 [ENTRY_WORDS, LANES]. 뉴런 수 < LANES인 layer는 위쪽 lane을 0으로 채운다"""
+        """64-lane weights → on-chip entry image uint8 [ENTRY_WORDS, LANES]. 뉴런 수 < LANES인 layer는 위쪽 lane을 0으로 채운다"""
         w = np.frombuffer(weights, np.uint8)
         out, at = [], 0
         for i, (n, k) in enumerate(self.WEIGHT_SHAPES):

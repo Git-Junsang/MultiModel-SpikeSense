@@ -2,11 +2,11 @@
 # p3_bd.tcl — P3 측정 설계의 블록 디자인 p3_bd (build_p3.tcl이 source)
 # ============================================================
 # XDMA(Gen2 ×2, AXI-MM 64 bit @125 MHz, H2C 1·C2H 1, AXI-Lite 마스터 64 KiB)
-# JTAG-to-AXI(보조 경로: PCIe 없이 레지스터 접근)
+# JTAG-to-AXI(보조 경로: PCIe 없이 register 접근)
 # SmartConnect 3×3, 클럭 2개(axi_aclk 125 MHz, ui_clk 100 MHz)
 #
 # 주소 (SmartConnect 하나에 마스터가 셋이므로 주소 지도를 하나로 맞춘다):
-#   0x0000_0000  레지스터 64 KiB (외부 포트 M_AXIL_REG → p3_regs, ui_clk)
+#   0x0000_0000  register 64 KiB (외부 포트 M_AXIL_REG → p3_regs, ui_clk)
 #                XDMA M_AXI_LITE(BAR0 64 KiB)와 JTAG-AXI만 접근
 #   0x0001_0000  BRAM 64 KiB (axi_aclk, PCIe DMA 지연 시험용)
 #   0x8000_0000  DDR3 1 GiB  (외부 포트 M_AXI_DDR → p3_top의 정적 MUX → MIG)
@@ -34,7 +34,7 @@ set_property -dict [list \
 ] $xdma
 
 # fit 변형(build_p3.tcl -fit): 측정용 BRAM 64 KiB와 JTAG-AXI를 빼고 최종 시스템에
-# 남을 경로(XDMA → DDR3, XDMA → 레지스터)만 둔다.
+# 남을 경로(XDMA → DDR3, XDMA → register)만 둔다.
 if { ![info exists p3_bd_fit] } { set p3_bd_fit 0 }
 
 set sc [create_bd_cell -type ip -vlnv xilinx.com:ip:smartconnect smartconnect_0]

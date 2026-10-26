@@ -7,11 +7,11 @@
 // 지워지지 않게 한다.
 //
 // 구성 (ui_clk 100 MHz, P3.4 문서의 구성안)
-//   weight cache        N_ENT개 entry × 4,096 word × 256 bit (4,068 word 사용 = 130,176 B)
+//   Weight cache        N_ENT개 entry × 4,096 word × 256 bit (4,068 word 사용 = 130,176 B)
 //                       쓰기 포트: DDR3 읽기 데이터(fill), 읽기 포트: 32레인 연산(1 word/cycle)
 //   슬라이스 버퍼       SLICE_BUF=1이면 2 × 512 word × 256 bit (이중 버퍼, 16 KiB씩)
 //   레인                32개, INT8 weight × 7 bit 입력 누산(layer 1 형태)
-//   membrane potential  layer별 bank 16 bit: 512트랙 × 384 / 256 / 64 / 2 뉴런, 읽기-수정-쓰기
+//   Membrane potential  layer별 bank 16 bit: 512트랙 × 384 / 256 / 64 / 2 뉴런, 읽기-수정-쓰기
 //   β·vth               BV_ALL40=1: 40모델 × 706뉴런 × 16 bit 상주, 0: entry별 1,024 × 16 bit
 //   추론 요청 queue          512 × 512 bit (64 B/추론 요청). Q_BRAM=0이면 분산 RAM(LUTRAM)
 //   트랙 메타           512 × 64 bit
@@ -58,7 +58,7 @@ module mem_fit #(
         end
     end
 
-    // ---------------- weight cache entry ----------------
+    // ---------------- Weight cache entry ----------------
     wire [255:0] e_rd [0:NB-1];
     genvar e;
     generate
@@ -173,7 +173,7 @@ module mem_fit #(
         bv_rd <= bv_q[c_src_d2 % BV_N];
     end
 
-    // ---------------- membrane bank (읽기-수정-쓰기) ----------------
+    // ---------------- Membrane bank (읽기-수정-쓰기) ----------------
     // 1 뉴런/cycle. 읽기 주소 → 2 cycle 뒤 데이터 → 갱신 → 같은 주소에 쓰기.
     localparam integer D1 = 512 * 384, D2 = 512 * 256, D3 = 512 * 64, D4 = 512 * 2;
     wire [15:0] cur16 = shadow[c_addr[4:0]][15:0];
@@ -209,7 +209,7 @@ module mem_fit #(
 endmodule
 
 // ============================================================
-// mem_rmw — membrane bank 하나: 깊이 D × 16 bit, 읽기-수정-쓰기 파이프라인
+// mem_rmw — membrane bank 하나: 깊이 D × 16 bit, 읽기-수정-쓰기 pipeline
 //   갱신식은 PLIF 형태(누설 β·mem>>8 + 전류, 16 bit 포화, threshold 이상이면 빼기)
 // ============================================================
 module mem_rmw #(

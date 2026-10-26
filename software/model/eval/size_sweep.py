@@ -2,12 +2,12 @@
 
 구조별 40대 체크포인트를 FP32와, weight만 layer별 대칭으로 반올림한 INT8·INT6·INT4로 평가해
 파일 단위 AUC를 비교한다. weight 외(입력·β·vth·membrane potential)는 FP32 그대로 두는 1차 선별이다.
-채택 후보는 P2.5와 같은 정수 파이프라인으로 다시 확인한다.
+채택 후보는 P2.5와 같은 정수 pipeline으로 다시 확인한다.
 
   학습 이름(tag)별 weights/<이름>/<장비>/last.pth (train_40unit.py --name). 기준은 L_normal_noaug(P2.4, `40→384→256→64→2`)
   옛 결과 파일의 tag L·M·S·P·XS가 차례로 L_normal_noaug·M_normal_noaug·S_normal_noaug·P_normal_noaug·XS_normal_noaug다
 
-평가 세트는 train_1unit.prepare의 supervised 분할(학습과 같은 seed)의 test이며 quant_int8.py와 같다.
+평가 세트는 train_1unit.prepare의 지도학습 분할(학습과 같은 seed)의 test이며 quant_int8.py와 같다.
 점수 = 출력 membrane potential 시간 평균에 softmax를 씌운 P(이상)의 파일 평균.
 
 결과: train_result/eval/size_sweep/{results.csv, summary.md}
@@ -138,7 +138,7 @@ def main():
             if b >= 32:
                 verdict = "(참고)"
             lines.append(f"| {tag} | {'-'.join(map(str, ls))} | {'FP32' if b >= 32 else f'INT{b}'} | "
-                         f"{wb:,} | {wb * 40 / 1e6:.2f} MB | {len(us)} | {v.mean():.4f} | {lref.mean():.4f} | "
+                         f"{wb:,} | {wb * 40 / 2**20:.2f} MiB | {len(us)} | {v.mean():.4f} | {lref.mean():.4f} | "
                          f"{v.mean() - lref.mean():+.4f} | {v.min():.4f} | {(v >= 0.9).sum()} ({(lref >= 0.9).sum()}) | "
                          f"{verdict} |")
     md = "\n".join(lines) + "\n"

@@ -5,7 +5,7 @@ Sharma, Ankit, Roy, ISLPED 2022
 
 ## 1. 문제
 
-SNN에는 input, weight, output 외에 membrane potential과 timestep이 있다. ANN dataflow에 시간 loop만 더하면 memory 이동을 제대로 줄이지 못할 수 있다.
+SNN에는 input, weight, output 외에 membrane potential과 timestep이 있다. ANN dataflow에 시간 loop만 더하면 메모리 이동을 제대로 줄이지 못할 수 있다.
 
 ## 2. 방법
 
@@ -13,17 +13,17 @@ SNN에는 input, weight, output 외에 membrane potential과 timestep이 있다.
 
 1. 같은 작업의 여러 timestep을 연속 처리해 membrane state를 재사용한다.
 2. PE 주변의 작은 buffer에 맞게 tile을 고른다.
-3. 시간축 일부를 더 가까운 memory level로 옮긴다.
+3. 시간축 일부를 더 가까운 메모리 level로 옮긴다.
 
-한 memory의 traffic만 줄이면 다른 level의 traffic이 늘 수 있다. 전체 energy와 latency를 함께 봐야 한다.
+한 메모리의 traffic만 줄이면 다른 level의 traffic이 늘 수 있다. 전체 energy와 latency를 함께 봐야 한다.
 
 ## 3. 결과
 
-Timeloop 기반 분석이다. FPGA board 실측이 아니다.
+Timeloop 기반 분석이다. FPGA 보드 실측이 아니다.
 
 - SNN loop order는 ANN의 7!에서 8!로 늘어난다.
 - Hardware와 workload에 따라 최적 dataflow가 달랐다.
-- 일부 조건에서 baseline보다 EDP가 최대 98 % 줄었다.
+- 일부 조건에서 baseline보다 EDP가 최대 98% 줄었다.
 
 최대 개선값을 모든 SNN에 적용하면 안 된다.
 
@@ -45,4 +45,4 @@ Timeloop 기반 분석이다. FPGA board 실측이 아니다.
 
 Membrane pressure와 temporal reuse 자체는 신규성이 아니다. 우리 기여 범위는 다중 트랙 state와 모델 cache의 결합 효과다.
 
-원문 확인: 문제 §2, 규칙 §3.3, 평가 §4~5.
+원문 확인: 문제 §2, 규칙 §3.3, 평가 §4–5.

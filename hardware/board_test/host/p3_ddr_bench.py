@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""p3_ddr_bench.py — P3.1 DDR3 실효 대역폭·지연 측정 매트릭스 (FPGA Host, root 권한)
+"""p3_ddr_bench.py — P3.1 DDR3 실효 bandwidth·지연 측정 매트릭스 (FPGA Host, root 권한)
 
-p3_top의 트래픽 생성기(ddr_tgen)를 레지스터로 설정·실행하고, 실행마다 설정·결과·
+p3_top의 traffic 생성기(ddr_tgen)를 register로 설정·실행하고, 실행마다 설정·결과·
 전송별 지연 기록(최대 2,048개)을 JSON 한 줄로 남긴다. 분석은 개발 서버의
 hardware/board_test/host/analyze_p3.py가 한다.
 
@@ -9,8 +9,8 @@ hardware/board_test/host/analyze_p3.py가 한다.
 
 그룹 (cycle은 ui_clk 100 MHz = 10 ns, 1 beat = 32 B):
   full     1 GiB 전 범위 쓰기 → 읽기 검증, seed와 그 보수로 두 번 (P1.6의 16 MiB 한계 보완)
-  burst    순차 접근, 버스트 길이 1~128 beat × 쓰기/읽기, 64 MiB, pipelined, outst 16
-  outst    순차 읽기, 버스트 16/128에서 동시 버스트 수 1~16
+  burst    순차 접근, 버스트 길이 1–128 beat × 쓰기/읽기, 64 MiB, pipelined, outst 16
+  outst    순차 읽기, 버스트 16/128에서 동시 버스트 수 1–16
   slice    슬라이스 크기별 읽기: 모델 전환(SLOT_RAND 40슬롯)과 같은 모델 연속(SEQ),
            blocking(한 번에 하나)과 pipelined(연속 전송)
   model    모델 단위·layer 단위 가져오기: 전체 weight 130,176 B, 슬롯 135,168 B, L1/L2/L3,
@@ -130,9 +130,9 @@ def main():
                    'cfg': cfg, 'res': res}
             f.write(json.dumps(rec) + '\n')
             f.flush()
-            avg = res['lat_sum'] / res['xfers'] if res['xfers'] else 0
+            avg = res['delay_sum'] / res['xfers'] if res['xfers'] else 0
             print(f'{grp:6s} {label:28s} {res["GBps"]:6.3f} GB/s  xfers={res["xfers"]:5d} '
-                  f'lat[min={res["lat_min"]} avg={avg:.1f} max={res["lat_max"]}] '
+                  f'lat[min={res["delay_min"]} avg={avg:.1f} max={res["delay_max"]}] '
                   f'fst_min={res["fst_min"]} err={res["err_cnt"]} proto={res["proto_err"]}',
                   flush=True)
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# accel_core(dma 포함) testbench (xsim, Verilator) + Verilator lint. 저장소 루트에서 실행한다.
+# accel_core(DMA 포함) testbench (xsim, Verilator) + Verilator lint. 저장소 루트에서 실행한다.
 # slave 모델 MODE 0(멈춤 없음), 1(무작위 backpressure·ID 섞기), 2(1 + 오류 응답)를 차례로 돌린다.
 # vector는 run_compute_array.sh와 같은 vec_m12/를 쓴다. Verilator obj_dir는 공백 없는 ~/mmss_build에 둔다.
 set -euo pipefail

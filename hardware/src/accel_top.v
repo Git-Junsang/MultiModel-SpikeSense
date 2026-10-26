@@ -6,12 +6,12 @@
 //        1 Gb/s에서 gtx_clk → gtx_clk90 경로(rgmii_phy_if의 clock ODDR 입력)는 상수 1·0이라 위상을 옮겨도 된다.
 // reset: RESET 버튼(rst_n, 누르면 0) → MIG sys_rst(ACTIVE LOW). accel_sys rst = MIG ui_clk_sync_rst 또는 Ethernet MMCM 미잠김,
 //        ui_clk에 sync_reset으로 맞추고 FF 하나를 더 거친다. gtx_clk·RGMII 수신 clock 쪽 reset은 eth_link·rgmii_phy_if 안에서 맞춘다.
-// MIG AXI: ID 4 bit 중 위 3 bit는 0. dma는 읽기 data를 ID bit 0으로 나누므로 rid bit 0을 돌려준다.
+// MIG AXI: ID 4 bit 중 위 3 bit는 0. DMA는 읽기 데이터를 ID bit 0으로 나누므로 rid bit 0을 돌려준다.
 //          size 32 B, INCR, wstrb 전부 1. 주소는 아래 30 bit(1 GiB). aresetn은 ui_clk_sync_rst를 한 번 잡아 쓴다.
 // RX_IDELAY·TX_PS: reset 때 LINK_TUNE 값. 보드(sub1 직결)에서 frame 손실을 재어 정했다(P5.2, p52_link.py).
-//   송신 위상은 −144~−24단계(90°에서 2.57~0.43 ns 앞)에서 손실 0이라 가운데 −80(−1.43 ns). 90° 그대로면 KSZ9031 안쪽
-//   TXC 지연(약 1.2 ns)이 더해져 PHY가 다음 nibble을 잡았다(하강 edge의 TXD[1]·TXD[3]).
-//   수신 tap은 0~28에서 손실 0, 30 근처가 가장자리다. ax7a200b_eth.xdc의 STA 모델은 이보다 좁아 tap 11부터 setup이 음수라,
+//   송신 위상은 −144~−24단계(90°에서 2.57–0.43 ns 앞)에서 손실 0이라 가운데 −80(−1.43 ns). 90° 그대로면 보드 PHY 안쪽
+//   TXC 지연이 더해져 PHY가 다음 nibble을 잡았다(하강 edge의 TXD[1]·TXD[3]).
+//   수신 tap은 0–28에서 손실 0, 30 근처가 가장자리다. ax7a200b_eth.xdc의 STA 모델은 이보다 좁아 tap 11부터 setup이 음수라,
 //   둘 다 만족하는 8(STA setup 0.23 ns, 보드 가장자리까지 1.68 ns)을 쓴다.
 // LED(캐리어, 0이면 켜짐): LED1 MIG 보정 끝, LED2 RUN, LED3 IDLE, LED4 ui_clk 점멸. 코어보드 LED: Ethernet MMCM 잠김.
 
@@ -42,7 +42,7 @@ module accel_top #(
     output wire [0:0]  ddr3_cs_n,
     output wire [3:0]  ddr3_dm,
     output wire [0:0]  ddr3_odt,
-    // RGMII PHY (KSZ9031RNX)
+    // RGMII PHY(설명서는 KSZ9031RNX, 실제 ID 0x937C·0x4032 = JL2101 계열, MDIO 주소 1)
     input  wire        rgmii_rx_clk,
     input  wire [3:0]  rgmii_rxd,
     input  wire        rgmii_rx_ctl,

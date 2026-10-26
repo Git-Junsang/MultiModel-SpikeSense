@@ -36,7 +36,7 @@ def verify_models(models_dir, weights_dir):
     manifest = json.loads((models_dir / "manifest.json").read_text(encoding="utf-8"))
     assert manifest["model_count"] == len(dd.UNITS) == 40
     assert manifest["slot_size"] == mf.SLOT_SIZE
-    ddr = (models_dir / "models.ddr.bin").read_bytes()
+    ddr = (models_dir / "models.ddr3.bin").read_bytes()
     assert len(ddr) == 40 * mf.SLOT_SIZE
     assert digest(ddr) == manifest["ddr_image_sha256"]
 

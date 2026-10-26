@@ -1,0 +1,19 @@
+
+****** xsim v2026.1 (64-bit)
+  **** SW Build 6511674 on Tue Jun 16 11:01:26 MDT 2026
+  **** IP Build 6504888 on Tue Jun 09 09:05:25 MDT 2026
+  **** SharedData Build 6501428 on Mon Jun 08 17:34:18 MDT 2026
+  **** Start of session at: Mon Oct 26 16:09:46 2026
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+    ** Copyright 2022-2026 Advanced Micro Devices, Inc. All Rights Reserved.
+
+source hardware/sim/mdio/xsim.dir/tb_mdio/xsim_script.tcl
+# xsim {tb_mdio} -autoloadwcfg -xsimdir hardware/sim/mdio/xsim.dir -runall
+Time resolution is 1 ps
+run -all
+run   MDIO 쓰기 4·읽기 5, MDC 상승 edge 576, 오류 0
+PASS
+$finish called at time : 49690 ns : File "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/testbench/tb_mdio.sv" Line 113
+exit
+INFO: xsimkernel Simulation Memory Usage: 154968 KB (Peak: 211792 KB), Simulation CPU Usage: 650 ms
+INFO: [Common 17-206] Exiting xsim at Mon Oct 26 16:09:48 2026...

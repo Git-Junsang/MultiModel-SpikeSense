@@ -1,7 +1,7 @@
 # ============================================================
 # flash_qspi.tcl — MCS 생성(개발 서버) / QSPI 기록(FPGA Host)
 # ============================================================
-# 보드 QSPI: N25Q128 3.3 V, 128 Mbit (매뉴얼 Part 2.5). 비트스트림은 SPIx4 설정.
+# 보드 QSPI: N25Q128 3.3 V, 128 Mbit (매뉴얼 Part 2.5). bitstream은 SPIx4 설정.
 #
 # 1) MCS 생성 (개발 서버):
 #    vivado -mode batch -source flash_qspi.tcl -tclargs -mode mcs -bit <file.bit> -mcs <out.mcs>

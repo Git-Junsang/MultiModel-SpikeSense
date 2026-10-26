@@ -1,12 +1,12 @@
 // ============================================================
-// tb_dma.sv — accel_core(compute_array + weight_cache + membrane_storage + dma)를 golden_l64_m12와 대조 (P4.4)
+// tb_dma.sv — accel_core(compute_array + weight_cache + membrane_storage + DMA)를 golden_l64_m12와 대조 (P4.4)
 // ============================================================
-// weight와 DDR3 트랙의 membrane potential을 모두 dma가 AXI slave 모델(DDR3)에서 읽고 쓴다. testbench는 scheduler 대신
+// weight와 DDR3 트랙의 membrane potential을 모두 DMA가 AXI slave 모델(DDR3)에서 읽고 쓴다. testbench는 scheduler 대신
 // batch를 정해 교체 계획(pl), membrane potential 준비(pf), 추론 시작(go)을 낸다. 다음 batch의 계획은 지금 batch의
 // 첫 추론이 시작될 때 낸다(prefetch). 다음 추론의 pf와 go는 앞 추론이 연산하는 동안 미리 낸다.
-//   앞 timestep 0~15   모델마다 batch 하나에 그 모델 트랙의 timestep을 모두 넣는다. batch가 적재(4,114 beat)보다
+//   앞 timestep 0–15   모델마다 batch 하나에 그 모델 트랙의 timestep을 모두 넣는다. Batch가 적재(4,114 beat)보다
 //                      길어 다음 모델 적재가 연산 중에 끝나야 한다(첫 batch 뒤 weight 대기 0).
-//   뒤 timestep 16~30  batch 하나 = 추론 하나. 같은 모델의 두 번째 트랙은 hit, 다음 모델은 miss라 적재가 늦어
+//   뒤 timestep 16–30  batch 하나 = 추론 하나. 같은 모델의 두 번째 트랙은 hit, 다음 모델은 miss라 적재가 늦어
 //                      연산이 멈춘다.
 // slave 모델 MODE: 0 멈춤 없음(첫 beat까지 26 cycle, ID 순서대로), 1 무작위 ready·지연·beat 간격, ID가 다른 burst끼리
 //                  순서 바꾸기와 beat 섞기, 2 = 1 + 오류 응답(SLVERR) 주입.
@@ -14,7 +14,7 @@
 //   - row마다 전류·membrane potential·spike·12 bit 저장값, 판정용 출력이 golden과 bit 일치, 끝난 뒤 DDR3 트랙 내용
 //   - 적재마다 entry의 word 2,034개·params row 46개가 slot과 같음(spike 0 건너뛰기로 안 읽는 word 포함)
 //   - 적재 수 = miss 수, weight beat = 적재 × 4,114, membrane potential beat = 읽기 22 × 30 × 34, 쓰기 22 × 31 × 34
-//   - AXI 규칙(valid 유지, 4 KiB 경계, burst 길이·주소 범위, 주소 전 쓰기 data 없음, wlast, 동시 weight burst ≤ 4)
+//   - AXI 규칙(valid 유지, 4 KiB 경계, burst 길이·주소 범위, 주소 전 쓰기 데이터 없음, wlast, 동시 weight burst ≤ 4)
 //   - 우선순위: membrane potential 읽기·쓰기가 기다리거나 진행 중일 때 새 weight burst를 내지 않음
 //   - 적재 중인 entry로 시작하지 않음, stall_cyc = testbench가 센 정지 cycle, 오류 응답의 주소
 // 실행 (저장소 루트):
@@ -26,7 +26,7 @@ module tb_dma #(
     parameter int MODE = 1
 );
 
-    localparam int N_VEC = 82, N_MOD = 42, T = 31, TA = 16, ROWS = 45, CUR_W = 17, N_ONCHIP = 768, E = 4, EW = 2;
+    localparam int N_VEC = 82, N_MOD = 42, T = 31, TA = 16, ROWS = 45, CUR_W = 17, N_ON_CHIP = 768, E = 4, EW = 2;
     localparam int LD = 4114, WB = 16, W_OUT = 4, LAT0 = 26;
     localparam string VEC = "hardware/sim/compute_array/vec_m12/";
     localparam [31:0] MODEL_BASE = 32'h0000_0000, STATE_BASE = 32'h0200_0000;
@@ -75,9 +75,9 @@ module tb_dma #(
     reg  [255:0]  m_rdata = '0;
     reg  [1:0]    m_rresp = 2'd0, m_bresp = 2'd0;
 
-    accel_core #(.E(E), .N_MODELS(N_MOD), .N_ONCHIP(N_ONCHIP)) dut (
+    accel_core #(.E(E), .N_MODELS(N_MOD), .N_ON_CHIP(N_ON_CHIP)) dut (
         .clk(clk), .rst(rst), .model_base(MODEL_BASE), .state_base(STATE_BASE),
-        .now_us(32'd0), .phase_us(15'd0), .epoch(16'd0), .first_epoch(1'b1),
+        .now_us(32'd0), .phase_us(15'd0), .period(16'd0), .first_period(1'b1),
         .cfg_we(cfg_we), .cfg_addr(cfg_addr), .cfg_data(cfg_data),
         .arr_valid(1'b0), .arr_model(6'd0), .arr_t_host(32'd0), .arr_n_expect(11'd0), .q_ne({N_MOD{1'b0}}),
         .pl_valid(pl_valid), .pl_model(pl_model), .pl_ready(pl_ready), .pl_done(pl_done),
@@ -148,13 +148,13 @@ module tb_dma #(
         if (a[4:0] != 5'd0 || ({20'd0, a[11:0]} + (len + 1) * 32) > 4096) prot("주소 정렬, 4 KiB 경계");
         if (id) begin
             k = (a - STATE_BASE) >> 11;
-            if (len != 8'd33 || a < STATE_BASE || ((a - STATE_BASE) & 32'h7FF) != 0 || k >= 1024 || k < N_ONCHIP)
+            if (len != 8'd33 || a < STATE_BASE || ((a - STATE_BASE) & 32'h7FF) != 0 || k >= 1024 || k < N_ON_CHIP)
                 prot("membrane potential 읽기 주소·길이");
         end else if (len + 1 > WB || a >= STATE_BASE || (a >> 18) >= N_MOD || ((a >> 5) & 32'h1FFF) + len + 1 > LD)
             prot("weight burst 주소·길이");
     endtask
 
-    // 오류 응답은 앞 주입과 8 cycle 넘게 떨어질 때만 낸다(dma는 같은 cycle에 하나만 보고한다)
+    // 오류 응답은 앞 주입과 8 cycle 넘게 떨어질 때만 낸다(DMA는 같은 cycle에 하나만 보고한다)
     function automatic bit inject(input bit cand, input [31:0] a);
         inject = 1'b0;
         if (cand && cyc - last_inj > 8) begin
@@ -210,7 +210,7 @@ module tb_dma #(
         if (m_awvalid && m_awready) begin
             k = (m_awaddr - STATE_BASE) >> 11;
             if (m_awlen != 8'd33 || m_awaddr < STATE_BASE || ((m_awaddr - STATE_BASE) & 32'h7FF) != 0
-                || k >= 1024 || k < N_ONCHIP)
+                || k >= 1024 || k < N_ON_CHIP)
                 prot("membrane potential 쓰기 주소·길이");
             b.addr = m_awaddr;
             b.len  = m_awlen;
@@ -391,7 +391,7 @@ module tb_dma #(
         end
     end
 
-    // ---------------- scheduler 대신 ----------------
+    // ---------------- Scheduler 대신 ----------------
     integer n_plan = 0, n_miss = 0, gate_err = 0;
     longint ref_stall = 0;
 
@@ -430,7 +430,7 @@ module tb_dma #(
         end
         if (dut.ld_busy && dut.ld_entry == go_entry) gate_err = gate_err + 1;
         v_now = v; t_now = t; rows_seen = 0; sat_exp = 1'b0;
-        if (tk >= N_ONCHIP) pend[tk] = 1'b1;
+        if (tk >= N_ON_CHIP) pend[tk] = 1'b1;
         @(negedge clk);
         go_valid = 1'b0;
     endtask
@@ -458,7 +458,7 @@ module tb_dma #(
         integer v, t, m, i, r, j, n, b, n_ddr, e;
         longint w_first, w_a, m_a;
         reg [34*256-1:0] img;
-        integer bm[$], bs[$], mv[$], mt[$], mb[$], eb[$];   // batch: 모델, 첫 추론 / 추론: vector, timestep, batch / batch의 entry
+        integer bm[$], bs[$], mv[$], mt[$], mb[$], eb[$];   // Batch: 모델, 첫 추론 / 추론: vector, timestep, batch / batch의 entry
 
         for (i = 0; i < 65536; i = i + 1) mstate[i] = {8{32'hA5A5_5A5A}};
         for (i = 0; i < 1024; i = i + 1) pend[i] = 1'b0;
@@ -480,9 +480,9 @@ module tb_dma #(
                                   : wall[m * 2034 + (b - 46) / 2][256 * ((b - 46) % 2) +: 256];
         end
         n_ddr = 0;
-        for (v = 0; v < N_VEC; v = v + 1) if (trk(v) >= N_ONCHIP) n_ddr = n_ddr + 1;
+        for (v = 0; v < N_VEC; v = v + 1) if (trk(v) >= N_ON_CHIP) n_ddr = n_ddr + 1;
 
-        // batch 목록: 앞 timestep은 모델마다 하나, 뒤 timestep은 추론마다 하나
+        // Batch 목록: 앞 timestep은 모델마다 하나, 뒤 timestep은 추론마다 하나
         for (m = 0; m < N_MOD; m = m + 1) begin
             bm.push_back(m);
             bs.push_back(mv.size());
@@ -514,7 +514,7 @@ module tb_dma #(
         go(mv[0], mt[0], eb[0]);
         w_first = w_stall;
         for (n = 0; n < mv.size(); n = n + 1) begin
-            // 추론 n이 시작됐다. batch의 첫 추론이면 다음 batch를 계획한다(prefetch)
+            // 추론 n이 시작됐다. Batch의 첫 추론이면 다음 batch를 계획한다(prefetch)
             if (n == bs[mb[n]] && mb[n] + 1 < bm.size()) begin
                 plan(bm[mb[n] + 1], e);
                 eb.push_back(e);
@@ -533,7 +533,7 @@ module tb_dma #(
             while (pend[i]) @(negedge clk);
         repeat (20) @(negedge clk);
         for (v = 0; v < N_VEC; v = v + 1)
-            if (trk(v) >= N_ONCHIP) begin
+            if (trk(v) >= N_ON_CHIP) begin
                 for (i = 0; i < 34; i = i + 1) img[256*i +: 256] = mstate[trk(v) * 64 + i];
                 for (r = 0; r < ROWS; r = r + 1)
                     for (j = 0; j < ((r == 44) ? 2 : 16); j = j + 1)

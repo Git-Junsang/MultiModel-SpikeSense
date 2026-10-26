@@ -1,5 +1,5 @@
 # ============================================================
-# build_p3.tcl — P3.1~P3.3 측정 설계 빌드 (MIG + 트래픽 생성기 + XDMA + JTAG-AXI)
+# build_p3.tcl — P3.1~P3.3 측정 설계 빌드 (MIG + traffic 생성기 + XDMA + JTAG-AXI)
 # ============================================================
 # 실행 (저장소 루트에서):
 #   vivado -mode batch -source hardware/board_test/p3_meas/build_p3.tcl \
@@ -8,11 +8,11 @@
 #
 # -fit: BRAM 적합성 실험(P3.2·P3.4). mem_fit.v의 on-chip 메모리 골격을 넣고, 측정용
 #   BRAM 64 KiB·JTAG-AXI를 빼고, 지연 기록을 16개로 줄여 배치·배선까지만 한다
-#   (비트스트림 없음). 예: -fit 4,1,1,1 → entry 4개, 슬라이스 버퍼, β·vth 40모델 상주, queue BRAM
+#   (bitstream 없음). 예: -fit 4,1,1,1 → entry 4개, 슬라이스 버퍼, β·vth 40모델 상주, queue BRAM
 #
 # -addr_map: MIG 사용자 주소 → DDR3 (bank, 행, 열) 매핑. 기본값은 P1.6과 같은
 #   BANK_ROW_COLUMN. ROW_BANK_COLUMN은 4 KiB(한 행)마다 bank가 바뀌어 순차 접근에서
-#   다음 bank의 행을 미리 열 수 있다. 두 비트스트림의 측정값을 비교한다(P3.1).
+#   다음 bank의 행을 미리 열 수 있다. 두 bitstream의 측정값을 비교한다(P3.1).
 # 기본 프로젝트 위치: ~/mmss_build/p3_<addr_map 소문자 약칭> (공백 없는 경로, build_p06.tcl 참고)
 # 산출물: <proj_dir>/p3_top.bit·.ltx·.mcs, <proj_dir>/reports/*.rpt
 # ============================================================
@@ -93,7 +93,7 @@ if { $p3_bd_fit } {
         [get_filesets sources_1]
 }
 add_files -fileset constrs_1 -norecurse [list "$script_dir/p3.xdc"]
-# PCIe 클럭(txoutclk)은 XDMA가 OOC로 합성되어 합성 단계에는 없다 → 구현에서만 쓴다
+# PCIe 클럭(txoutclk)은 XDMA가 out-of-context로 합성되어 합성 단계에는 없다 → 구현에서만 쓴다
 set_property USED_IN_SYNTHESIS false [get_files p3.xdc]
 foreach x {io pcie} {
     add_files -fileset constrs_1 -norecurse [list "$repo_root/hardware/constraints/ax7a200b_$x.xdc"]

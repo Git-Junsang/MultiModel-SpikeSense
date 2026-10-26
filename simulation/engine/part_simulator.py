@@ -1,4 +1,4 @@
-"""part_simulator.py — 시뮬레이터 본체. 추론 요청열 하나를 부품 셋(cache 정책·scheduler·연산)으로 끝까지 돌리고 지표를 낸다.
+"""part_simulator.py — simulator 본체. 추론 요청열 하나를 부품 셋(cache 정책·scheduler·연산)으로 끝까지 돌리고 지표를 낸다.
 진행 규칙은 simulation_engine.md §5"""
 import numpy as np
 
@@ -30,7 +30,7 @@ class Queue:
             if self.finish is not None:
                 j = self.last_req[wl.track[i]]
                 if j >= 0 and not (self.served[j] and self.finish[j] <= wl.t_arr[i]):
-                    self.served[i] = True                  # queue에 넣지 않는다. oldest가 건너뛰지 않으면 빈 batch가 끝없이 돈다
+                    self.served[i] = True                  # Queue에 넣지 않는다. oldest가 건너뛰지 않으면 빈 batch가 끝없이 돈다
                     self.dropped.append(i)
                     continue
                 self.last_req[wl.track[i]] = i
@@ -60,13 +60,13 @@ class Queue:
 def simulate(wl, cache, scheduler, compute, stop_on_miss=False, detail=False):
     """추론 요청열 wl을 부품 셋으로 끝까지 돌리고 지표 dict를 낸다. 결정 시각 T에 다음 batch의 모델과 적재를 정하고,
     그 batch의 첫 연산 시작 s가 다음 결정 시각이다(1단 선행). stop_on_miss면 측정 구간에서 deadline miss가 나는 즉시 멈춘다.
-    detail이면 cycle 회계와 응답 시간 분해를 더한다"""
+    detail이면 cycle 회계와 response time 분해를 더한다"""
     for part in (cache, scheduler, compute):
         part.reset(wl)
     compute.log = [] if detail else None
     finish = np.full(wl.t_arr.size, np.nan)
     queue = Queue(wl, finish)
-    sizes, starts, loads_b, windows = [], [], [], []   # batch마다 기록
+    sizes, starts, loads_b, windows = [], [], [], []   # Batch마다 기록
     T = 0.0
     while True:
         queue.advance(T)
@@ -79,7 +79,7 @@ def simulate(wl, cache, scheduler, compute, stop_on_miss=False, detail=False):
             if queue.count == 0:                       # 그 도착을 버렸다(drop 규칙). 다음 도착으로
                 continue
         m, head = scheduler.pick(queue, T, cache, compute.compute_free_at)
-        if m is None:                                  # scheduler가 기다린다: head = 다시 고를 시각
+        if m is None:                                  # Scheduler가 기다린다: head = 다시 고를 시각
             T = max(head, T)
             continue
         nbytes = cache.plan(m, queue, T)
@@ -102,11 +102,11 @@ def simulate(wl, cache, scheduler, compute, stop_on_miss=False, detail=False):
         sizes.append(len(taken))
         starts.append(s)
         loads_b.append(nbytes)
-        windows.append((m, int(wl.epoch[head]) if wl.epoch is not None and head is not None else -1))   # 적재 window = (모델, 주기)
+        windows.append((m, int(wl.period[head]) if wl.period is not None and head is not None else -1))   # 적재 window = (모델, 주기)
         T = s
     dr = np.array(queue.dropped, int)
-    ok = (wl.t_host >= wl.w0) & np.isfinite(finish)     # drop 전에 센다: 결과가 나온 추론 요청
-    finish[dr] = wl.t_host[dr] + 2 * PERIOD_US          # drop: 결과가 없으므로 응답 시간을 2주기로 적어 miss로 센다
+    ok = (wl.t_host >= wl.w0) & np.isfinite(finish)     # Drop 전에 센다: 결과가 나온 추론 요청
+    finish[dr] = wl.t_host[dr] + 2 * PERIOD_US          # drop: 결과가 없으므로 response time을 2주기로 적어 miss로 센다
     bs = np.array(starts)
     res = metrics(wl, finish, np.array(sizes), bs, np.array(loads_b), np.array(windows, np.int64).reshape(-1, 2))
     res['drop'] = int((wl.t_host[dr] >= wl.w0).sum())
@@ -116,7 +116,7 @@ def simulate(wl, cache, scheduler, compute, stop_on_miss=False, detail=False):
         res['host_max_ms'] = float((wl.t_ready[i] - wl.t_host[i]).max() / 1000)
         res['fpga_side_max_ms'] = float((rcv - wl.t_ready[i]).max() / 1000)
         res['send_side_max_ms'] = float((rcv - wl.t_send[i]).max() / 1000)
-        if wl.drop_busy:                               # 결과가 나온 추론 요청만의 최대 응답 시간
+        if wl.drop_busy:                               # 결과가 나온 추론 요청만의 최대 response time
             res['max_done_ms'] = float((rcv - wl.t_host[i]).max() / 1000)
     if cache.entries:                                  # 같은 batch 순서의 offline 최소 적재 수
         res['belady_loads'] = belady([w[0] for w in windows], cache.entries, (bs >= wl.w0) & (bs < wl.w1))
@@ -128,12 +128,12 @@ def simulate(wl, cache, scheduler, compute, stop_on_miss=False, detail=False):
 
 
 def metrics(wl, finish, k, s, b, w):
-    """batch 기록(추론 요청 수 k, 첫 연산 시각 s, 적재 B b(0 = hit), (모델, 주기) w)과 추론 요청별 연산 완료 finish → 지표.
+    """Batch 기록(추론 요청 수 k, 첫 연산 시각 s, 적재 B b(0 = hit), (모델, 주기) w)과 추론 요청별 연산 완료 finish → 지표.
     추론 요청은 t_host ≥ w0, batch는 s가 [w0, w1)인 것을 센다. 열 이름은 결과 CSV 형식이라 바꾸지 않는다"""
     hw = wl.hw
-    resp = wl.recv_time(finish, np.arange(finish.size)) - wl.t_host
+    response_time = wl.recv_time(finish, np.arange(finish.size)) - wl.t_host
     sel = wl.t_host >= wl.w0
-    r = resp[sel]
+    r = response_time[sel]
     win = (s >= wl.w0) & (s < wl.w1)
     span = wl.w1 - wl.w0
     return {
@@ -150,28 +150,28 @@ def metrics(wl, finish, k, s, b, w):
         'm_bytes': float(k[win].sum() * hw.membrane_rw_bytes),  # membrane potential 읽기 + 쓰기 B
         'batch_mean': float(k[win].mean()),
         'hit_rate': float((b[win] == 0).mean()),
-        'dma_util': float((b[win].sum() / hw.ddr_mbps + hw.membrane_us(k[win].sum())) / span),
+        'dma_util': float((b[win].sum() / hw.ddr3_bandwidth_mbps + hw.membrane_us(k[win].sum())) / span),
         'cmp_util': float(k[win].sum() * hw.dense_req_us / span),
-        'ddr_mbps': float((b[win].sum() + k[win].sum() * hw.membrane_rw_bytes) / span),
-        'min_slack_ms': float(PERIOD_US / 1000 - r.max() / 1000),
+        'ddr3_used_bandwidth_mbps': float((b[win].sum() + k[win].sum() * hw.membrane_rw_bytes) / span),
+        'min_deadline_margin_ms': float(PERIOD_US / 1000 - r.max() / 1000),
         'batch_max': int(k[win].max()) if win.any() else 0,
         **_load_stats(wl, sel, win & (b > 0), w),
-        'resp': r,                                             # 실행기가 히스토그램으로 바꾼 뒤 지운다
+        'response_time': r,                                             # 실행기가 히스토그램으로 바꾼 뒤 지운다
     }
 
 
 def _load_stats(wl, sel, ld, w):
     """측정 구간의 weight 적재 수, 같은 (모델, 주기) 안의 재적재 수, 추론 요청이 있던 (모델, 주기) 수"""
-    if wl.epoch is None or w.shape[0] != ld.size:
+    if wl.period is None or w.shape[0] != ld.size:
         return {}
     wm = w[ld]
     _, per = np.unique(wm[:, 0] * 1_000_000 + wm[:, 1], return_counts=True)
     return {'weight_loads': int(ld.sum()), 'window_reloads': int(ld.sum() - per.size), 'window_loads_max': int(per.max()) if per.size else 0,
-            'model_periods': int(np.unique(wl.model[sel].astype(np.int64) * 1_000_000 + wl.epoch[sel]).size)}
+            'model_periods': int(np.unique(wl.model[sel].astype(np.int64) * 1_000_000 + wl.period[sel]).size)}
 
 
 def cycle_stats(wl, finish, busy, n_win):
-    """측정 구간의 compute array cycle 회계(연산 + 정지 + 유휴 = 구간)와 응답 시간 분해(입력 + FPGA + 결과).
+    """측정 구간의 compute array cycle 회계(연산 + 정지 + 유휴 = 구간)와 response time 분해(입력 + FPGA + 결과).
     정지 = 도착한 추론 요청이 남았는데 compute array가 쉰 cycle, 유휴 = FPGA 안에 추론 요청이 없는 cycle"""
     w0, w1 = wl.w0, wl.w1
     b = np.asarray(busy, float).reshape(-1, 2)

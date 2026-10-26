@@ -1,13 +1,13 @@
 // ============================================================
 // tb_frontend.sv — frontend(ingest, req_table, track_scheduler, result)를 simulator 결정과 대조 (P4.5·P4.6)
 // ============================================================
-// 1) 기록 재생: export_sched_trace.py가 낸 simulator(Grouping + PNU-count) 사건을 시각 순서로 넣는다.
+// 1) 기록 재생: export_sched_trace.py가 낸 simulator(Grouping + PNU-Count) 사건을 시각 순서로 넣는다.
 //    도착은 64 B 추론 요청으로 넣고, accel_core 자리의 stub이 사건 시각에 연산 시작(go_ready)과 완료(done)를 준다.
 //    사건 사이에는 RTL이 결정할 시간(GAP cycle)을 둔다. 같은 시각 사건은 이어서 넣는다. now_us는 사건 시각이다.
 //    확인: 교체 계획 순서·모델·그때의 모델별 queue 있음(q_ne), batch 첫 추론과 구성원·순서, go의 entry·입력·RESET_STATE,
 //          go 전에 pf, predictor 도착 알림, 결과 32 B 모든 필드(batch 크기, 시각, 출력, 포화·LATE flag), drop 수,
-//          DDR3 트랙 결과가 wb_done 뒤에 나옴(wb_done을 0~400 cycle 늦게 준다), ev_*·pending_n 출력.
-// 2) 지정 시험: 검사 오류 1~5와 정보(범위 밖 위 bit, 받은 순번, x의 여러 byte), n_expect 포화, run = 0,
+//          DDR3 트랙 결과가 wb_done 뒤에 나옴(wb_done을 0–400 cycle 늦게 준다), ev_*·pending_n 출력.
+// 2) 지정 시험: 검사 오류 1–5와 정보(범위 밖 위 bit, 받은 순번, x의 여러 byte), n_expect 포화, run = 0,
 //    결과 전 같은 트랙 drop, 결과 backpressure(res_ok), 같은 cycle의 목록 추가·떼어 내기, DDR3 결과가 wb_done을 기다리는 순서.
 // 실행 (저장소 루트):
 //   bash hardware/testbench/run_frontend.sh
@@ -18,7 +18,7 @@ module tb_frontend #(
     parameter int GAP = 96
 );
 
-    localparam int N_MODELS = 40, N_ONCHIP = 768, MAXE = 400000, MAXB = 200000;
+    localparam int N_MODELS = 40, N_ON_CHIP = 768, MAXE = 400000, MAXB = 200000;
     int    TID = 0;                       // 기록 번호(+TID=n)
     string DIR;
     localparam [31:0] DEADLINE = 32000, MARGIN = 31000;    // 응답이 1 ms를 넘으면 LATE
@@ -58,7 +58,7 @@ module tb_frontend #(
     wire [3:0]   err_code;
     wire [31:0]  err_info;
 
-    frontend #(.N_TRACKS(1024), .N_MODELS(N_MODELS), .N_ONCHIP(N_ONCHIP), .EW(2)) dut (
+    frontend #(.N_TRACKS(1024), .N_MODELS(N_MODELS), .N_ON_CHIP(N_ON_CHIP), .EW(2)) dut (
         .clk(clk), .rst(rst), .run(run), .n_tracks(n_tracks), .n_models(n_models),
         .deadline_us(DEADLINE), .margin_us(MARGIN), .now_us(now_us),
         .rq_valid(rq_valid), .rq_ready(rq_ready), .rq_data(rq_data),
@@ -101,7 +101,7 @@ module tb_frontend #(
         cnt++;
     endtask
 
-    // 교체 계획 stub: 계획 k는 batch k. 1~20 cycle 뒤 pl_done
+    // 교체 계획 stub: 계획 k는 batch k. 1–20 cycle 뒤 pl_done
     int pend_done = -1;
     always @(posedge clk) begin
         pl_done <= 1'b0;
@@ -148,7 +148,7 @@ module tb_frontend #(
         if (ev_sat) n_sat_ev++;
     end
 
-    // 재생의 되쓰기 응답: DDR3 트랙 완료마다 0~400 cycle 늦게, 완료 순서대로
+    // 재생의 되쓰기 응답: DDR3 트랙 완료마다 0–400 cycle 늦게, 완료 순서대로
     longint wb_due [$];
     int     wb_trk [$];
     bit     wb_seen [0:1023];
@@ -181,7 +181,7 @@ module tb_frontend #(
             else begin
                 e = rq_exp.pop_front();
                 res_pend[e.trk]--;
-                if (e.trk >= N_ONCHIP) begin
+                if (e.trk >= N_ON_CHIP) begin
                     if (!wb_seen[e.trk]) fail($sformatf("트랙 %0d: wb_done 전에 결과", e.trk), err_res);
                     wb_seen[e.trk] = 1'b0;
                 end
@@ -227,7 +227,7 @@ module tb_frontend #(
         longint i = e[221:190];
         int tr = e[189:180];
         int arr0, drop0, w = 0;
-        // simulator는 연산 완료로 drop을 판정하고 RTL은 결과를 보낸 뒤 칸을 비운다. 재생은 사건 순서만 지키므로 그 사이 cycle을 준다
+        // Simulator는 연산 완료로 drop을 판정하고 RTL은 결과를 보낸 뒤 칸을 비운다. 재생은 사건 순서만 지키므로 그 사이 cycle을 준다
         while (!e[50] && res_pend[tr] != 0) begin step(1); if (++w > 5000) begin fail($sformatf("트랙 %0d 결과가 안 나감", tr), err_misc); break; end end
         arr0 = n_arr; drop0 = n_drop;
         send_req(mkreq(8'hA5, e[125], 16'(tr), e[141:126], 8'(e[179:174]), e[173:142], {16'd0, e[124:109]}, xval(i)));
@@ -285,7 +285,7 @@ module tb_frontend #(
         r.flags = {5'd0, ($signed(now_us - lim) > 0), sat, rs_of[tr]};
         rq_exp.push_back(r);
         res_pend[tr]++;
-        if (tr >= N_ONCHIP) begin
+        if (tr >= N_ON_CHIP) begin
             wb_last = (cyc + 2 + $urandom % 400 > wb_last + 1) ? cyc + 2 + $urandom % 400 : wb_last + 1;
             wb_due.push_back(wb_last);
             wb_trk.push_back(tr);
@@ -328,8 +328,8 @@ module tb_frontend #(
     endtask
 
     // ---------------- 지정 시험 ----------------
-    // auto_go = 1이면 stub이 go를 본 2 cycle 뒤 go_ready를 주고, 실제 handshake 뒤 LAT cycle에 done(DDR3 트랙은 2 cycle 뒤 wb_done)을 낸다
-    int  d_err = 0, LAT = 40, n_go = 0;
+    // auto_go = 1이면 stub이 go를 본 2 cycle 뒤 go_ready를 주고, 실제 handshake 뒤 DELAY cycle에 done(DDR3 트랙은 2 cycle 뒤 wb_done)을 낸다
+    int  d_err = 0, DELAY = 40, n_go = 0;
     bit  auto_go = 1'b0;
     int  st = 0, cnt = 0, trk = 0;
     always @(posedge clk) if (auto_go && !rst) begin : auto_stub
@@ -339,10 +339,10 @@ module tb_frontend #(
         1: if (cnt != 0) cnt--;
            else if (go_valid) begin go_ready <= 1'b1; st = 4; end
            else st = 0;
-        4: if (go_valid) begin trk = go_track; n_go++; cnt = LAT; st = 2; end     // go_ready가 1인 cycle의 handshake
+        4: if (go_valid) begin trk = go_track; n_go++; cnt = DELAY; st = 2; end     // go_ready가 1인 cycle의 handshake
            else st = 0;
         2: if (cnt == 0) begin done <= 1'b1; out_mem0 <= 16'(trk); out_mem1 <= 16'(trk + 1); sat16 <= 1'b0;
-                               cnt = 2; st = (trk >= N_ONCHIP) ? 3 : 0; end else cnt--;
+                               cnt = 2; st = (trk >= N_ON_CHIP) ? 3 : 0; end else cnt--;
         default: if (cnt == 0) begin wb_done <= 1'b1; st = 0; end else cnt--;
         endcase
     end
@@ -431,7 +431,7 @@ module tb_frontend #(
         end
         $display("run   지정 시험 2: 결과 backpressure. 불일치 %0d", d_err);
 
-        // 3) batch 시작 cycle에 같은 모델 추론 요청이 들어오면 다음 batch로 간다
+        // 3) Batch 시작 cycle에 같은 모델 추론 요청이 들어오면 다음 batch로 간다
         auto_go = 1'b0;
         got.delete();
         send_req(mkreq(8'hA5, 0, 16'd800, 16'd0, 8'd7, 32'd300, 32'd2, xval(800)));   // DDR3 트랙
@@ -456,11 +456,11 @@ module tb_frontend #(
         rs_rand = 1'b0;
         for (k = 0; k < 2; k++) begin : drop_after_done
             int tk;
-            tk = (k == 0) ? 20 : 850;                           // on-chip, DDR3
+            tk = (k == 0) ? 20 : 850;                           // On-chip, DDR3
             s0 = n_go;
             send_req(mkreq(8'hA5, 0, 16'(tk), 16'd0, 8'd6, 32'd400, 32'd1, xval(tk)));
             while (n_go == s0) step(1);
-            step(LAT + 10);
+            step(DELAY + 10);
             send_expect(mkreq(8'hA5, 0, 16'(tk), 16'd1, 8'd6, 32'd410, 32'd1, xval(tk + 1)), 4'd5, 32'(tk), "연산 뒤 결과 전");
             rs_rand = 1'b1;
             wait_idle("연산 뒤 결과 전");
@@ -483,7 +483,7 @@ module tb_frontend #(
             s0 = 0;
             while (!go_valid) begin step(1); if (++s0 > 2000) break; end
             @(negedge clk); go_ready = 1'b1; @(negedge clk); go_ready = 1'b0;
-            step(LAT);
+            step(DELAY);
             @(negedge clk); done = 1'b1; out_mem0 = (k == 0) ? 16'd860 : 16'd31; @(negedge clk); done = 1'b0;
         end
         step(60);

@@ -1,11 +1,11 @@
 """논문용 도착·cache 예시(offset/fig5의 확장): nominal frame 끝과 실제 도착을 나누고, entry 4개의 victim 선택 한 번을 보인다.
 영문, 그림 안 제목 없음, 단 폭 3.5 in, 글자 7 pt 이상.
 
-입력: 없음. simulation 결과가 아니라 설명용 예시다(P3.26 §2.1·§2.2)
+입력: 없음. Simulation 결과가 아니라 설명용 예시다(P3.26 §2.1·§2.2)
   모델 A~E(offset 0, 0.8, …, 3.2 ms: 모델 40개 중 이웃한 5개, 나머지 모델은 생략), 모델마다 트랙 3개
-  도착 = O_m + G_m(모델 묶음 지연, 그 모델 트랙 모두 같음) + j(추론 요청별, 0 ≤ j < J = 0.8 ms). 값은 손으로 골랐고 C 묶음만 3 ms 늦다
+  도착 = O_m + G(m, k)(모델 그룹 지연, 그 모델 트랙 모두 같음) + j(추론 요청별, 0 ≤ j < J = 0.8 ms). 값은 손으로 골랐고 모델 C의 모델 그룹만 3 ms 늦다
   cache는 앞 주기에서 A·B·C·D를 담은 상태(steady)로 시작한다. 처리 규칙은 engine.py와 같다: Grouping(가장 먼저 도착한 대기
-  추론 요청의 모델, 기다리지 않음), 한 batch 앞 적재, 가장 최근 batch의 entry는 잠금, PNU-count 교체. 묶음 지연 분포는 Uniform(0, 4 ms)로 둔다
+  추론 요청의 모델, 기다리지 않음), 한 batch 앞 적재, 가장 최근 batch의 entry는 잠금, PNU-Count 교체. 모델 그룹 지연 분포는 Uniform(0, 4 ms)로 둔다
     첫 추론 요청 전(el < τ_G):      t̂ = 지금 + δ_G(el, 1) = 지금 + (4 − el)/2
     첫 추론 요청 a1 뒤, 남은 r > 0:  t̂ = 지금 + (J − (지금 − a1))/(r + 1)
     그 밖:                       t̂ = 다음 주기 offset + E[G] + J/(n + 1)
@@ -27,14 +27,14 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."
 import common as cm  # noqa: E402
 
 cm.paper_style()
-T, SLOT, J, GMAX = 32.0, 0.8, 0.8, 4.0     # 주기, offset 간격 T/M(M = 40), jitter 폭, 묶음 지연 분포 Uniform(0, GMAX) (ms)
+T, SLOT, J, GMAX = 32.0, 0.8, 0.8, 4.0     # 주기, offset 간격 T/M(M = 40), jitter 폭, 모델 그룹 지연 분포 Uniform(0, GMAX) (ms)
 LOAD, INF = 0.0439, 0.00536                # weight 적재 43.9 µs, 추론 1번 535.9 cycle (ms)
 NAMES, N, E = "ABCDE", 3, 4                # 모델, 모델당 트랙, entry
 SEED = 970743                              # (a)의 무작위 offset(교체 전 판과 같은 그림)
 COLOR = dict(zip(NAMES, list(cm.TYPE_COLOR.values())[:5]))
 MARK = dict(zip(NAMES, "os^Dv"))
 O = {m: SLOT * k for k, m in enumerate(NAMES)}
-G = dict(A=0.3, B=0.5, C=3.0, D=0.2, E=0.25)                       # 모델 묶음 지연(C만 늦음)
+G = dict(A=0.3, B=0.5, C=3.0, D=0.2, E=0.25)                       # 모델 그룹 지연(C만 늦음)
 U = dict(A=(0.05, 0.3, 0.5), B=(0.1, 0.4, 0.75), C=(0.1, 0.3, 0.6), D=(0.0, 0.2, 0.45), E=(0.1, 0.35, 0.6))
 arr = sorted((O[m] + G[m] + u, m) for m in NAMES for u in U[m])     # (도착 ms, 모델)
 
@@ -44,7 +44,7 @@ rand_ofs = rng.uniform(0, T, (5, N))       # (a) 트랙별 무작위 frame 끝
 
 
 def t_hat(x, now, queued, got, a1, group=True):
-    """PNU-count 다음 사용 예측. group = False면 묶음 지연을 모르는 P3.25 식"""
+    """PNU-Count 다음 사용 예측. group = False면 모델 그룹 지연을 모르는 P3.25 식"""
     if x in queued:
         return now
     el, r, nxt = now - O[x], N - got[x], O[x] + T + J / (N + 1)
@@ -145,7 +145,7 @@ def actual(ax, x, m, y=None):
 
 
 # (a) 무작위 offset: 트랙마다 frame 끝이 주기 안에 흩어진다
-rows(ax_a, list(NAMES), [COLOR[m] for m in NAMES], "(a) Unaligned: random offsets", (-0.6, T + 0.6))
+rows(ax_a, list(NAMES), [COLOR[m] for m in NAMES], "(a) unaligned: random offsets", (-0.6, T + 0.6))
 for m, xs in zip(NAMES, rand_ofs):
     for x in xs:
         nominal(ax_a, x, m)
@@ -165,8 +165,8 @@ ax_b.add_patch(Rectangle((XZ[0], -0.55), XZ[1] - XZ[0], 5.05, fill=False, edgeco
                          linestyle=(0, (2, 1.5)), zorder=0))
 ax_b.text(XZ[1] + 0.5, 0, "enlarged in (c) and (d)", color=cm.MUTED, fontsize=7, style="italic", va="center")
 
-# (c) 실제 도착: O_m 뒤 묶음 지연 G만큼 밀린 뒤 폭 J 안에 온다. C 묶음은 3 ms 늦다
-rows(ax_c, list(NAMES), [COLOR[m] for m in NAMES], f"(c) Arrivals: group delay $G$ + jitter $J$ = {J:g} ms", XZ)
+# (c) 실제 도착: O_m 뒤 모델 그룹 지연 G만큼 밀린 뒤 폭 J 안에 온다. 모델 C의 모델 그룹은 3 ms 늦다
+rows(ax_c, list(NAMES), [COLOR[m] for m in NAMES], f"(c) Arrivals: model-group delay $G(m, k)$ + jitter $J$ = {J:g} ms", XZ)
 ax_c.set_ylim(4.95, -0.6)
 for m in NAMES:
     y = ROW[m]
@@ -177,7 +177,7 @@ for m in NAMES:
 for m, s, mem in batches:
     for j in mem:
         actual(ax_c, arr[j][0], m)
-ax_c.text(O["C"] + G["C"] / 2, ROW["C"] - 0.1, f"$G$ = {G['C']:g} ms (whole group late)", color=COLOR["C"], fontsize=6.5,
+ax_c.text(O["C"] + G["C"] / 2, ROW["C"] - 0.1, f"$G$ = {G['C']:g} ms (whole model group late)", color=COLOR["C"], fontsize=6.5,
           ha="center", va="bottom", bbox=dict(facecolor="white", edgecolor="none", pad=0.2), zorder=5)   # t* 선 위
 ax_c.text(O["C"] + G["C"] + J / 2, ROW["C"] + 0.42, "$J$", color=COLOR["C"], fontsize=6.5, ha="center", va="top")
 for m in NAMES:
@@ -185,7 +185,7 @@ for m in NAMES:
 ax_c.text(XZ[1] + 0.15, -1.15, "batches", color=cm.MUTED, fontsize=7, ha="left", va="center", clip_on=False)
 ax_c.set_xticks(np.arange(0, 6.5, 0.8), [f"{x:g}" for x in np.arange(0, 6.5, 0.8)])
 
-# (d) entry 4개: 앞 주기의 A·B·C·D로 시작해 t*에 E를 적재하며 victim을 고른다
+# (d) Entry 4개: 앞 주기의 A·B·C·D로 시작해 t*에 E를 적재하며 victim을 고른다
 rows(ax_d, [f"e{k + 1}" for k in range(E)], [cm.INK] * E, "(d) Weight cache: victim selection at $t^*$", XZ)
 seq = {k: [(XZ[0], m)] for k, m in enumerate("ABCD")}
 for k, m, t0 in loads:

@@ -2,7 +2,7 @@
 // tb_compute_array.sv — compute_array + weight_entry를 golden 82개와 대조 (P4.1)
 // ============================================================
 // vector마다 31 timestep을 차례로 추론한다. 첫 timestep은 RESET_STATE.
-// membrane potential은 TB가 STORE_BITS로 포화해 들고 있다(RTL 저장은 P4.2 membrane_bank 몫).
+// Membrane potential은 TB가 STORE_BITS로 포화해 들고 있다(RTL 저장은 P4.2 membrane_bank 몫).
 //   STORE_BITS 16 → golden_l64, 12 → golden_l64_m12 (vector 폴더 vec/, vec_m12/)
 // 확인 항목:
 //   - row마다 전류, 포화 후 membrane potential, spike, soft reset 뒤 membrane potential이
@@ -53,7 +53,7 @@ module tb_compute_array #(
     wire [16*CUR_W-1:0] dbg_cur;
     wire [15:0]  dbg_spk;
 
-    // entry 적재 (dma 대신)
+    // Entry 적재 (DMA 대신)
     reg          ld_we = 1'b0, ld_pwe = 1'b0;
     reg  [10:0]  ld_addr = 11'd0;
     reg  [5:0]   ld_paddr = 6'd0;
@@ -80,7 +80,7 @@ module tb_compute_array #(
         .p_raddr(p_addr), .p_dout(p_data)
     );
 
-    // membrane potential: STORE_BITS 포화 저장, 읽기 latency 2
+    // Membrane potential: STORE_BITS 포화 저장, 읽기 지연 2
     reg [255:0] mstate [0:ROWS-1];
     reg [255:0] m_q1;
     always @(posedge clk) begin

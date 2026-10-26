@@ -1,11 +1,11 @@
 """장비 40대 모델을 차례로 학습한다(P1.4).
 
 학습 방식(2026-09-23 확정):
-  - supervised: 실제 이상 파일 50%를 학습에, 나머지 50% + test 정상 전체를 평가에 쓴다.
-  - --clip_loss: 파일 안 세그먼트 출력을 평균해 파일 하나를 표본 하나로 본다.
+  - 지도학습: 실제 이상 파일 50%를 학습에, 나머지 50% + test 정상 전체를 평가에 쓴다.
+  - --clip_loss: 파일 안 segment 출력을 평균해 파일 하나를 표본 하나로 본다.
     판정(추론)이 파일 단위이므로 손실도 같은 단위로 맞춘 것이다. 판정 방식은 그대로다.
   - --hop 16: 학습용 구간만 절반씩 겹쳐 잘라 표본을 약 2배로 늘린다. val·test는 겹치지 않는다.
-  - 채택 체크포인트는 코사인 감쇠가 끝난 **마지막 에포크**(last.pth)다. val loss 최소 시점은
+  - 채택 체크포인트는 코사인 감쇠가 끝난 **마지막 epoch**(last.pth)다. val loss 최소 시점은
     이상 파일이 20개뿐인 검증셋의 잡음을 타서 덜 수렴한 모델을 고르는 일이 잦았다.
 
 프로세스 하나에서 끝까지 돌며 GPU 메모리를 계속 쥔다. 30분 주기로 LLM이 다시
@@ -59,7 +59,7 @@ def run_unit(machine, mid, out_root, args):
     if args.bands:
         argv += ["--bands", args.bands]
     res = train_1unit.main(argv)
-    m = res["last"]                      # 채택 체크포인트 = 마지막 에포크
+    m = res["last"]                      # 채택 체크포인트 = 마지막 epoch
     row = {"unit": res["unit"], "epochs": args.epochs, "sec": round(time.time() - t0, 1),
            **{k: round(m[k], 4) for k in COLS[3:-1]}}
     row["test_auc_bestval"] = round(res["best"]["test_auc"], 4)   # 참고용(이전 선택 기준)

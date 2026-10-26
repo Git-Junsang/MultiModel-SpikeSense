@@ -5,9 +5,9 @@
 // 제약 : hardware/constraints/ax7a200b_base.xdc, ax7a200b_io.xdc
 //
 // 동작 (200 MHz 시스템 클럭 기준):
-//   led_core  (코어보드, Active-High) : 1 Hz 점멸 → 클럭·비트스트림 확인
+//   led_core  (코어보드, Active-High) : 1 Hz 점멸 → 클럭·bitstream 확인
 //   led_n[3:0](캐리어, Active-Low)    : 약 3 Hz로 LED1→LED4 순환
-//   KEY1~4를 누르고 있으면 해당 LED가 순환과 관계없이 계속 켜진다 → 버튼 핀 확인
+//   KEY1–4를 누르고 있으면 해당 LED가 순환과 관계없이 계속 켜진다 → 버튼 핀 확인
 //   RESET을 누르고 있으면 카운터가 멈추고 캐리어 LED가 모두 꺼진다 → RESET 핀 확인
 //
 // 원격 확인 (LED를 볼 수 없을 때, VIO로 JTAG 읽기):

@@ -5,15 +5,15 @@
 // 확인 항목:
 //   - 모든 register 기본값·읽기·쓰기, 없는 주소 읽기 0, 읽기 전용·없는 주소 쓰기 무시, wstrb != 4'hF 무시
 //   - RUN = 1이면 설정·PNU 표 창 쓰기 무시(CTRL은 씀), 범위 밖 N_TRACKS·N_MODELS 무시
-//   - PNU 표 창 → cfg_we 1 cycle, cfg_addr = (addr − 0x1000) >> 2, cfg_data = wdata[15:0] (OFFSET·N_REG·TAU·LUT_G·LUT_U 끝)
-//   - 시각: 매 cycle testbench 모델과 비교. phase_us 31,999 → 0과 epoch +1을 실제 3,200,000 cycle을 돌려 확인
-//     epoch 0xFFFF → 0(hierarchy로 당김) 뒤에도 first_epoch 0
+//   - PNU 표 창 → cfg_we 1 cycle, cfg_addr = (addr − 0x1000) >> 2, cfg_data = wdata[15:0] (offset·N_REG·TAU·LUT_G·LUT_U 끝)
+//   - 시각: 매 cycle testbench 모델과 비교. phase_us 31,999 → 0과 period +1을 실제 3,200,000 cycle을 돌려 확인
+//     period 0xFFFF → 0(hierarchy로 당김) 뒤에도 first_period 0
 //   - counter 사건마다 값, 모든 사건을 같은 cycle에, ev_state_xfer 1·2, MAX_PENDING, cnt_clear·SOFT_RESET으로 0
 //   - 64 bit 값 5개: LO를 읽을 때 HI 고정, 값마다 따로. NOW_CYC·CMP_BUSY는 위쪽 bit를 hierarchy로 넣고,
 //     WEIGHT_BYTES·STATE_BYTES는 사건을 실제로 2^32 B 넘게 넣는다
 //   - 오류 우선순위 err0 > err1 > err2, 첫 오류만, ERR_CLEAR(같은 cycle 새 오류는 잡음), SOFT_RESET으로 지움
 //   - core_rst는 SOFT_RESET 쓰기 다음 cycle부터 4 cycle, cnt_clear는 1 cycle, RUN 0
-//   - AXI: valid·data 유지, 나가 있는 응답 하나, 응답 OKAY, 응답이 밀린 동안 다음 주소를 받지 않음
+//   - AXI: valid·데이터 유지, 나가 있는 응답 하나, 응답 OKAY, 응답이 밀린 동안 다음 주소를 받지 않음
 // 실행 (저장소 루트):
 //   bash hardware/testbench/run_regs.sh
 // ============================================================
@@ -22,7 +22,7 @@
 module tb_regs;
 
     localparam [31:0] ID = 32'h534E_4E58, VERSION = 32'h0001_0000;
-    localparam int N_ENTRY = 4, N_ONCHIP = 768;
+    localparam int N_ENTRY = 4, N_ON_CHIP = 768;
 
     reg clk = 1'b0;
     always #5 clk = ~clk;
@@ -44,22 +44,30 @@ module tb_regs;
     wire [1:0]  bresp, rresp;
     wire [31:0] rdata;
     reg         mig_calib = 0, sys_idle = 0;
-    wire        run, core_rst, cnt_clear, cfg_we, first_epoch;
+    wire        run, core_rst, cnt_clear, cfg_we, first_period;
     wire [10:0] n_tracks, cfg_addr;
     wire [5:0]  n_models;
     wire [31:0] model_base, state_base, deadline_us, margin_us, now_us, link_tune;
-    wire [15:0] cfg_data, epoch;
+    wire [15:0] cfg_data, period;
     wire [63:0] now_cyc;
     wire [14:0] phase_us;
     reg         ev_req_in = 0, ev_req_drop = 0, ev_res_out = 0, ev_late = 0, ev_batch = 0, ev_load = 0, ev_sat = 0, cmp_busy = 0;
     reg  [1:0]  ev_state_xfer = 0;
     reg  [10:0] pending_n = 0;
     reg  [63:0] stall_cyc = 0;
+    reg         md_busy = 1'b0;               // MDIO 자리
+    reg  [15:0] md_rdata = 16'hBEEF;
+    wire        md_valid;
+    wire [31:0] md_cmd;
+    int         n_md = 0;
+    always @(posedge clk) if (md_valid) n_md++;
+    reg  [383:0] link_dbg;                 // 진단 counter 자리: word i = 0xD000_0000 + i
+    initial for (int i = 0; i < 12; i++) link_dbg[32*i +: 32] = 32'hD000_0000 + i;
     reg         err0_valid = 0, err1_valid = 0, err2_valid = 0;
     reg  [3:0]  err0_code = 0;
     reg  [31:0] err0_info = 0, err1_info = 0, err2_info = 0;
 
-    regs #(.N_ENTRY(N_ENTRY), .N_ONCHIP(N_ONCHIP), .VERSION(VERSION)) dut (
+    regs #(.N_ENTRY(N_ENTRY), .N_ON_CHIP(N_ON_CHIP), .VERSION(VERSION)) dut (
         .clk(clk), .rst(rst),
         .s_axil_awaddr(awaddr), .s_axil_awvalid(awvalid), .s_axil_awready(awready),
         .s_axil_wdata(wdata), .s_axil_wstrb(wstrb), .s_axil_wvalid(wvalid), .s_axil_wready(wready),
@@ -68,13 +76,14 @@ module tb_regs;
         .s_axil_rdata(rdata), .s_axil_rresp(rresp), .s_axil_rvalid(rvalid), .s_axil_rready(rready),
         .mig_calib(mig_calib), .sys_idle(sys_idle),
         .run(run), .core_rst(core_rst), .cnt_clear(cnt_clear),
+        .md_valid(md_valid), .md_cmd(md_cmd), .md_busy(md_busy), .md_rdata(md_rdata),
         .n_tracks(n_tracks), .n_models(n_models), .model_base(model_base), .state_base(state_base),
         .deadline_us(deadline_us), .margin_us(margin_us), .link_tune(link_tune),
         .cfg_we(cfg_we), .cfg_addr(cfg_addr), .cfg_data(cfg_data),
-        .now_us(now_us), .now_cyc(now_cyc), .phase_us(phase_us), .epoch(epoch), .first_epoch(first_epoch),
+        .now_us(now_us), .now_cyc(now_cyc), .phase_us(phase_us), .period(period), .first_period(first_period),
         .ev_req_in(ev_req_in), .ev_req_drop(ev_req_drop), .ev_res_out(ev_res_out), .ev_late(ev_late),
         .ev_batch(ev_batch), .ev_load(ev_load), .ev_sat(ev_sat), .ev_state_xfer(ev_state_xfer),
-        .pending_n(pending_n), .cmp_busy(cmp_busy), .stall_cyc(stall_cyc),
+        .pending_n(pending_n), .cmp_busy(cmp_busy), .stall_cyc(stall_cyc), .link_dbg(link_dbg),
         .err0_valid(err0_valid), .err0_code(err0_code), .err0_info(err0_info),
         .err1_valid(err1_valid), .err1_info(err1_info), .err2_valid(err2_valid), .err2_info(err2_info)
     );
@@ -99,10 +108,10 @@ module tb_regs;
     bit m_first = 1;
     always @(posedge clk) begin
         // cycle 0은 첫 rst edge 전이라 register 값이 아직 없다
-        if (cyc != 0 && (now_cyc != m_cyc || now_us != m_us || phase_us != m_ph || epoch != m_ep || first_epoch != m_first)) begin
+        if (cyc != 0 && (now_cyc != m_cyc || now_us != m_us || phase_us != m_ph || period != m_ep || first_period != m_first)) begin
             t_bad++;
-            if (t_bad <= 5) $display("FAIL 시각: cyc %0d/%0d us %0d/%0d phase %0d/%0d epoch %0d/%0d first %0b (cycle %0d)",
-                                     now_cyc, m_cyc, now_us, m_us, phase_us, m_ph, epoch, m_ep, first_epoch, cyc);
+            if (t_bad <= 5) $display("FAIL 시각: cyc %0d/%0d us %0d/%0d phase %0d/%0d period %0d/%0d first %0b (cycle %0d)",
+                                     now_cyc, m_cyc, now_us, m_us, phase_us, m_ph, period, m_ep, first_period, cyc);
         end
         if (core_rst) begin
             m_cyc = 0; m_div = 0; m_us = 0; m_ph = 0; m_ep = 0; m_first = 1;
@@ -301,7 +310,7 @@ module tb_regs;
         rchk(32'h0000, ID);
         rchk(32'h0004, VERSION);
         rchk(32'h0008, N_ENTRY);
-        rchk(32'h000C, N_ONCHIP);
+        rchk(32'h000C, N_ON_CHIP);
         rchk(32'h0100, 0);
         rchk(32'h0104, 0);
         rchk(32'h0300, 1024);
@@ -318,6 +327,12 @@ module tb_regs;
         rchk(32'h0424, 0); rchk(32'h043C, 0); rchk(32'h020C, 0);
         rchk(32'h0500, 0);
         rchk(32'h0504, 0);
+        for (int i = 0; i < 12; i++) rchk(32'h0440 + 4 * i, 32'hD000_0000 + i);   // 진단 counter는 그대로 읽힌다
+        rchk(32'h0108, 32'h0000_BEEF);                                         // MDIO: {busy, 0, data}
+        md_busy = 1'b1; rchk(32'h0108, 32'h8000_BEEF); md_busy = 1'b0;
+        wr(32'h0108, 32'h8A69_1A00);                                         // 읽기 op, phy 3, reg 9
+        chk($sformatf("MDIO 명령 수"), n_md, 1);
+        chk($sformatf("MDIO 명령"), md_cmd, 32'h8A69_1A00);
 
         // ===== STATUS =====
         grp = $sformatf("STATUS");
@@ -330,7 +345,7 @@ module tb_regs;
         grp = $sformatf("없는 주소");
         begin
             reg [31:0] ua[22];
-            ua = '{32'h0010, 32'h00FC, 32'h0108, 32'h01FC, 32'h0204, 32'h0210, 32'h031C, 32'h03FC, 32'h0440,
+            ua = '{32'h0010, 32'h00FC, 32'h010C, 32'h01FC, 32'h0204, 32'h0210, 32'h031C, 32'h03FC, 32'h0470,
                    32'h04FC, 32'h0508, 32'h0FFC, 32'h1000, 32'h1100, 32'h2000, 32'h2FFC, 32'h3000,
                    32'h7FFF_FFFC, 32'h8000_0000, 32'h0001_0000, 32'h0001_0300, 32'hFFFF_FFFC};
             for (int i = 0; i < 22; i++) rchk(ua[i], 0);
@@ -425,7 +440,7 @@ module tb_regs;
         wr(32'h1004, 32'h0000_0021);
         chk($sformatf("cfg_we (RUN = 0)"), n_cfg - k0, 1);
         if (q_addr.size() > 0) begin chk($sformatf("cfg_addr"), q_addr[$], 11'h001); chk($sformatf("cfg_data"), q_data[$], 16'h0021); end
-        // CTRL bit1~3은 읽으면 0, SOFT_RESET이 RUN을 끈다
+        // CTRL bit1–3은 읽으면 0, SOFT_RESET이 RUN을 끈다
         wr(32'h0104, 32'h1);
         wr(32'h0104, 32'hF);
         chk($sformatf("SOFT_RESET → run 0"), run, 0);
@@ -564,32 +579,32 @@ module tb_regs;
         chk($sformatf("NOW_US"), d, snap_us);
         chk($sformatf("SOFT_RESET 뒤 NOW_US 작음"), d < 5, 1);
         ev(9, 1_974_000);                   // 1,974,000 × 2,176 = 4,295,424,000 B
-        while (epoch == 0) @(negedge clk);
+        while (period == 0) @(negedge clk);
         chk($sformatf("phase 넘침 뒤 phase_us"), phase_us, 0);
-        chk($sformatf("first_epoch"), first_epoch, 0);
+        chk($sformatf("first_period"), first_period, 0);
         chk($sformatf("now_us"), now_us, 32000);
         idle(250);
         rd(32'h0200, d);
         chk($sformatf("NOW_US"), d, snap_us);
         chk($sformatf("NOW_US > 32,000"), d > 32000, 1);
-        // epoch 16 bit가 한 바퀴 돌아 0이 되어도 first_epoch는 0 (35분 RUN을 hierarchy로 당김, 모델도 같이)
+        // period 16 bit가 한 바퀴 돌아 0이 되어도 first_period는 0 (35분 RUN을 hierarchy로 당김, 모델도 같이)
         @(negedge clk);
-        dut.epoch = 16'hFFFF; m_ep = 16'hFFFF;
+        dut.period = 16'hFFFF; m_ep = 16'hFFFF;
         dut.phase_us = 15'd31999; m_ph = 31999;
         dut.div = 7'd90; m_div = 90;
         idle(20);
-        chk($sformatf("epoch 한 바퀴 뒤 epoch"), epoch, 0);
-        chk($sformatf("epoch 한 바퀴 뒤 phase_us"), phase_us, 0);
-        chk($sformatf("epoch 한 바퀴 뒤 first_epoch"), first_epoch, 0);
+        chk($sformatf("period 한 바퀴 뒤 period"), period, 0);
+        chk($sformatf("period 한 바퀴 뒤 phase_us"), phase_us, 0);
+        chk($sformatf("period 한 바퀴 뒤 first_period"), first_period, 0);
         grp = $sformatf("64 bit HI");
         rchk(32'h0428, 32'(64'd1_974_000 * 2176));
         rchk(32'h042C, 1);
         rchk(32'h0424, 0);
-        // SOFT_RESET: 시각·counter 0, 시각은 다시 첫 epoch
+        // SOFT_RESET: 시각·counter 0, 시각은 다시 첫 period
         grp = $sformatf("시각");
         wr(32'h0104, 32'h2);
-        chk($sformatf("first_epoch"), first_epoch, 1);
-        chk($sformatf("epoch"), epoch, 0);
+        chk($sformatf("first_period"), first_period, 1);
+        chk($sformatf("period"), period, 0);
         rchk(32'h0428, 0);
         rchk(32'h042C, 0);
 

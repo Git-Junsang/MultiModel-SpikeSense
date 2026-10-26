@@ -16,7 +16,7 @@ set_property PROBES.FILE $opt(ltx) $dev
 refresh_hw_device $dev
 set vio [lindex [get_hw_vios -of_objects $dev] 0]
 if { $opt(act) eq "clear" } {
-    set clr [lindex [get_hw_probes -of_objects $vio -filter {TYPE == vio_output && NAME.SHORT =~ *lat_clr*}] 0]
+    set clr [lindex [get_hw_probes -of_objects $vio -filter {TYPE == vio_output && NAME.SHORT =~ *delay_clr*}] 0]
     set_property OUTPUT_VALUE 1 $clr; commit_hw_vio $clr
     after 300
     set_property OUTPUT_VALUE 0 $clr; commit_hw_vio $clr

@@ -8,9 +8,9 @@ import numpy as np
 
 from part_hardware import CLK, PERIOD_US
 
-RESP_BIN_MS, RESP_BINS = 0.05, 1400   # 응답 시간 히스토그램 0.05 ms 칸, 70 ms 이상은 마지막 칸(합산 p99용)
+RESPONSE_TIME_BIN_MS, RESPONSE_TIME_BINS = 0.05, 1400   # Response time 히스토그램 0.05 ms 칸, 70 ms 이상은 마지막 칸(합산 p99용)
 PRED_ERR_BIN_US = 50.0          # 다음 사용 예측 오차 히스토그램 칸 µs
-SEED_STAT_KEYS = ('dram_kib', 'ddr_mbps', 'mean_ms', 'p99_ms', 'max_ms', 'min_slack_ms', 'hit', 'loads_per_model_period',
+SEED_STAT_KEYS = ('ddr3_traffic_kib', 'ddr3_used_bandwidth_mbps', 'mean_ms', 'p99_ms', 'max_ms', 'min_deadline_margin_ms', 'hit', 'loads_per_model_period',
              'reloads_per_model_period', 'max_done_ms', 'fpga_side_max_ms')
 
 
@@ -53,7 +53,7 @@ def read_csv(path):
 def summarize(rs):
     """실행 여러 개를 합산한다. 비율·추론 요청당 값은 합을 나눠 내고 p99는 히스토그램을 합쳐 구한다(칸 위 경계)"""
     n = sum(r['n_req'] for r in rs)
-    h = np.zeros(RESP_BINS + 1)
+    h = np.zeros(RESPONSE_TIME_BINS + 1)
     for r in rs:
         for j, k in r['hist']:
             h[j] += k
@@ -62,10 +62,10 @@ def summarize(rs):
     span = sum(r['cyc_busy'] + r['cyc_stall'] + r['cyc_idle'] for r in rs) * CLK       # 측정 구간 합 µs
     wavg = lambda k: sum(r['n_req'] * r[k] for r in rs) / n
     return dict(runs=len(rs), n_req=n, miss=sum(r['miss'] for r in rs), drop=sum(r['drop'] for r in rs),
-                mean_ms=wavg('mean_ms'), p99_ms=float(np.searchsorted(cum, 0.99 * cum[-1]) + 1) * RESP_BIN_MS,
+                mean_ms=wavg('mean_ms'), p99_ms=float(np.searchsorted(cum, 0.99 * cum[-1]) + 1) * RESPONSE_TIME_BIN_MS,
                 max_ms=max(r['max_ms'] for r in rs), in_ms=wavg('in_ms'), fpga_ms=wavg('fpga_ms'), out_ms=wavg('out_ms'),
-                w_kib=sum(r['w_bytes'] for r in rs) / rw / 1024, dram_kib=sum(r['w_bytes'] + r['m_bytes'] for r in rs) / rw / 1024,
-                ddr_mbps=sum(r['w_bytes'] + r['m_bytes'] for r in rs) / span,
+                w_kib=sum(r['w_bytes'] for r in rs) / rw / 1024, ddr3_traffic_kib=sum(r['w_bytes'] + r['m_bytes'] for r in rs) / rw / 1024,
+                ddr3_used_bandwidth_mbps=sum(r['w_bytes'] + r['m_bytes'] for r in rs) / span,
                 batch=rw / sum(r['req_win'] / r['batch_mean'] for r in rs if r['batch_mean']),
                 hit=float(np.mean([r['hit_rate'] for r in rs])), **_summary_cache(rs, rw),
                 **{k: max(r[k] for r in rs) for k in ('max_done_ms', 'host_max_ms', 'fpga_side_max_ms') if k in rs[0]})
@@ -80,7 +80,7 @@ def _summary_cache(rs, rw):
         for j, k in r['pred_hist']:
             h[j] += k
     n = tot('pred_n')
-    return dict(min_slack_ms=PERIOD_US / 1000 - mx, batch_max=max(r['batch_max'] for r in rs),
+    return dict(min_deadline_margin_ms=PERIOD_US / 1000 - mx, batch_max=max(r['batch_max'] for r in rs),
                 window_loads_max=max(r.get('window_loads_max', 0) for r in rs),
                 weight_loads=tot('weight_loads'), window_reloads=tot('window_reloads'),
                 loads_per_model_period=tot('weight_loads') / max(1, tot('model_periods')),
@@ -93,7 +93,7 @@ def _summary_cache(rs, rw):
 
 
 def seed_stats(rs):
-    """seed마다(시나리오를 합쳐) 지표를 내고 seed 사이 표준편차·95 % bootstrap CI(평균)·최소·최대를 낸다"""
+    """Seed마다(시나리오를 합쳐) 지표를 내고 seed 사이 표준편차·95 % bootstrap CI(평균)·최소·최대를 낸다"""
     by = {}
     for r in rs:
         by.setdefault(r['seed'], []).append(r)

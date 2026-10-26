@@ -7,7 +7,7 @@ weight는 Host가 DDR3 창에 적재한 slot을 02 §6 배치로 읽는다. 그�
 시각은 실제 FPGA가 아니다. NOW_US는 시작 5초 뒤 2^32에서 되감기게 둔다(Host의 32 bit 시각 처리 확인).
   --drop TRACK:SEQ        그 추론 요청을 결과 없이 버린다(state도 바꾸지 않는다)
   --delay TRACK:SEQ:MS    그 결과를 MS ms 늦게 보낸다
-RUN이 1 → 0이 되면 받은 추론 요청·결과(requests.npz), 설정·PNU 표·counter(regs.json), DDR3 내용(ddr.bin)을 --out에 쓴다.
+RUN이 1 → 0이 되면 받은 추론 요청·결과(requests.npz), 설정·PNU 표·counter(regs.json), DDR3 내용(ddr3.bin)을 --out에 쓴다.
 
     python3 software/host/mock_fpga.py --out <폴더> [--ip 127.0.0.1] [--drop 31:40] [--delay 7:70:45]
 """
@@ -23,9 +23,9 @@ import time
 import numpy as np
 
 SLOT, USED = 0x40000, 131648
-LAYERS = [(0x5C0, 384, 40, 6), (0x41C0, 256, 384, 4), (0x1C1C0, 64, 256, 1), (0x201C0, 2, 64, 1)]   # 시작, 출력, 입력, 64 lane 묶음
+LAYERS = [(0x5C0, 384, 40, 6), (0x41C0, 256, 384, 4), (0x1C1C0, 64, 256, 1), (0x201C0, 2, 64, 1)]   # 시작, 출력, 입력, 64-lane 묶음
 PSTART = (0, 768, 1280, 1408)                                                                          # params 안 layer 시작 B
-DDR_BASE, DDR_SIZE = 0x8000_0000, 40 * SLOT
+DDR3_BASE, DDR3_SIZE = 0x8000_0000, 40 * SLOT
 
 
 def decode_slot(b):
@@ -63,7 +63,7 @@ class Mock:
         self.drop = {tuple(map(int, s.split(':'))) for s in a.drop}
         self.delay = {tuple(map(int, s.split(':')[:2])): int(s.split(':')[2]) for s in a.delay}
         self.base = (1 << 32) - self.raw_us() - 5_000_000
-        self.ddr, self.ddr_hi = bytearray(DDR_SIZE), 0
+        self.ddr3, self.ddr3_hi = bytearray(DDR3_SIZE), 0
         self.cfg = {0x300 + 4 * i: 0 for i in range(7)}
         self.pnu, self.run, self.err = {}, 0, (0, 0)
         self.reset()
@@ -116,19 +116,19 @@ class Mock:
             st = 3
         elif addr % 4:
             st = 1
-        elif addr >= DDR_BASE:
-            a = addr - DDR_BASE
-            if addr % 32 or a + 4 * cnt > DDR_SIZE:
+        elif addr >= DDR3_BASE:
+            a = addr - DDR3_BASE
+            if addr % 32 or a + 4 * cnt > DDR3_SIZE:
                 st = 1
             elif cnt % 8:
                 st = 3
             elif self.run:
                 st = 2
             elif op == 2:
-                self.ddr[a:a + 4 * cnt] = p[12:12 + 4 * cnt]
-                self.ddr_hi = max(self.ddr_hi, a + 4 * cnt)
+                self.ddr3[a:a + 4 * cnt] = p[12:12 + 4 * cnt]
+                self.ddr3_hi = max(self.ddr3_hi, a + 4 * cnt)
             else:
-                data = bytes(self.ddr[a:a + 4 * cnt])
+                data = bytes(self.ddr3[a:a + 4 * cnt])
         elif op == 2:
             for i, v in enumerate(struct.unpack_from(f'<{cnt}I', p, 12)):
                 self.wr(addr + 4 * i, v)
@@ -173,7 +173,7 @@ class Mock:
         for m in sorted({o[2] for o in ok}):
             grp = [o for o in ok if o[2] == m]
             if m not in self.models:
-                self.models[m] = decode_slot(bytes(self.ddr[m * SLOT:m * SLOT + USED]))
+                self.models[m] = decode_slot(bytes(self.ddr3[m * SLOT:m * SLOT + USED]))
             q = self.models[m]
             for o in grp:
                 if o[3] or o[0] not in self.state:
@@ -202,8 +202,8 @@ class Mock:
                  res=R, **{k: L[:, i] for i, k in enumerate(names)})
         with open(os.path.join(self.out, 'regs.json'), 'w') as f:
             json.dump(dict(cfg=self.cfg, pnu=self.pnu, cnt=self.cnt, err=self.err), f)
-        with open(os.path.join(self.out, 'ddr.bin'), 'wb') as f:
-            f.write(self.ddr[:self.ddr_hi])
+        with open(os.path.join(self.out, 'ddr3.bin'), 'wb') as f:
+            f.write(self.ddr3[:self.ddr3_hi])
 
     def serve(self):
         print('ready', flush=True)

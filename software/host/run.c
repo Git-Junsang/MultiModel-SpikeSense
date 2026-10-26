@@ -2,10 +2,10 @@
  *
  * thread 3개: 계산(main, 입력·특징 추출·송신), 수신(결과·판정), 시각(1초마다 FPGA 시각과의 차이, 06 §5).
  * 입력: S16LE 16 kHz. WAV(RIFF)면 머리말을 읽고, 아니면 --channels 채널 raw. 트랙 i는 채널 i % C를 쓴다.
- * frame 경계는 샘플 번호로 정한다(06 §2). 모델 m 주기 k의 frame = 샘플 [O_m + 512k, O_m + 512k + 1,024).
- * 그 frame의 마지막 샘플이 든 block이 들어온 시각이 t_host다. 모델 묶음은 트랙을 모두 계산한 뒤 23개씩 이어서 보낸다.
+ * Frame 경계는 샘플 번호로 정한다(06 §2). 모델 m 주기 k의 frame = 샘플 [O_m + 512k, O_m + 512k + 1,024).
+ * 그 frame의 마지막 샘플이 든 block이 들어온 시각이 t_host다. 모델 그룹은 트랙을 모두 계산한 뒤 23개씩 이어서 보낸다.
  * 판정은 트랙마다 결과 31개의 out0·out1 합(평균과 같은 비교)으로 한다(02 §5). 결과가 빠진 판정 주기는 판정하지 않는다.
- * shortcut: pipe 입력의 t_host는 read()가 돌아온 시각이다. 오디오 장치의 block 도착 시각은 아니다. mic를 붙이면 ALSA timestamp로 바꾼다. */
+ * shortcut: pipe 입력의 t_host는 read()가 돌아온 시각이다. 오디오 장치의 block 도착 시각은 아니다. Mic를 붙이면 ALSA timestamp로 바꾼다. */
 #define _GNU_SOURCE
 #include <errno.h>
 #include <fcntl.h>
@@ -26,10 +26,11 @@
 #define RING 4096                 /* 채널마다 샘플 ring. block + frame ≤ RING */
 #define MAX_BLOCK 2048
 
-typedef struct { _Atomic uint32_t kk; uint64_t t_host_ns; } pend_t;   /* kk = epoch + 1, 0이면 비어 있음 */
+typedef struct { _Atomic uint32_t kk; uint64_t t_host_ns; } pend_t;   /* kk = period + 1, 0이면 비어 있음 */
 
 static pend_t pend[MAX_TRACKS][8];
-static uint8_t model_of[MAX_TRACKS];
+static uint8_t model_of[MAX_TRACKS], has_ref[MAX_TRACKS];
+static double floor_of[MAX_TRACKS];
 static int n_tracks, n_of[N_MODELS], tracks_of[N_MODELS][MAX_TRACKS];
 static double scale[N_MODELS];
 static _Atomic uint32_t diff_us;
@@ -37,9 +38,9 @@ static atomic_int stop_rx, stop_sync;
 static volatile sig_atomic_t stop_main;
 static int fd_req;
 static ctl_t ctl;
-static FILE *f_res, *f_bun;
+static FILE *f_res, *f_model_group;
 
-static struct { uint64_t recv, late, unmatched, judged; double resp_max, resp_sum; } rx;   /* 수신 thread만 쓴다 */
+static struct { uint64_t recv, late, unmatched, judged; double response_time_max, response_time_sum; } rx;   /* 수신 thread만 쓴다 */
 static struct { int32_t cycle, cnt; int64_t s0, s1; } jd[MAX_TRACKS];
 static struct { uint64_t ok, fail; uint32_t rtt_max; } sy;
 
@@ -78,16 +79,16 @@ static void *rx_main(void *arg)
             rx.unmatched++;
             continue;
         }
-        double resp = (double)(t - p->t_host_ns) / 1e3;       /* 응답 시간 µs = t_recv − t_host */
+        double response_time = (double)(t - p->t_host_ns) / 1e3;       /* Response time µs = t_recv − t_host */
         int out0 = (int16_t)get16(b + 24), out1 = (int16_t)get16(b + 26);
         rx.recv++;
-        rx.late += resp > PERIOD_US;
-        rx.resp_sum += resp;
-        rx.resp_max = fmax(rx.resp_max, resp);
+        rx.late += response_time > PERIOD_US;
+        rx.response_time_sum += response_time;
+        rx.response_time_max = fmax(rx.response_time_max, response_time);
         if (f_res)
             fprintf(f_res, "%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%d,%d,%llu,%llu,%.1f\n", tr, seq, kk - 1, b[4], b[5], get16(b + 6),
                     get32(b + 8), get32(b + 12), get32(b + 16), get32(b + 20), out0, out1,
-                    (unsigned long long)p->t_host_ns, (unsigned long long)t, resp);
+                    (unsigned long long)p->t_host_ns, (unsigned long long)t, response_time);
         judge((int)tr, kk - 1, out0, out1);
     }
     return NULL;
@@ -133,7 +134,7 @@ static void load_scales(const char *path)
         fprintf(stderr, "경고: %s에서 모델 scale %d개만 읽었다. 없는 모델의 이상 점수는 nan\n", path, m);
 }
 
-/* WAV면 fmt를 확인하고 data 첫 byte까지 읽는다. raw면 읽은 12 B를 pre에 남긴다. 반환 data 길이(모르면 −1), 오류 −2 */
+/* WAV면 fmt를 확인하고 데이터 첫 byte까지 읽는다. raw면 읽은 12 B를 pre에 남긴다. 반환 데이터 길이(모르면 −1), 오류 −2 */
 static long open_audio(int fd, int *ch, uint8_t *pre, int *npre)
 {
     uint8_t h[16];
@@ -174,10 +175,10 @@ int cmd_run(int argc, char **argv)
 {
     const char *ip = "192.168.10.2", *in = "-", *map = NULL, *logp = NULL, *manifest = "hardware/data/models_l64/manifest.json";
     int C = 1, pace = 0, loop = 0, B = 64, cpu = -1;
-    double seconds = 0;
+    double seconds = 0, floor_db = FLOOR_DB;
     n_tracks = MAX_TRACKS;
     static struct option o[] = {{"fpga", 1, 0, 'f'}, {"in", 1, 0, 'i'}, {"channels", 1, 0, 'c'}, {"tracks", 1, 0, 'n'},
-                                {"map", 1, 0, 'p'}, {"pace", 0, 0, 'P'}, {"loop", 0, 0, 'L'}, {"block", 1, 0, 'b'},
+                                {"map", 1, 0, 'p'}, {"floor-db", 1, 0, 'F'}, {"pace", 0, 0, 'P'}, {"loop", 0, 0, 'L'}, {"block", 1, 0, 'b'},
                                 {"seconds", 1, 0, 's'}, {"log", 1, 0, 'l'}, {"manifest", 1, 0, 'M'}, {"cpu", 1, 0, 'u'}, {0}};
     for (int ch; (ch = getopt_long(argc, argv, "", o, NULL)) != -1;)
         switch (ch) {
@@ -186,6 +187,7 @@ int cmd_run(int argc, char **argv)
         case 'c': C = atoi(optarg); break;
         case 'n': n_tracks = atoi(optarg); break;
         case 'p': map = optarg; break;
+        case 'F': floor_db = atof(optarg); break;
         case 'P': pace = 1; break;
         case 'L': loop = 1; break;
         case 'b': B = atoi(optarg); break;
@@ -195,7 +197,9 @@ int cmd_run(int argc, char **argv)
         case 'u': cpu = atoi(optarg); break;
         default: return 2;
         }
-    if (n_tracks < 1 || n_tracks > MAX_TRACKS || B < 1 || B > MAX_BLOCK || (n_tracks = load_map(map, n_tracks, model_of)) < 0) {
+    for (int i = 0; i < MAX_TRACKS; i++)
+        floor_of[i] = floor_db;            /* map 둘째 칸이 있으면 트랙마다 바뀐다 */
+    if (n_tracks < 1 || n_tracks > MAX_TRACKS || B < 1 || B > MAX_BLOCK || (n_tracks = load_map(map, n_tracks, model_of, floor_of)) < 0) {
         fprintf(stderr, "--tracks 1~%d, --block 1~%d\n", MAX_TRACKS, MAX_BLOCK);
         return 2;
     }
@@ -207,7 +211,7 @@ int cmd_run(int argc, char **argv)
     int fd = strcmp(in, "-") ? open(in, O_RDONLY) : 0, npre = 0;
     uint8_t *buf = malloc((size_t)MAX_BLOCK * 2 * 256 + 64);
     long data_len = fd < 0 ? -2 : open_audio(fd, &C, buf, &npre);
-    off_t data_off = lseek(fd, 0, SEEK_CUR);  /* --loop가 돌아갈 data 첫 byte. raw는 pre로 읽은 만큼 앞이다 */
+    off_t data_off = lseek(fd, 0, SEEK_CUR);  /* --loop가 돌아갈 데이터 첫 byte. raw는 pre로 읽은 만큼 앞이다 */
     if (data_off >= 0)
         data_off -= npre;
     if (data_len < -1 || C < 1 || C > MAX_TRACKS || (size_t)B * (size_t)C > (size_t)MAX_BLOCK * 256) {   /* buf 크기 */
@@ -246,17 +250,17 @@ int cmd_run(int argc, char **argv)
         char path[1024];
         snprintf(path, sizeof path, "%s_result.csv", logp);
         f_res = fopen(path, "w");
-        snprintf(path, sizeof path, "%s_bundle.csv", logp);
-        f_bun = fopen(path, "w");
-        if (!f_res || !f_bun) {
+        snprintf(path, sizeof path, "%s_model_group.csv", logp);
+        f_model_group = fopen(path, "w");
+        if (!f_res || !f_model_group) {
             fprintf(stderr, "log %s_*.csv를 열 수 없다\n", logp);
             return 1;
         }
         setvbuf(f_res, NULL, _IOFBF, 1 << 20);
-        setvbuf(f_bun, NULL, _IOFBF, 1 << 20);
-        fprintf(f_res, "track_id,seq,epoch,model_id,flags,batch_n,t_host_us,t_in_us,t_start_us,t_done_us,out0,out1,"
-                       "t_host_ns,t_recv_ns,resp_us\n");
-        fprintf(f_bun, "epoch,model_id,delay_us,n_req,t_host_ns,t_start_ns,t_ready_ns,t_send_ns\n");
+        setvbuf(f_model_group, NULL, _IOFBF, 1 << 20);
+        fprintf(f_res, "track_id,seq,period,model_id,flags,batch_n,t_host_us,t_in_us,t_start_us,t_done_us,out0,out1,"
+                       "t_host_ns,t_recv_ns,response_time_us\n");
+        fprintf(f_model_group, "period,model_id,delay_us,n_req,t_host_ns,t_start_ns,t_ready_ns,t_send_ns\n");
     }
     printf("track_id,cycle,model_id,decision,score\n");
     struct sigaction sa = {.sa_handler = on_signal};
@@ -275,7 +279,7 @@ int cmd_run(int argc, char **argv)
 
     const size_t fb = 2u * (size_t)C, want = (size_t)B * fb;
     size_t have = (size_t)npre;
-    long left = data_len;                      /* WAV data 남은 byte, raw면 −1 */
+    long left = data_len;                      /* WAV 데이터 남은 byte, raw면 −1 */
     uint64_t S = 0, n_ev = 0, limit = seconds > 0 ? (uint64_t)(seconds * SR) : UINT64_MAX;
     uint64_t sent = 0, send_err = 0, overrun = 0, t0 = mono_ns() + 100000000u;
     while (!stop_main && S < limit) {
@@ -315,14 +319,14 @@ int cmd_run(int argc, char **argv)
         have -= nfr * fb;
         S += nfr;
 
-        for (;;) {                             /* frame 끝이 S 안에 든 모델 묶음을 offset 순서로 */
+        for (;;) {                             /* Frame 끝이 S 안에 든 모델 그룹을 offset 순서로 */
             int m = (int)(n_ev % N_MODELS);
             uint32_t k = (uint32_t)(n_ev / N_MODELS);
             uint64_t end = (uint64_t)OFFSET_SAMPLES(m) + (uint64_t)HOP * k + FRAME;
             if (end > S)
                 break;
             n_ev++;
-            int cnt = n_of[m], first = k % SEG == 0;
+            int cnt = n_of[m], first = k % SEG == 0;   /* 판정 주기 첫 frame */
             if (!cnt)
                 continue;
             uint64_t ts = mono_ns();
@@ -343,7 +347,7 @@ int cmd_run(int argc, char **argv)
                 p[6] = (uint8_t)m;
                 put32(p + 8, th_us);
                 put32(p + 12, (uint32_t)cnt);  /* n_expect: 이 모델·주기의 추론 요청 수 */
-                seg_norm_q(db, &hi[tr], &lo[tr], first, p + 16);
+                norm_q(db, floor_of[tr], &hi[tr], &lo[tr], &has_ref[tr], p + 16);
             }
             uint64_t tr_ns = mono_ns();
             for (int j = 0; j < cnt; j++) {
@@ -357,8 +361,8 @@ int cmd_run(int argc, char **argv)
                 send_err += send(fd_req, pkt + (size_t)j * REQ_B, len, 0) != (ssize_t)len;
             }
             sent += (uint64_t)cnt;
-            if (f_bun)
-                fprintf(f_bun, "%u,%d,%.3f,%d,%llu,%llu,%llu,%llu\n", k, m, (double)(tr_ns - t_arr) / 1e3, cnt,
+            if (f_model_group)
+                fprintf(f_model_group, "%u,%d,%.3f,%d,%llu,%llu,%llu,%llu\n", k, m, (double)(tr_ns - t_arr) / 1e3, cnt,
                         (unsigned long long)t_arr, (unsigned long long)ts, (unsigned long long)tr_ns,
                         (unsigned long long)mono_ns());
         }
@@ -368,7 +372,7 @@ int cmd_run(int argc, char **argv)
             break;
     }
 
-    usleep(2 * PERIOD_US);                     /* deadline이 지날 때까지 남은 결과를 받는다 */
+    usleep(2 * PERIOD_US);                     /* Deadline이 지날 때까지 남은 결과를 받는다 */
     atomic_store(&stop_rx, 1);
     atomic_store(&stop_sync, 1);
     pthread_join(th_rx, NULL);
@@ -379,16 +383,16 @@ int cmd_run(int argc, char **argv)
     uint64_t lost = sent > rx.recv ? sent - rx.recv : 0;
     fflush(stdout);
     fprintf(stderr, "summary sent=%llu recv=%llu late=%llu lost=%llu deadline_miss=%llu judged=%llu missing_cycles=%llu "
-                    "unmatched=%llu resp_mean_us=%.1f resp_max_us=%.1f overrun=%llu send_err=%llu sync_ok=%llu sync_fail=%llu "
+                    "unmatched=%llu response_time_mean_us=%.1f response_time_max_us=%.1f overrun=%llu send_err=%llu sync_ok=%llu sync_fail=%llu "
                     "sync_rtt_max_us=%u audio_s=%.3f\n",
             (unsigned long long)sent, (unsigned long long)rx.recv, (unsigned long long)rx.late, (unsigned long long)lost,
             (unsigned long long)(rx.late + lost), (unsigned long long)rx.judged, (unsigned long long)(full - rx.judged),
-            (unsigned long long)rx.unmatched, rx.recv ? rx.resp_sum / (double)rx.recv : 0.0, rx.resp_max,
+            (unsigned long long)rx.unmatched, rx.recv ? rx.response_time_sum / (double)rx.recv : 0.0, rx.response_time_max,
             (unsigned long long)overrun, (unsigned long long)send_err, (unsigned long long)sy.ok,
             (unsigned long long)sy.fail, sy.rtt_max, (double)S / SR);
     if (f_res)
         fclose(f_res);
-    if (f_bun)
-        fclose(f_bun);
+    if (f_model_group)
+        fclose(f_model_group);
     return 0;
 }

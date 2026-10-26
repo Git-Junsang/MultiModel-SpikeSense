@@ -69,7 +69,8 @@ module tb_eth;
     reg          run = 1'b0;
 
     eth_link #(.TARGET("GENERIC"), .PHY_RST_CYC(PHY_RST)) dut (
-        .clk(clk), .rst(rst), .gtx_clk(gtx), .gtx_clk90(gtx90), .rx_tap(5'd0),
+        .clk(clk), .rst(rst), .gtx_clk(gtx), .gtx_clk90(gtx90), .rx_tap(5'd0), .dbg_clr(1'b0), .dbg_cnt(),
+        .md_valid(1'b0), .md_op(2'd0), .md_phy(5'd0), .md_reg(5'd0), .md_wdata(16'd0), .md_busy(), .md_rdata(),
         .rgmii_rx_clk(h_txc), .rgmii_rxd(h_txd ^ {3'b000, flip}), .rgmii_rx_ctl(h_txctl),
         .rgmii_tx_clk(d_txc), .rgmii_txd(d_txd), .rgmii_tx_ctl(d_txctl),
         .phy_reset_n(phy_reset_n), .phy_mdc(phy_mdc), .phy_mdio(phy_mdio),
@@ -241,7 +242,7 @@ module tb_eth;
     bit           hold_rs = 0;               // 1이면 ctrl이 요청을 실행하기 시작할 때까지 결과를 쌓아 둔다
     always @(posedge clk) begin
         rq_ready <= ($urandom_range(0, 15) != 0);
-        // queue pop은 조건식 밖에서 한다. Verilator 5.020은 else-if 조건의 pop을 앞 조건과 상관없이 실행한다
+        // Queue pop은 조건식 밖에서 한다. Verilator 5.020은 else-if 조건의 pop을 앞 조건과 상관없이 실행한다
         if (rq_valid && rq_ready) begin
             if (exp_req.size() == 0)
                 err("unexpected request");
@@ -634,7 +635,7 @@ module tb_eth;
         udp_send(sport, 16'd5001);
     endtask
 
-    // 가장 앞 제어 요청의 응답을 기다려 확인하고 읽은 data를 rd에 둔다
+    // 가장 앞 제어 요청의 응답을 기다려 확인하고 읽은 데이터를 rd에 둔다
     task automatic ctl_wait(input string name);
         int t, len, rlen, st;
         logic [47:0] dst;
@@ -754,7 +755,7 @@ module tb_eth;
             if (i % 6 == 5) barrier("request group");
         end
         barrier("phase 1");
-        // 모델 묶음: 23개 datagram 11개를 선로 속도로
+        // 모델 그룹: 23개 datagram 11개를 선로 속도로
         for (int i = 0; i < 11; i++) send_reqs(23, 16'd6000, 1'b1);
         barrier("model group burst");
         $display("run   요청·결과: 요청 %0d, 결과 %0d, len_err %0d, 오류 %0d", n_req, n_res, n_lenerr, errors - e0);

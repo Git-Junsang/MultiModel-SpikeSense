@@ -3,7 +3,7 @@
   **** SW Build 6511674 on Tue Jun 16 11:01:26 MDT 2026
   **** IP Build 6504888 on Tue Jun 09 09:05:25 MDT 2026
   **** SharedData Build 6501428 on Mon Jun 08 17:34:18 MDT 2026
-  **** Start of session at: Sun Oct 25 04:15:35 2026
+  **** Start of session at: Mon Oct 26 19:16:58 2026
     ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
     ** Copyright 2022-2026 Advanced Micro Devices, Inc. All Rights Reserved.
 
@@ -17,7 +17,7 @@ run   cycle 최소 329, 평균 541.6, 최대 1205
 run   control overhead 최소 67, 평균 67.2, 최대 87 (가정 203)
 PASS
 $finish called at time : 14672260 ns : File "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/testbench/tb_compute_array.sv" Line 226
-run: Time (s): cpu = 00:00:00 ; elapsed = 00:00:43 . Memory (MB): peak = 1479.332 ; gain = 0.000 ; free physical = 12730 ; free virtual = 19760
+run: Time (s): cpu = 00:00:00.01 ; elapsed = 00:00:42 . Memory (MB): peak = 1503.344 ; gain = 0.000 ; free physical = 13937 ; free virtual = 20186
 exit
-INFO: xsimkernel Simulation Memory Usage: 156832 KB (Peak: 213656 KB), Simulation CPU Usage: 42640 ms
-INFO: [Common 17-206] Exiting xsim at Sun Oct 25 04:16:19 2026...
+INFO: xsimkernel Simulation Memory Usage: 156832 KB (Peak: 213656 KB), Simulation CPU Usage: 42360 ms
+INFO: [Common 17-206] Exiting xsim at Mon Oct 26 19:17:47 2026...

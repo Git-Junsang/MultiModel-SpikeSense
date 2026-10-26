@@ -1,8 +1,8 @@
 // result.v — 결과 packet 만들기와 request table 칸 비우기 (06_HOST_INTERFACE.md §4.2, 03_ARCHITECTURE.md §3)
 //
-// 완료 기록을 done 순서대로 FIFO에 쌓는다. on-chip 트랙은 바로, DDR3 트랙은 되쓰기 응답(wb_done) 뒤에 보낸다.
+// 완료 기록을 done 순서대로 FIFO에 쌓는다. On-chip 트랙은 바로, DDR3 트랙은 되쓰기 응답(wb_done) 뒤에 보낸다.
 // membrane_buf는 되쓰기를 done 순서대로 하므로 wb_done 수만 세면 된다.
-// request table의 {t_in, t_host, seq, model, RESET_STATE}를 읽어 32 B 결과를 만들고, 보낸 뒤 그 트랙 칸을 비운다.
+// Request table의 {t_in, t_host, seq, model, RESET_STATE}를 읽어 32 B 결과를 만들고, 보낸 뒤 그 트랙 칸을 비운다.
 // LATE = t_done > t_host + DEADLINE_US − MARGIN_US(µs, 차이로 비교). res_ok = 0이면 scheduler가 새 추론을 시작하지 않는다.
 
 module result #(
@@ -91,7 +91,7 @@ module result #(
                     rdc <= 1'b0;
                     es  <= E_RD;
                 end
-            E_RD: begin                                 // req_table 읽기 latency 2
+            E_RD: begin                                 // req_table 읽기 지연 2
                 rdc <= 1'b1;
                 if (rdc) begin
                     rs_valid <= 1'b1;

@@ -3,7 +3,7 @@
   **** SW Build 6511674 on Tue Jun 16 11:01:26 MDT 2026
   **** IP Build 6504888 on Tue Jun 09 09:05:25 MDT 2026
   **** SharedData Build 6501428 on Mon Jun 08 17:34:18 MDT 2026
-  **** Start of session at: Sun Oct 25 04:23:40 2026
+  **** Start of session at: Mon Oct 26 19:25:57 2026
     ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
     ** Copyright 2022-2026 Advanced Micro Devices, Inc. All Rights Reserved.
 
@@ -22,5 +22,5 @@ run   지정 시험 5: DDR3 결과가 wb_done을 기다림. 불일치 0
 PASS
 $finish called at time : 73275790 ns : File "/mnt/nas/data/2026-CAU/중앙대학교 학부연구생/Project/MultiModel-SpikeSense/hardware/testbench/tb_frontend.sv" Line 512
 exit
-INFO: xsimkernel Simulation Memory Usage: 174008 KB (Peak: 218536 KB), Simulation CPU Usage: 3420 ms
-INFO: [Common 17-206] Exiting xsim at Sun Oct 25 04:23:45 2026...
+INFO: xsimkernel Simulation Memory Usage: 174008 KB (Peak: 218536 KB), Simulation CPU Usage: 3820 ms
+INFO: [Common 17-206] Exiting xsim at Mon Oct 26 19:26:02 2026...

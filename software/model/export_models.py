@@ -2,7 +2,7 @@
 
 프로젝트 루트에서:
   python3 software/model/export_models.py                # 1lane, L → hardware/data/models
-  python3 software/model/export_models.py --format l64   # L, 64 lane → hardware/data/models_l64 (P3.9 구현 기준)
+  python3 software/model/export_models.py --format l64   # L, 64-lane → hardware/data/models_l64 (P3.9 구현 기준)
 """
 
 import argparse
@@ -106,7 +106,7 @@ def main():
               f"slot={meta['slot_offset_hex']}")
 
     ddr = b"".join(slots)
-    (args.out / "models.ddr.bin").write_bytes(ddr)
+    (args.out / "models.ddr3.bin").write_bytes(ddr)
     manifest = {
         "format_version": mf.FORMAT_VERSION,
         "model_count": len(entries),

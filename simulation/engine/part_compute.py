@@ -28,11 +28,11 @@ class Compute(Part):
         return s, fin
 
     def _load(self, T, nbytes):
-        """시각 T에 nbytes 적재를 낸다. 앞 전송과 겹쳐 고정 비용이 숨는다: 완료 = max(T + 고정 비용, 앞 전송 완료) + 크기 / 대역폭"""
-        self.dma_free_at = max(T + DMA_SETUP_US, self.dma_free_at) + nbytes / self.hw.ddr_mbps
+        """시각 T에 nbytes 적재를 낸다. 앞 전송과 겹쳐 고정 비용이 숨는다: 완료 = max(T + 고정 비용, 앞 전송 완료) + 크기 / bandwidth"""
+        self.dma_free_at = max(T + DMA_SETUP_US, self.dma_free_at) + nbytes / self.hw.ddr3_bandwidth_mbps
         return self.dma_free_at
 
     def _membrane(self, s, k):
-        """membrane potential이 DDR3에 있으면 batch의 weight 전송 뒤에 추론 요청 k개의 읽기·쓰기 DMA를 더한다(다음 적재가 늦어진다)"""
+        """Membrane potential이 DDR3에 있으면 batch의 weight 전송 뒤에 추론 요청 k개의 읽기·쓰기 DMA를 더한다(다음 적재가 늦어진다)"""
         if self.hw.membrane_rw_bytes:
             self.dma_free_at = max(self.dma_free_at, s) + self.hw.membrane_us(k)

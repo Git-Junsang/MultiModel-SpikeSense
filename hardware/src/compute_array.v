@@ -1,6 +1,6 @@
-// compute_array.v — 추론 1개(40→384→256→64→2)를 처리하는 64 lane 연산부
+// compute_array.v — 추론 1개(40→384→256→64→2)를 처리하는 64-lane compute array
 //
-// 03_ARCHITECTURE.md §4. 64 lane output-stationary, lane j = 출력 그룹의 뉴런 64g + j.
+// 03_ARCHITECTURE.md §4. 64-lane output-stationary, lane j = 출력 그룹의 뉴런 64g + j.
 //   layer 1  그룹 6개 × input 40개, cycle마다 word 1개
 //   layer 2  그룹 4개, spike가 1인 layer 1 뉴런만 cycle마다 2개(port A·B + pre-adder)
 //   layer 3  그룹 1개, spike가 1인 layer 2 뉴런만 cycle마다 2개
@@ -12,13 +12,13 @@
 // 단계 (cycle 번호 = 명령이 그 단계 register에 있는 cycle)
 //   0      명령 register (FSM)
 //   1      목록 읽기 결과, word 주소 → entry
-//   3      entry 출력(latency 2) → mac_unit 입력
+//   3      entry 출력(지연 2) → mac_unit 입력
 //   6      누산 enable·clear (mac_unit M 단계)
 //   7      누산 결과 → shadow 또는 layer 4 adder tree
-//   P0~P4  row마다 membrane potential·params 읽기(P0) → plif_array(P2, latency 2) → 쓰기(P4)
+//   P0~P4  row마다 membrane potential·params 읽기(P0) → plif_array(P2, 지연 2) → 쓰기(P4)
 //
-// membrane potential row r = 뉴런 16r~16r+15. layer 1 row 0~23, layer 2 24~39, layer 3 40~43,
-// layer 4 44(lane 0·1만 유효). 읽기 latency 2. 저장 bit 줄이기는 membrane_bank 몫이다.
+// Membrane potential row r = 뉴런 16r~16r+15. layer 1 row 0–23, layer 2 24–39, layer 3 40–43,
+// layer 4 44(lane 0·1만 유효). 읽기 지연 2. 저장 bit 줄이기는 membrane_bank 몫이다.
 
 module compute_array #(
     parameter CUR_W = 17,          // 전류 |최대| 49,152 (layer 2)
@@ -43,7 +43,7 @@ module compute_array #(
     input  wire [511:0]         w_b_data,
     output wire [5:0]           p_addr,
     input  wire [255:0]         p_data,
-    // membrane potential
+    // Membrane potential
     output wire                 m_rd_en,
     output wire [5:0]           m_rd_row,
     input  wire [255:0]         m_rd_data,
@@ -57,8 +57,8 @@ module compute_array #(
 );
 
     localparam [1:0] L1 = 2'd0, L2 = 2'd1, L3 = 2'd2, L4 = 2'd3;
-    localparam W_LAT = 2;
-    localparam K_MAC = 1 + W_LAT;   // mac_unit 입력 단계
+    localparam W_DELAY = 2;
+    localparam K_MAC = 1 + W_DELAY;   // mac_unit 입력 단계
     localparam K_ACC = K_MAC + 3;   // 누산 단계
     localparam K_CAP = K_MAC + 4;   // 누산 결과 단계
 

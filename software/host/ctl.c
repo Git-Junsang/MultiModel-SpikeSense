@@ -106,7 +106,7 @@ int clock_diff(ctl_t *c, int tries, uint32_t *diff, uint32_t *rtt_us)
     return 0;
 }
 
-int load_map(const char *path, int n_tracks, uint8_t *model)
+int load_map(const char *path, int n_tracks, uint8_t *model, double *floor_db)
 {
     if (!path || !*path) {
         for (int i = 0; i < n_tracks; i++)
@@ -118,13 +118,19 @@ int load_map(const char *path, int n_tracks, uint8_t *model)
         fprintf(stderr, "map 파일 %s를 열 수 없다\n", path);
         return -1;
     }
-    int n = 0, m;
-    while (fscanf(f, "%d", &m) == 1) {
+    char line[256];
+    int n = 0, m, got;
+    double fl;
+    while (fgets(line, sizeof line, f)) {
+        if ((got = sscanf(line, "%d %lf", &m, &fl)) < 1)
+            continue;                          /* 빈 줄 */
         if (m < 0 || m >= N_MODELS || n >= MAX_TRACKS) {
-            fprintf(stderr, "map %s: 줄 %d의 model_id %d 또는 트랙 수가 범위 밖\n", path, n + 1, m);
+            fprintf(stderr, "map %s: 트랙 %d의 model_id %d 또는 트랙 수가 범위 밖\n", path, n, m);
             fclose(f);
             return -1;
         }
+        if (got == 2 && floor_db)
+            floor_db[n] = fl;
         model[n++] = (uint8_t)m;
     }
     fclose(f);

@@ -1,5 +1,5 @@
 // ============================================================
-// tb_p3_core.sv — p3_core(레지스터 + ddr_tgen) 단위 검증 (xsim)
+// tb_p3_core.sv — p3_core(register + ddr_tgen) 단위 검증 (xsim)
 // ============================================================
 // MIG 대신 동작 모델(AXI4 슬레이브, 무작위 ready·지연, 순서 응답)을 붙이고
 // AXI-Lite로 설정·시작·결과 읽기를 한다. 확인 항목:
@@ -7,7 +7,7 @@
 //   - 쓰기 패턴을 읽기 검증으로 다시 읽으면 오류 0 (SEQ / SLOT_RAND / SLOT_RR / RAND_BEAT)
 //   - 메모리 한 워드를 바꾸면 오류 1개와 그 주소가 보고된다
 //   - blocking 모드에서 전송이 겹치지 않는다, pipelined에서 max_outst를 넘지 않는다
-//   - 지연 통계(min ≤ 평균 ≤ max)와 기록 개수·값, abort, TS·MARK 레지스터
+//   - 지연 통계(min ≤ 평균 ≤ max)와 기록 개수·값, abort, TS·MARK register
 // 실행 (저장소 루트):
 //   bash hardware/board_test/p3_meas/run_tb.sh
 // ============================================================
@@ -63,7 +63,7 @@ module tb_p3_core;
 
     // ---------------- 메모리 모델 ----------------
     bit [255:0] mem [bit [24:0]];
-    int rd_lat = 20;            // AR 수락 → 첫 R beat 최소 cycle
+    int rd_delay = 20;            // AR 수락 → 첫 R beat 최소 cycle
     int ready_pct = 70;
     int max_seen_outst = 0;
     int n_iss = 0, n_cmp = 0;
@@ -133,7 +133,7 @@ module tb_p3_core;
             end
             m_rvalid <= 1'b0;
             m_rlast  <= 1'b0;
-            if (rq.size() > 0 && cyc >= rq[0].t + rd_lat && $urandom_range(99) < 85) begin
+            if (rq.size() > 0 && cyc >= rq[0].t + rd_delay && $urandom_range(99) < 85) begin
                 if (!(m_rvalid && m_rready && m_rlast && rq.size() == 0)) begin
                     m_rvalid <= 1'b1;
                     m_rdata  <= mem.exists(rq[0].ba + rbeat) ? mem[rq[0].ba + rbeat] : '0;
@@ -193,7 +193,7 @@ module tb_p3_core;
     endtask
 
     typedef struct {
-        bit [31:0] cyc, beats, xfers, lat_min, lat_max, lat_sum, fst_min, fst_max, err, err_addr, proto, log_n;
+        bit [31:0] cyc, beats, xfers, delay_min, delay_max, delay_sum, fst_min, fst_max, err, err_addr, proto, log_n;
     } res_t;
 
     task automatic run(input bit write, input bit verify, input [1:0] amode, input bit pipe,
@@ -221,9 +221,9 @@ module tb_p3_core;
         rd(16'h0100, r.cyc);
         rd(16'h0108, r.beats);
         rd(16'h0110, r.xfers);
-        rd(16'h0114, r.lat_min);
-        rd(16'h0118, r.lat_max);
-        rd(16'h011C, r.lat_sum);
+        rd(16'h0114, r.delay_min);
+        rd(16'h0118, r.delay_max);
+        rd(16'h011C, r.delay_sum);
         rd(16'h0124, r.fst_min);
         rd(16'h0128, r.fst_max);
         rd(16'h0134, r.err);
@@ -232,13 +232,13 @@ module tb_p3_core;
         rd(16'h0148, r.log_n);
         $display("run w=%0d v=%0d am=%0d pipe=%0d xb=%0d bmax=%0d n=%0d out=%0d : cyc=%0d beats=%0d xfers=%0d lat[min=%0d max=%0d avg=%0.1f] fst[min=%0d max=%0d] err=%0d proto=%0d log=%0d maxout=%0d",
                  write, verify, amode, pipe, xb, bmax, n, outst, r.cyc, r.beats, r.xfers,
-                 r.lat_min, r.lat_max, real'(r.lat_sum) / real'(r.xfers), r.fst_min, r.fst_max,
+                 r.delay_min, r.delay_max, real'(r.delay_sum) / real'(r.xfers), r.fst_min, r.fst_max,
                  r.err, r.proto, r.log_n, max_seen_outst);
         check(r.xfers == n, "전송 수");
         check(r.beats == n * xb, "beat 수(tgen)");
         check(beats_seen == n * xb, "beat 수(모델)");
         check(r.proto == 0, "프로토콜 오류");
-        check(r.lat_min <= r.lat_max, "lat min<=max");
+        check(r.delay_min <= r.delay_max, "lat min<=max");
         v_exp_log = (n + cur_logmask) / (cur_logmask + 1);
         check(r.log_n == ((v_exp_log < 2048) ? v_exp_log : 2048), "기록 개수");
         check(max_seen_outst <= outst, "max_outst 초과");
@@ -271,7 +271,7 @@ module tb_p3_core;
         check(r.err == 0, "쓰기 오류");
         run(0, 1, 0, 0, base0, 200, 64, 5, 4, 32'hA5A5_0001, r);
         check(r.err == 0, "SEQ 읽기 검증");
-        check(r.fst_min >= rd_lat, "fst >= 모델 지연");
+        check(r.fst_min >= rd_delay, "fst >= 모델 지연");
 
         // 2) 한 워드를 바꾸면 오류 1개와 그 주소
         mem[(base0 >> 5) + 77] ^= 256'h1;
@@ -297,12 +297,12 @@ module tb_p3_core;
         wr(16'h006C, 32'h7FF);     // addr_mask: 2048 beat
         run(0, 1, 2, 0, 32'h0010_0000, 1, 1, 300, 1, 32'h99, r);
         check(r.err == 0, "RAND_BEAT 검증");
-        check(r.lat_min >= rd_lat, "단일 지연 >= 모델 지연");
+        check(r.delay_min >= rd_delay, "단일 지연 >= 모델 지연");
 
         // 6) 기록 값 확인: 0번 항목의 lat가 통계 범위 안
         rd(16'h8004, v);
         rd(16'h8000, v2);
-        check(v >= r.lat_min && v <= r.lat_max, "기록 lat 범위");
+        check(v >= r.delay_min && v <= r.delay_max, "기록 lat 범위");
         check(v2 <= v, "기록 fst <= lat");
 
         // 7) 2048개 초과 → 기록 2048개에서 멈춤, log_mask

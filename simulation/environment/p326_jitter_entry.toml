@@ -1,16 +1,16 @@
-# P3.26 E2 재실험: entry 수 × 추론 요청별 jitter, Host 처리 지연 = 모델 묶음 지연(M3 CPU 고정·부하 없음 재생) + U(0, J)
-# entry가 늘면 weight 전송은 줄고 on-chip membrane potential 트랙이 준다. 같은 트랙의 이전 추론 요청이 안 끝났으면 새 추론 요청을 버린다(fpga_drop_busy)
-# entry 선택 규칙(P3.25와 같음, 실험 전 고정): 그 jitter에서 deadline miss 0, 최소 deadline 여유 > 0,
-# DDR3 KiB/추론이 그 jitter·정책에서 entry 2~10 중 최솟값의 110 % 이내인 가장 작은 entry
-# 나머지 조건: L·64 lane @100 MHz, 1,024트랙, 모델 40개, rtl67, DDR3 3,015 MB/s, 12 bit membrane potential,
+# P3.26 E2 재실험: entry 수 × 추론 요청별 jitter, Host 처리 지연 = 모델 그룹 지연(M3 CPU 고정·부하 없음 재생) + U(0, J)
+# Entry가 늘면 weight 전송은 줄고 on-chip membrane potential 트랙이 준다. 같은 트랙의 이전 추론 요청이 안 끝났으면 새 추론 요청을 버린다(fpga_drop_busy)
+# Entry 선택 규칙(P3.25와 같음, 실험 전 고정): 그 jitter에서 deadline miss 0, 최소 deadline 여유 > 0,
+# DDR3 KiB/추론이 그 jitter·정책에서 entry 2–10 중 최솟값의 110% 이내인 가장 작은 entry
+# 나머지 조건: L·64-lane @100 MHz, 1,024트랙, 모델 40개, rtl67, DDR3 3,015 MB/s, 12 bit membrane potential,
 # Model-Grouped Offset Assignment, Grouping, 즉시 송신. 시나리오 6개 × seed 30
 # 키 설명은 template.toml
 
 sim_mode = "run"
-sim_scenarios = ["U", "K", "S", "I", "SK", "R"]
+sim_scenarios = ["uniform", "skewed", "synchronized", "intermittent", "skewed_synchronized", "fluctuating"]
 sim_seeds = 30
 sim_seed0 = 0
-sim_warm_periods = 16
+sim_warmup_periods = 16
 sim_meas_periods = 64
 model_size = "L"
 model_count = 40
@@ -21,13 +21,13 @@ compute_ctrl_scale = 1.0
 membrane_place = "split"
 membrane_bits = 12
 bram_reserve_tiles = 25.5
-ddr_bw_mbps = 3015.0
+ddr3_bandwidth_mbps = 3015.0
 track_count = 1024
-host_offset = "model"
+host_offset = "offset_assignment"
 host_jitter_ms = 0.8
 host_jitter_dist = "uniform"
 host_jitter_trace = ""
-host_group_trace = "hardware/board_test/p325_meas/result/m3_group_pin3_load0.csv.gz"
+host_model_group_delay_trace = "hardware/board_test/p325_meas/result/m3_group_pin3_load0.csv.gz"
 host_gather_ms = 0.0
 host_gather_to_max = false
 host_packet_gap_us = 0.0
@@ -47,8 +47,8 @@ tune_conds = []
 
 [sweep]
 policy = [
-  {label = "PNU-count", cache_policy = "pnu_count"},
-  {label = "Oracle MIN", cache_policy = "oracle"},
+  {label = "PNU-Count", cache_policy = "pnu_count"},
+  {label = "Oracle MIN", cache_policy = "oracle_min"},
 ]
 host_jitter_ms = [0.0, 0.8, 1.6, 3.2]
 cache_entries = [2, 3, 4, 5, 6, 8, 10]

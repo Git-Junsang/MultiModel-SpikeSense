@@ -8,7 +8,7 @@ membrane potential·누산 |최대|, threshold 정수 최대를 잰다. 채택�
   prior 16 bit 넘침 시 wrap(선행 RTL)       sat  16 bit 포화
   rnd  누설 반올림(기본 내림)               b12  beta Q0.12(기본 Q0.8)
 
-뉴런별 스케일은 하드웨어 곱셈 없이 threshold·membrane potential 단위로 흡수되지만, threshold 정수가 커진다.
+뉴런별 스케일은 hardware 곱셈 없이 threshold·membrane potential 단위로 흡수되지만, threshold 정수가 커진다.
 정수 연산은 float64 행렬곱(값이 2^53 미만이라 정확) + int64 원소 연산으로 흉내 낸다.
 
 결과: train_result/eval/quant_variants/results.csv
