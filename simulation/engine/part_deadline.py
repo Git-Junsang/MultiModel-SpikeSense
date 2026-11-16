@@ -6,7 +6,7 @@ import os
 import numpy as np
 
 from part_hardware import DMA_SETUP_US, PERIOD_US, ROOT
-from part_workload import LINK_IN_FILE, LINK_OUT_FILE, PACKET_REQUESTS, link_samples
+from part_workload import PACKET_REQUESTS, link_samples
 
 
 @functools.lru_cache(maxsize=None)
@@ -39,7 +39,7 @@ def bound(s):
     cd, lw = hw.dense_req_us, hw.load_us(hw.model_bytes)
     rw = -(-sum(hw.arch[1:]) * hw.membrane_bits // 8)                # DDR3 트랙 하나의 membrane potential B
     cs = 2 * DMA_SETUP_US + rw / hw.ddr3_bandwidth_mbps + rw / (hw.ddr3_bandwidth_mbps * hw.write_ratio)   # 읽기 + 쓰기 DMA
-    din, dout = float(link_samples(LINK_IN_FILE).max()), float(link_samples(LINK_OUT_FILE).max())
+    din, dout = float(link_samples(hw.link, 0).max()), float(link_samples(hw.link, 1).max())
     n_ddr3 = N - s.on_chip_tracks
     single, allmiss = N * cd + M * lw + n_ddr3 * cs, N * cd + N * lw + n_ddr3 * cs
     cond = H + din + single + dout

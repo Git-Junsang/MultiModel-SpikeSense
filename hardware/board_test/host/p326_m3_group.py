@@ -1,9 +1,9 @@
 """p326_m3_group.py — M3 원자료(p325_mel_load.py 출력) → 모델·period 모델 그룹 지연 표(period, model_id, delay_us = t_ready − t_frame µs).
 같은 모델·period 트랙은 t_ready가 같다(퍼짐 0). 그래서 모델 그룹마다 한 줄이고, 다르면 멈춘다. 처음 16 period(0.5 s)는 뺀다.
-원자료가 있는 폴더(sub1 ~/mmss_jobs/p325, m3/m3_<조건>.csv.gz)에서 실행하고, 출력 m3/m3_group_<조건>.csv.gz를
-hardware/board_test/p325_meas/result/로 가져온다. Simulation의 host_model_group_delay_trace가 읽는다(P3.26).
+원자료가 있는 폴더(hardware/board_test/p325_meas/raw, m3/m3_<조건>.csv.gz)에서 실행하고, 출력 m3/m3_group_<조건>.csv.gz를
+hardware/board_test/p325_meas/result/로 옮긴다. Simulation의 host_model_group_delay_trace가 읽는다(P3.26).
 
-    ~/mmss_venv/bin/python p326_m3_group.py
+    cd hardware/board_test/p325_meas/raw && python3 ../../host/p326_m3_group.py
 """
 import csv, gzip, json
 import numpy as np

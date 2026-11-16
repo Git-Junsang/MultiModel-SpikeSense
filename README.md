@@ -112,7 +112,7 @@ MultiModel-SpikeSense/
 | 실행 script | `<동사>_<대상>`: `train_1unit`, `train_40unit`, `export_models`, `export_golden`, `verify_export`, `verify_reference` |
 | `model/eval/` | 결과 폴더 `train_result/eval/<이름>/`과 같은 이름 |
 | `model/references/` | 선행 저장소 code 사본. 고치지 않는다 |
-| `host/` | C program `mmss_host` 하나에 `setup`·`run`·`stop`이 있다. 사용법은 `main.c` 첫머리, 식은 파일마다 첫머리에 적었다. `build/`는 빌드 산출물이다 |
+| `host/` | C program `mmss_host` 하나에 `setup`·`run`·`stop`이 있다. 사용법은 `main.c` 첫머리, 식은 파일마다 첫머리에 적었다. `build/`는 빌드 산출물이다. `demo.py`는 USB mic demo(P6.4)로 `prep`이 소리 파일을 `dataset/demo/`(git 제외)에 만들고 `run`이 Pi에서 돈다 |
 
 학습 이름은 `<크기>_<용도>_<학습방법>`이다. 크기는 `XS`·`P`·`synchronized`·`M`·`L`·`XL`(layer 구조는 `snn_torch.py`의 `ARCHS`), 용도는 `normal`·`mixed`(섞인 소리), 학습방법은 `noaug`·`aug`(겹침 증강)다.
 
@@ -136,7 +136,7 @@ MultiModel-SpikeSense/
 | 점별 결과 | `<환경 이름>.csv`. 점마다 환경 값 전부, BRAM tile, 요약 지표 | `p326_final_compare.csv` |
 | 실행별 결과 | `<환경 이름>_runs.csv.gz`. run은 점 × 시나리오 × seed마다 한 줄 | `p326_final_compare_runs.csv.gz` |
 
-키 설명은 `environment/template.toml`, engine 구조와 열 이름은 [simulation_engine.md](documents/design_references/simulation_engine.md)에 있다. 환경 파일을 고치면 결과 CSV를 다시 만든다. 결과 CSV만 따로 고치지 않는다. 옛 스크립트와 결과의 차이는 [P3.14 보고서](<documents/reports/P3.14 Research Report.md>)에 있다.
+키 설명은 `environment/template.toml`, engine 구조와 열 이름은 [simulation_engine.md](documents/manual/simulation_engine.md)에 있다. 환경 파일을 고치면 결과 CSV를 다시 만든다. 결과 CSV만 따로 고치지 않는다. 옛 스크립트와 결과의 차이는 [P3.14 보고서](<documents/reports/P3.14 Research Report.md>)에 있다.
 
 ### analysis
 
@@ -147,7 +147,7 @@ MultiModel-SpikeSense/
 | `architecture` | `fig1_x-dataflow_y-block` | 시스템 구조. Host Offset Assignment, next-use predictor, 제어·메타데이터 경로. Entry 4·768/256트랙은 평가 구성(†) | 없음 |
 | `offset` | `fig5_x-time_y-track` | Offset Assignment와 실제 도착. (c) FPGA 도착 = 모델 그룹 지연 G + 추론 요청별 지연 | 없음 |
 | `offset` | `fig6_x-time_y-arrival-cache` | 모델 그룹 지연을 고려한 cache 교체 예. 모델 그룹 지연을 무시한 예측과 비교 | 없음(설명용 예) |
-| `latency` | `fig1_x-host-processing-delay_y-ccdf` | Xeon Host의 모델 그룹 처리 지연 CCDF, 조건 4개 | `hardware/board_test/p325_meas/result/m3_delay_ccdf.csv` |
+| `delay` | `fig1_x-host-processing-delay_y-ccdf` | Xeon Host의 모델 그룹 처리 지연 CCDF, 조건 4개 | `hardware/board_test/p325_meas/result/m3_delay_ccdf.csv` |
 | `compare` | `fig12_x-ddr3-traffic_y-max-response-time` | Offset Assignment와 scheduler에 따른 DDR3 traffic과 관측 최대 (a) response time (b) 준비 완료 뒤 response time | `p326_final_compare` |
 | `compare` | `fig13_x-jitter_y-ddr3-traffic-reload` | 추론 요청별 퍼짐에 따른 cache 정책의 DDR3 traffic과 재적재 | `p326_cache_policy` |
 | `entry` | `fig1_x-jitter_y-entry_c-ddr3-traffic` | 추론 요청별 퍼짐 J와 entry 수에 따른 DDR3 traffic(PNU-Count), 고른 entry 표시 | `p326_jitter_entry` |
@@ -165,7 +165,7 @@ Simulation 원자료는 `simulation/result/<이름>.csv`, 모델 원자료는 `s
 
 | 폴더 | 내용 |
 |---|---|
-| `board_test/` | LED·MIG·XDMA 시험과 DDR3·PCIe 측정. 원자료와 요약은 `p3_meas/result/`, 분석은 `host/analyze_p3.py`. Host 처리 지연 측정(mic–Host 지연, clock drift, Host 처리 지연, Ethernet 지연, P3.25) code는 `host/p325_*.py`·`analyze_p325.py`·`test_p325.py`, 결과는 `p325_meas/result/`. Host 처리 지연 측정 원자료의 모델 그룹 지연 표(`m3_group_<조건>.csv.gz`, simulation `host_model_group_delay_trace` 입력)는 `host/p326_m3_group.py`가 만든다(P3.26). accel_top 보드 시험(RGMII 보정 `host/p52_link.py`, tb_sys 순서 `host/p52_sys.py`, P5.2) 결과는 `p52_meas/result/`. 목표 부하 정확도·속도(`host/p52_acc.py`, `host/p52_acc_run.sh`, P5.3) 요약은 `p53_meas/result/`. 결과 손실 조사(`host/p53_loss_run.sh`, `p53_loss_gap.py`, `p53_mdio.py`, `p53_hostphy.py`) 요약은 `p53_meas/result/loss/` |
+| `board_test/` | LED·MIG·XDMA 시험과 DDR3·PCIe 측정. 원자료와 요약은 `p3_meas/result/`, 분석은 `host/analyze_p3.py`. Host 처리 지연 측정(mic–Host 지연, clock drift, Host 처리 지연, Ethernet 지연, P3.25) code는 `host/p325_*.py`·`analyze_p325.py`·`test_p325.py`, 결과는 `p325_meas/result/`. Host 처리 지연 측정 원자료의 모델 그룹 지연 표(`m3_group_<조건>.csv.gz`, simulation `host_model_group_delay_trace` 입력)는 `host/p326_m3_group.py`가 만든다(P3.26). accel_top 보드 시험(RGMII 보정 `host/p52_link.py`, tb_sys 순서 `host/p52_sys.py`, P5.2) 결과는 `p52_meas/result/`. 목표 부하 정확도·속도(`host/p52_acc.py`, `host/p52_acc_run.sh`, P5.3) 요약은 `p53_meas/result/`. 결과 손실 조사(`host/p53_loss_run.sh`, `p53_loss_gap.py`, `p53_mdio.py`, `p53_hostphy.py`) 요약은 `p53_meas/result/loss/`. 조용한 frame 기준별 AUC(`host/p29_quiet.py`, `p29_diag.py`, P2.9) 요약은 `p29_meas/result/`. 보드 원자료(추론 요청별 결과 CSV, pcap, PHY·NIC log)는 `<측정>/raw/`에 gzip으로 둔다. NAS에만 있고 git에는 올리지 않는다. pcap은 `gunzip -k`로 푼 뒤 읽는다. 옛 실행의 CSV 열 이름은 지금 이름(`period`, `response_time_us`, `board_model_group.csv`)으로 바꿨다. `raw/scripts/`는 당시 돌린 script 사본이라 옛 이름을 쓴다. 입력 `eval.s16`은 `host/p52_acc.py prep`으로 다시 만든다 |
 | `data/models_l64/`, `data/golden_l64/` | L INT8 모델 40개(64-lane slot)와 golden 82개. RTL 기준 |
 | `data/golden_l64_m12/` | golden_l64와 같은 입력, membrane potential 12 bit 저장. P4.2 기준(`export_golden.py --format l64 --mem-bits 12`) |
 | `data/models/`, `data/golden/` | 1 lane slot(row-major) |
@@ -197,13 +197,15 @@ python3 export_golden.py --format l64                           # golden vector
 python3 verify_export.py --format l64                           # export 검증
 ```
 
+`verify_export.py`는 checkpoint를 다시 양자화해 BIN, HEX, slot, DDR3 image, SHA-256과 golden vector 82개를 비교한다.
+
 ### Simulation
 
 ```bash
 python3 simulation/engine/engine.py simulation/environment/p326_final_compare.toml --jobs 11
 python3 simulation/engine/test_engine.py                        # 손계산·환경 파일·CSV·P3.25·P3.26·deadline 분석 시험
 python3 simulation/engine/test_engine.py p326 env               # 고른 부만(core p325 p326 env csv)
-python3 simulation/engine/engine.py simulation/environment/p326_deadline_bound.toml                  # 조건부 응답 시간(bound mode)
+python3 simulation/engine/engine.py simulation/environment/p326_deadline_bound.toml                  # 조건부 response time(bound mode)
 python3 simulation/engine/engine.py simulation/environment/p326_deadline_adversarial.toml --jobs 19  # adversarial search
 ```
 
@@ -222,11 +224,15 @@ python3 software/host/verify_host.py                                    # qemu-a
 Pi에서는 저장소 root에서 돌린다. FPGA는 `192.168.10.2`, Pi NIC는 `192.168.10.1/24`다(06 §4).
 
 ```bash
-mmss_host setup --models hardware/data/models_l64/models.ddr3.bin --map map.txt --model-group-delay-trace g.csv --jitter-us 800
-arecord -D hw:1 -f S16_LE -r 16000 -c 8 | mmss_host run --map map.txt --cpu 3 --log run    # mic 8개
+zcat hardware/board_test/p316_meas/result/pi_group_pin3_performance_load0.csv.gz > g.csv   # PNU 표용 모델 그룹 지연 표(06 §7.4)
+mmss_host setup --models hardware/data/models_l64/models.ddr3.bin --map map.txt --model-group-delay-trace g.csv --jitter-us 0
+mmss_host run --map map.txt --mic Microphone,Microphone_1 --cpu 3 --log run   # USB mic 2개(ALSA card 이름), 48 kHz → 16 kHz
 mmss_host run --tracks 1024 --in fan.wav --pace --loop --seconds 300 --cpu 3 --log load      # wav로 1,024트랙 부하
+mmss_host run --tracks 1024 --mic Microphone,Microphone_1 --in fan.wav --seconds 300 --cpu 3 --log mix   # 트랙 0–1은 mic, 2–1,023은 wav
 mmss_host stop
 ```
+
+`--mic`는 mic 하나를 채널 하나로 받고, 트랙 i는 채널 i % (mic 수)를 쓴다. `--in` wav를 함께 주면 mic 수 뒤의 트랙은 wav를 반복해 읽는다(06 §2). `mmss_host resample`은 같은 resampler를 stdin → stdout으로 돌리는 시험용 명령이다.
 
 `map.txt`는 한 줄이 트랙 하나(줄 번호 = track_id)이고 `model_id [dB 하한]`을 적는다. 없으면 트랙 i의 모델은 i % 40이다. 하한은 mic의 바닥 잡음 위로 정하고, 적지 않으면 `--floor-db`(기본 −80 dB)를 쓴다(02 §5). `run --log`가 쓰는 `<이름>_model_group.csv`는 모델 그룹 지연 표 형식(`epoch, model_id, delay_us`)이라 `setup --model-group-delay-trace`와 simulation의 `host_model_group_delay_trace`에 그대로 넣을 수 있다.
 
@@ -257,12 +263,14 @@ python3 analysis/develop/compare/fig12_x-ddr3-traffic_y-max-response-time.py
 
 | 문서 | 내용 |
 |---|---|
-| [design_references](documents/design_references/01_OVERVIEW.md) | 설계 정본. 기준 수치, 용어, 모델, 구조, 메모리, scheduling, Host interface, simulation, 평가, 선행연구 |
+| [design_references](documents/design_references/01_OVERVIEW.md) | 설계 정본. 기준 수치, 모델, 구조, 메모리, scheduling, Host interface, simulation, 평가, 선행연구 |
 | [TASKS.md](documents/TASKS.md) | 진행 상황과 다음 작업 |
 | [보고서](documents/reports/) | 단계별 실험과 결과 |
 | [ENVIRONMENT.md](documents/manual/ENVIRONMENT.md) | 개발 서버, FPGA Host, 보드 시험 절차 |
 | [COMPUTE_SERVERS.md](documents/manual/COMPUTE_SERVERS.md) | 계산 서버 사용법 |
+| [simulation_engine.md](documents/manual/simulation_engine.md) | simulator 코드 구조, 식, 환경 키, 결과 CSV |
 | [STYLE_GUIDE.md](documents/STYLE_GUIDE.md) | 문서 형식과 문체 |
+| [TERMS.md](documents/TERMS.md) | 용어 뜻과 표기 |
 
 ---
 

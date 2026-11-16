@@ -4,7 +4,7 @@
     python3 simulation/engine/engine.py simulation/environment/<파일>.toml [--jobs 11]
 
 환경 파일 → Setup(hardware 조건 + 부품 조립) → mode(run·search·tune·bound·adversarial) → 결과 CSV. 부품은 part_*.py에 종류별로 있다.
-구조, 식, mode, 결과 CSV 열은 documents/design_references/simulation_engine.md에 있다. 시간은 µs, B/µs = MB/s
+구조, 식, mode, 결과 CSV 열은 documents/manual/simulation_engine.md에 있다. 시간은 µs, B/µs = MB/s
 """
 import argparse
 import itertools
@@ -23,7 +23,7 @@ from part_jitter import JITTERS, Jitter
 from part_result import RESPONSE_TIME_BIN_MS, RESPONSE_TIME_BINS, read_csv, seed_stats, summarize, write_csv  # noqa: F401 (그림 script가 engine.read_csv로 쓴다)
 from part_scheduler import DeepRTMethod, DystaMethod, Grouping
 from part_simulator import simulate
-from part_workload import SCENARIOS, Workload
+from part_workload import LINK_FILES, SCENARIOS, Workload
 
 ENV_DIR = os.path.join(ROOT, 'simulation', 'environment')
 TEMPLATE = os.path.join(ENV_DIR, 'template.toml')
@@ -42,7 +42,7 @@ class Setup:
         self.e = e
         hw = self.hw = Hardware(e['compute_lanes'], e['track_count'], e['membrane_place'], e['membrane_bits'],
                                 MODEL_SIZES[e['model_size']], e['compute_ctrl_scale'], e['compute_spikes_per_cycle'],
-                                e['model_count'], e['ddr3_bandwidth_mbps'])
+                                e['model_count'], e['ddr3_bandwidth_mbps'], e['host_link'])
         c = self.compute = Compute(hw)
         budget = hw.tile_budget - e['bram_reserve_tiles']
         st = self.cache = CACHE_POLICIES[e['cache_policy']](hw, entries=e['cache_entries'] or None, budget=budget - c.tiles(),
@@ -150,7 +150,7 @@ def check(lb, e):
               and (not e['host_gather_to_max'] or (e['host_offset'] == 'offset_assignment' and not e['host_gather_ms']))),
              ('host_packet_gap_us', e['host_packet_gap_us'] >= 0
               and (not e['host_packet_gap_us'] or bool(e['host_gather_ms'] or e['host_gather_to_max']))),
-             ('host_fixed_delay_us', e['host_fixed_delay_us'] >= 0),
+             ('host_fixed_delay_us', e['host_fixed_delay_us'] >= 0), ('host_link', e['host_link'] in LINK_FILES),
              ('fpga_drop_busy', isinstance(e['fpga_drop_busy'], bool)),
              ('sim_scenarios', bool(e['sim_scenarios']) and set(e['sim_scenarios']) <= set(SCENARIOS)),
              ('cache_attrs', all(hasattr(C, k) for k in e['cache_attrs'])),

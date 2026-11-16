@@ -1,7 +1,9 @@
 """논문용 시스템 구조도(논문 Fig. 1). 영문, 그림 안 제목 없음, 단 폭 3.5 in, 글자 7 pt.
 design_references/03 §2 block에 P3.25 설계(Next-use predictor, Host 메타데이터 경로)를 더했다.
 P3.26: predictor 표를 모델 그룹 지연·추론 요청별 지연(jitter) 두 개로, 입력에 모델별 이번 주기 첫 도착 시각을 더했다.
-Entry 4개와 membrane 768/256트랙은 평가에 쓴 구성(†)이고 entry 수는 목표 Host 측정 뒤 정한다.
+2026-11-06: 모든 block의 RTL·보드 확인(P4.1–P4.10, P5.2–P5.3)에 맞춰 "no RTL yet" 표시를 지우고,
+DDR3 트랙 membrane potential 경로(DMA ↔ 준비 buffer)와 시작 때 모델 image 적재 경로(Host → 제어 → DDR3 창)를 더했다.
+Entry 4개와 membrane 768/256트랙은 평가에 쓴 구성이다(entry 수는 목표 Host 측정 뒤 정한다). † 주석은 사용자 지시로 뺐다.
 
 입력: 없음(simulation 결과를 쓰지 않는 개념도)
 실행: python3 analysis/develop/architecture/fig1_x-dataflow_y-block.py
@@ -11,7 +13,6 @@ Entry 4개와 membrane 768/256트랙은 평가에 쓴 구성(†)이고 entry �
 표기
   실선 = 추론 요청 데이터(mel 입력, 결과, weight, state), 파란 점선 = 제어·메타데이터
   파란 block = 제안. Host Offset Assignment(SW)과 Next-use predictor(HW)를 따로 표시한다(Grouping만의 기여로 읽히지 않게)
-  점선 테두리 = RTL이 없는 제안 block. RTL이 있는 block은 compute array 하나(P4.1)라 그 block에 적는다
 """
 import os
 import sys
@@ -24,17 +25,17 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."
 import common as cm  # noqa: E402
 
 cm.paper_style()
-W, H, FOOT = 3.5, 3.68, 0.13                       # 좌표 = inch. FOOT = 그림 아래 † 설명 줄
+W, H, BOT = 3.5, 3.68, 0.12                        # 좌표 = inch. BOT = 범례 한 줄 아래 잘라 낼 여백
 C = [(0.24, 0.92), (1.00, 1.86), (1.94, 2.70), (2.78, 3.46)]   # 네 열의 x 범위
 LINE, HL_FILL, HL_EDGE, BAND, CTRL = "#3d3d3a", "#e8f1fc", cm.SERIES[0], "#f3f3f0", cm.SERIES[0]
 DASH = (0, (3, 1.6))
 ON_CHIP, IN_DDR3 = 768, 256                         # Membrane potential 트랙(12 bit, entry 4). 합 1,024
 FS = 7
 
-fig = plt.figure(figsize=(W, H + FOOT))
+fig = plt.figure(figsize=(W, H - BOT))
 ax = fig.add_axes([0, 0, 1, 1])
 ax.set_xlim(0, W)
-ax.set_ylim(-FOOT, H)
+ax.set_ylim(BOT, H)
 ax.axis("off")
 
 
@@ -91,13 +92,13 @@ EY, RB, RC = (2.64, 2.78), (2.06, 2.52), (1.22, 1.86)
 box(C[0][0], C[3][1], *EY, "Gigabit Ethernet MAC (UDP)", fill="#e9e8e3")
 box(*C[1], *RB, "Ingest,\nrequest table")
 box(*C[2], *RB, "Grouping\nscheduler\n(no wait)")
-box(*C[3], *RB, "64-lane\ncompute array,\n100 MHz\n(RTL-verified)")
+box(*C[3], *RB, "64-lane\ncompute array,\n100 MHz")
 
-box(*C[0], RC[0] + 0.06, RC[1] - 0.06, "Registers:\noffset table,\ndelay LUTs\n(model-group\ndelay, jitter)")
+box(*C[0], RC[0] + 0.06, RC[1] - 0.06, "Control:\noffset table,\ndelay LUTs\n(model-group\ndelay, jitter)")
 box(C[1][0], C[2][1], *RC, z=1)
 ax.text(C[1][0] + 0.05, RC[1] - 0.03, "Weight cache", ha="left", va="top", fontsize=FS, fontweight="bold")
-PX, PY = (C[1][0] + 0.05, C[1][0] + 0.77), (RC[0] + 0.05, RC[1] - 0.16)   # Next-use predictor(제안 HW, RTL 없음 → 점선)
-box(*PX, *PY, hl=True, dashed=True)
+PX, PY = (C[1][0] + 0.05, C[1][0] + 0.77), (RC[0] + 0.05, RC[1] - 0.16)   # Next-use predictor(제안 HW)
+box(*PX, *PY, hl=True)
 tag(PX[0] + 0.04, PY[1] - 0.025, "Proposed (HW)")
 ax.text(sum(PX) / 2, PY[0] + 0.12, "Next-use\npredictor", ha="center", va="center", fontsize=FS, linespacing=1.1, zorder=3)
 EX, EW, EG = 2.10, 0.10, 0.03                       # Entry 4개(각 28.5 RAMB36-equivalent tile)
@@ -106,15 +107,15 @@ for i in range(4):
     ax.add_patch(Rectangle((EX + (EW + EG) * i, SY[0]), EW, SY[1] - SY[0], facecolor="white", edgecolor=LINE,
                            linewidth=0.6, zorder=3))
 ECX = EX + 2 * EW + 1.5 * EG
-ax.text(ECX, RC[1] - 0.04, "4 entries$^\\dagger$,\n114 BRAM tiles", ha="center", va="top", fontsize=FS, linespacing=1.05, zorder=3)
+ax.text(ECX, RC[1] - 0.04, "4 entries,\n114 BRAM tiles", ha="center", va="top", fontsize=FS, linespacing=1.05, zorder=3)
 note(ECX + 0.02, RC[0] + 0.13, "locks: current,\nprefetch target", ha="center", ctrl=True)
 arrow((PX[1], sum(SY) / 2), (EX, sum(SY) / 2), ctrl=True)
 note((PX[1] + EX) / 2, sum(SY) / 2 - 0.085, "victim", ha="center", ctrl=True)
 
-RD = (0.92, 1.10)
-box(C[0][0], C[2][1], *RD, "DMA (one prefetch ahead)")
-BY = (0.90, 1.30)
-box(*C[3], *BY, f"Membrane bank\n{ON_CHIP} tracks$^\\dagger$,\n12-bit")
+RD, DX = (0.92, 1.10), (0.50, 2.47)                # DMA. 왼쪽은 모델 image 경로, 오른쪽은 state 경로 자리
+box(*DX, *RD, "DMA (one prefetch ahead)")
+BY = (0.86, 1.34)                                   # Membrane Storage: on-chip 트랙 bank + DDR3 트랙 준비 buffer
+box(*C[3], *BY, f"Membrane bank\n({ON_CHIP} tracks)\nand DDR3-track\nbuffer, 12-bit")
 
 # 추론 요청 데이터(실선)
 arrow((mid(1), HY[0]), (mid(1), EY[1]))
@@ -132,14 +133,18 @@ arrow((mid(3) + 0.20, RB[0]), (mid(3) + 0.20, BY[1]), both=True)   # Compute arr
 note(mid(3) + 0.16, (RB[0] + RC[1]) / 2 - 0.02, "state", ha="right")
 arrow((ECX, RD[1]), (ECX, RC[0]))                              # DMA → entry
 DY = (0.39, 0.69)
-box(C[0][0], C[3][1], *DY, f"Weights of 40 models (4.97 MiB) $\\cdot$ membrane potential of {IN_DDR3} tracks$^\\dagger$")
-arrow((mid(0), DY[1]), (mid(0), RD[0]), both=True)
-note(mid(0) + 0.04, (DY[1] + RD[0]) / 2, "weights, state")
+box(C[0][0], C[3][1], *DY, f"40 model images (5.02 MiB) $\\cdot$ membrane potential of {IN_DDR3} tracks")
+arrow((1.20, DY[1]), (1.20, RD[0]), both=True)
+note(1.24, (DY[1] + RD[0]) / 2, "weights, state")
+arrow((DX[1], sum(RD) / 2), (C[3][0], sum(RD) / 2), both=True)    # DMA ↔ DDR3 트랙 buffer
+note((DX[1] + C[3][0]) / 2, RD[1] + 0.06, "state", ha="center")
 
 # 제어·메타데이터(파란 점선)
 arrow((C[1][0] + 0.10, HY[0]), (C[1][0] + 0.10, EY[1]), ctrl=True)
-note(C[1][0] + 0.06, 2.94, "start-up\nregisters", ha="right", ctrl=True)
+note(C[1][0] + 0.06, 2.94, "start-up registers,\nmodel images", ha="right", ctrl=True)
 arrow((C[0][0] + 0.07, EY[0]), (C[0][0] + 0.07, RC[1] - 0.06), ctrl=True)
+arrow((C[0][0] + 0.07, RC[0] + 0.06), (C[0][0] + 0.07, DY[1]), ctrl=True)   # 시작 때 모델 image → DDR3 창
+note(C[0][0] + 0.11, (DY[1] + RD[0]) / 2, "model images", ctrl=True)
 note(C[0][0] + 0.11, sum(RB) / 2, "offset table,\ndelay LUTs,\ntrack/model\ncounts", ctrl=True)
 arrow((C[0][1], sum(PY) / 2), (PX[0], sum(PY) / 2), ctrl=True)
 arrow((PX[1] - 0.10, RB[0]), (PX[1] - 0.10, PY[1]), ctrl=True)   # "Weight cache" 글자 오른쪽으로 지난다
@@ -149,12 +154,8 @@ note(mid(2) + 0.04, (RB[0] + RC[1]) / 2, "next model", ctrl=True)
 
 ax.legend(handles=[Line2D([], [], color=LINE, linewidth=0.7, label="request data"),
                    Line2D([], [], color=CTRL, linewidth=0.7, linestyle=DASH, label="control / metadata"),
-                   Patch(facecolor=HL_FILL, edgecolor=HL_EDGE, linewidth=0.8, label="proposed"),
-                   Patch(facecolor=HL_FILL, edgecolor=HL_EDGE, linewidth=0.8, linestyle=DASH,
-                         label="proposed, no RTL yet")],
-          loc="lower center", bbox_to_anchor=(W / 2, 0.0), bbox_transform=ax.transData, ncol=2, frameon=False,
+                   Patch(facecolor=HL_FILL, edgecolor=HL_EDGE, linewidth=0.8, label="proposed")],
+          loc="lower center", bbox_to_anchor=(W / 2, BOT), bbox_transform=ax.transData, ncol=3, frameon=False,
           fontsize=FS, handlelength=1.8, columnspacing=1.2, borderaxespad=0.1, labelspacing=0.3)
 
-ax.text(W / 2, -FOOT / 2, "$^\\dagger$evaluated configuration; the entry count is set after measuring the target Host",
-        ha="center", va="center", fontsize=6.5, style="italic", color=cm.MUTED)
 cm.save(fig, __file__, exts=("pdf", "png"), dpi=300)

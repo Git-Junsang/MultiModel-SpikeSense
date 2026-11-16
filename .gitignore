@@ -15,6 +15,9 @@ _workspace/
 software/dataset/*
 !software/dataset/*.py
 
+# 보드 원자료: NAS에만 둔다(GitHub 파일 한도 100 MB). 요약은 result/에 올린다
+hardware/board_test/*/raw/
+
 # Vivado·xsim 산출물
 .Xil/
 hardware/vivado/build/

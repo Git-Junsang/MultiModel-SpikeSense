@@ -1,0 +1,62 @@
+# P3.17 E1: entry 수 × 교체 정책, 라즈베리파이 5 Host 측정 조건(P3.16)
+# Host 처리 지연 = 라즈베리파이 5에서 잰 모델 그룹 지연을 넣음(1,024트랙·즉시 송신·300 s). 추론 요청별 지연은 넣지 않는다(none):
+# 측정한 FPGA 도착 퍼짐(p50 8 µs, p99 17 µs)은 Ethernet 입력 지연 표본을 추론 요청마다 뽑는 것만으로 재현된다(p50 6.5 µs, p99 15 µs).
+# 링크 지연 = Ethernet 표본(host_link = "ethernet", P3.16 라즈베리파이 5–보드 직결).
+# Entry 선택 규칙(P3.25·P3.26과 같음, 실험 전 고정): deadline miss 0, 최소 deadline 여유 > 0,
+# DDR3 KiB/추론이 그 Host 조건·정책에서 entry 2–10 중 최솟값의 110% 이내인 가장 작은 entry
+# 나머지 조건: L·64-lane @100 MHz, 1,024트랙, 모델 40개, rtl67, DDR3 3,015 MB/s, 12 bit membrane potential,
+# Model-Grouped Offset Assignment, Grouping, 즉시 송신, drop 규칙. 시나리오 6개 × seed 30
+# 키 설명은 template.toml
+
+sim_mode = "run"
+sim_scenarios = ["uniform", "skewed", "synchronized", "intermittent", "skewed_synchronized", "fluctuating"]
+sim_seeds = 30
+sim_seed0 = 0
+sim_warmup_periods = 16
+sim_meas_periods = 64
+model_size = "L"
+model_count = 40
+compute_lanes = 64
+compute_input = "golden"
+compute_spikes_per_cycle = 2
+compute_ctrl_scale = 1.0
+membrane_place = "split"
+membrane_bits = 12
+bram_reserve_tiles = 25.5
+ddr3_bandwidth_mbps = 3015.0
+track_count = 1024
+host_offset = "offset_assignment"
+host_jitter_ms = 0.0
+host_jitter_dist = "none"
+host_jitter_trace = ""
+host_model_group_delay_trace = "hardware/board_test/p316_meas/result/pi_group_pin3_performance_load0.csv.gz"
+host_gather_ms = 0.0
+host_gather_to_max = false
+host_packet_gap_us = 0.0
+host_fixed_delay_us = 0.0
+host_link = "ethernet"
+fpga_drop_busy = true
+cache_policy = "pnu_count"
+cache_entries = 4
+cache_attrs = {}
+scheduler = "grouping"
+scheduler_attrs = {}
+search_key = "track_count"
+search_values = []
+search_step = 16
+tune_attr = ""
+tune_values = []
+tune_conds = []
+
+[sweep]
+host = [
+  {label = "Pi CPU 고정·performance·부하 없음", host_model_group_delay_trace = "hardware/board_test/p316_meas/result/pi_group_pin3_performance_load0.csv.gz"},
+  {label = "Pi CPU 고정·performance·부하 3", host_model_group_delay_trace = "hardware/board_test/p316_meas/result/pi_group_pin3_performance_load3.csv.gz"},
+  {label = "Pi CPU 고정 없음·ondemand·부하 없음", host_model_group_delay_trace = "hardware/board_test/p316_meas/result/pi_group_pin-none_ondemand_load0.csv.gz"},
+]
+policy = [
+  {label = "PNU-Count", cache_policy = "pnu_count"},
+  {label = "PNU-Count RTL", cache_policy = "pnu_rtl"},
+  {label = "Oracle MIN", cache_policy = "oracle_min"},
+]
+cache_entries = [2, 3, 4, 5, 6, 8, 10]

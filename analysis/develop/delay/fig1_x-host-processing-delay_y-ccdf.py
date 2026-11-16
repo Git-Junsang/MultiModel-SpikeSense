@@ -1,7 +1,7 @@
 """보고서용 Host 처리 지연 CCDF(M3): frame 마지막 샘플이 Host에 들어온 시각 → 모델 그룹 mel 계산 완료. 조건 4개
 
 입력: hardware/board_test/p325_meas/result/m3_delay_ccdf.csv (sub1 = Xeon W-2255, Python, 1,024트랙, 조건마다 300 s, 처음 0.5 s 제외).
-원자료는 sub1의 mmss_jobs/p325/m3/m3_<조건>.csv.gz. 모델 하나의 트랙을 한 번에 계산해 같은 모델 안 퍼짐(jitter)은 4조건 모두 0이다.
+원자료는 hardware/board_test/p325_meas/raw/m3/m3_<조건>.csv.gz(git 제외). 모델 하나의 트랙을 한 번에 계산해 같은 모델 안 퍼짐(jitter)은 4조건 모두 0이다.
 개발 서버급 CPU 값이라 최종 Host(라즈베리파이 5급) 근거가 아니다. Mic–Host·Ethernet 구간은 들어 있지 않다(F7은 측정 뒤).
 
     python3 analysis/develop/delay/fig1_x-host-processing-delay_y-ccdf.py

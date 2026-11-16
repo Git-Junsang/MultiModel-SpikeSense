@@ -5,7 +5,7 @@
 CFLAGS_ARCH ?= -mcpu=cortex-a76
 CFLAGS      = -O2 -Wall -Wextra -std=c11 $(CFLAGS_ARCH)
 LDFLAGS     = -static -pthread -lm
-SRC         = main.c mel.c ctl.c setup.c run.c
+SRC         = main.c mel.c ctl.c setup.c run.c mic.c
 
 ifeq ($(origin CC),default)
 CC = aarch64-linux-gnu-gcc-11

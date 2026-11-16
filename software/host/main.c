@@ -4,7 +4,10 @@
  *                   [--margin-us M]
  *   mmss_host run   [--fpga IP] [--tracks N | --map FILE] [--in FILE|-] [--channels C] [--pace] [--loop] [--block B]
  *                   [--seconds S] [--log PREFIX] [--manifest FILE] [--cpu N] [--floor-db F]
+ *   mmss_host run   ... --mic ID[,ID...]   (USB mic 입력. ID = ALSA card 이름, 예: Microphone,Microphone_1. --pace 대신)
+ *                   [--in FILE]            (함께 주면 mic 수 뒤의 트랙은 WAV FILE을 트랙마다 다른 위치에서 반복해 읽는 가상 트랙)
  *   mmss_host stop  [--fpga IP]
+ *   mmss_host resample < 48k.raw > 16k.raw   (시험용: mic 입력과 같은 48 → 16 kHz resampler, S16LE mono)
  *
  * setup: 06 §6 1–6(설계 확인, 모델 image 적재·확인, 설정, PNU 표, SOFT_RESET, RUN = 1)
  * run:   stdout에 판정(track_id, cycle, model_id, decision, score), stderr 끝에 summary 한 줄.
@@ -24,6 +27,8 @@ int main(int argc, char **argv)
         return cmd_run(argc - 1, argv + 1);
     if (argc >= 2 && !strcmp(argv[1], "stop"))
         return cmd_stop(argc - 1, argv + 1);
+    if (argc >= 2 && !strcmp(argv[1], "resample"))
+        return cmd_resample(argc - 1, argv + 1);
     fprintf(stderr, "사용: %s setup|run|stop [옵션]  (main.c 첫머리 참고)\n", argv[0]);
     return 2;
 }

@@ -37,8 +37,9 @@ class Hardware:
     cycle당 spike 입력 수에서 뉴런 그룹, 적재 B, 추론 요청당 연산, BRAM tile을 정한다. 연산 cycle은 P4.1 RTL 식이다"""
 
     def __init__(self, lanes=64, tracks=1024, membrane_place='split', membrane_bits=12, arch=MODEL_SIZES['L'], ctrl_scale=1.0,
-                 spikes_per_cycle=2, models=40, ddr3_bandwidth_mbps=DDR3_READ_BANDWIDTH_MBPS):
+                 spikes_per_cycle=2, models=40, ddr3_bandwidth_mbps=DDR3_READ_BANDWIDTH_MBPS, link='pcie'):
         L = lanes
+        self.link = link                                   # Host–FPGA 링크 지연 표본(part_workload.LINK_FILES)
         self.tracks, self.membrane_bits = tracks, membrane_bits
         self.models, self.ddr3_bandwidth_mbps, self.arch, self.spikes_per_cycle = models, ddr3_bandwidth_mbps, tuple(arch), spikes_per_cycle
         self.ctrl_cycles = CTRL_OVERHEAD_CYC * ctrl_scale

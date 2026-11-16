@@ -5,12 +5,14 @@
   1 setup: 모델 image 40개가 DDR3 창에 그대로 있다. 설정 블록. PNU 표 = 04 §3.1 식(numpy). engine PNURTL 표와의 차이(참고)
   2 run: 2채널 WAV(DCASE fan_id06 정상·이상), 트랙 34개(모델 5에 30개 → datagram 23 + 7개), 실시간 속도(--pace)
     2a 추론 요청 필드: RESET_STATE, seq, model_id, n_expect, 빈 byte, datagram 크기, t_host_us(FPGA 시각, 2^32 되감기 포함)
+       t_host_us 위상 = FPGA 주기 격자에서 모델 offset 뒤 첫 block 경계(mock clock이 200 ppm 빨라도. 1초 시각 맞추기 사이 오차 200 µs)
     2b x = Python 특징 추출(p325_mel_load.mel_db + TrackNorm + snn_int8.quantize_input)을 같은 샘플 구간에 쓴 값.
        채널 1에 2 s 무음(무음 frame은 기준 멈춤), 트랙 33은 map 둘째 칸으로 하한 −60 dB
     2c mock 결과 = snn_int8.forward(checkpoint 양자화, 12 bit 저장)를 받은 x에 쓴 값. 모델 image 적재와 RESET_STATE 확인
     2d 판정 = mock 결과로 Python이 구한 판정(decision 같음, score 차 < 1e-9). 버린 추론 요청이 든 판정 주기는 판정 없음
     2e summary: 보낸 수 = mock이 받은 수, 버린 1개 = lost, 늦춘 1개(45 ms) = late, missing_cycles 1, unmatched 0
   3 stop: counter REQ_IN·RES_OUT
+  4 resample(mic 입력의 48 → 16 kHz) = scipy.signal.resample_poly(x, 1, 3)을 10샘플 늦춘 값(1 차이까지). 장치 열기는 Pi에서만 확인한다
 
     python3 software/host/verify_host.py [--keep]          (저장소 root에서. 빌드: make -C software/host)
 """
@@ -136,7 +138,7 @@ def main():
         ddr, img = open(os.path.join(tmp, 'mock', 'ddr3.bin'), 'rb').read(), open(IMG, 'rb').read()
         check('1a 모델 image 40개 = models.ddr3.bin', all(ddr[m * SLOT:m * SLOT + USED] == img[m * SLOT:m * SLOT + USED] for m in range(40)))
         cfg = [regs['cfg'][str(0x300 + 4 * i)] for i in range(6)]
-        check('1b 설정 블록', cfg == [len(MAP), 40, 0, 0x0200_0000, 32000, 0], str(cfg))
+        check('1b 설정 블록', cfg == [len(MAP), 40, 0, 0x0200_0000, 32000, 250], str(cfg))
         pnu = {int(k): v for k, v in regs['pnu'].items()}
         rd = lambda base, n: [pnu.get(base + 4 * i, -1) for i in range(n)]  # noqa: E731
         nreg = [MAP.count(m) for m in range(40)]
@@ -166,6 +168,11 @@ def main():
         check('2a t_host_us: FPGA 시각 기준, 받은 시각보다 0~32 ms 앞', (lag < 32000).all(), f'최대 {lag.max()} µs')
         check('2a t_host_us: 같은 트랙 이웃 frame 차이 32 ms', np.abs(step - 32000).max() < 300,
               f'차이 {step.min()}~{step.max()} µs, 2^32 되감기 {int((np.diff(d["t_host_us"]) < -2**31).sum())}번')
+        un = (d['t_host_us'].astype(np.int64) - int(d['t_host_us'][0])) % 2**32 + int(d['t_host_us'][0])
+        end0 = (np.arange(40) * 512 + 20) // 40 + 1024      # OFFSET_SAMPLES(m) + FRAME
+        ph = (-(-end0 // 64) * 64 * 1000 // 16) % 32000     # 위상 0에서 시작한 64샘플 block 중 frame 끝 샘플이 든 block의 도착 위상(µs)
+        e = (un % 32000 - ph[mdl] + 16000) % 32000 - 16000
+        check('2a t_host_us 위상 = FPGA 주기 격자의 모델 offset 뒤 첫 block 경계', np.abs(e).max() < 300, f'차이 최대 {np.abs(e).max()} µs')
         x_c = d['x']
         x_r = np.zeros_like(x_c)
         for t in range(len(MAP)):
@@ -215,7 +222,7 @@ def main():
         check('2e summary: sent = mock이 받은 수, lost 1, late 1, deadline_miss 2, missing_cycles 1, unmatched 0, send_err 0',
               sm['sent'] == n and sm['lost'] == 1 and sm['late'] == 1 and sm['deadline_miss'] == 2 and sm['missing_cycles'] == 1
               and sm['unmatched'] == 0 and sm['send_err'] == 0 and sm['judged'] == len(want),
-              f"응답 시간 평균 {sm['response_time_mean_us']:.0f} µs, 최대 {sm['response_time_max_us']:.0f} µs(늦춘 결과), overrun {sm['overrun']:.0f}, "
+              f"response time 평균 {sm['response_time_mean_us']:.0f} µs, 최대 {sm['response_time_max_us']:.0f} µs(늦춘 결과), overrun {sm['overrun']:.0f}, "
               f"시각 맞추기 {sm['sync_ok']:.0f}번")
         with open(os.path.join(tmp, 'run_model_group.csv')) as f:
             nb = sum(1 for _ in f) - 1
@@ -225,6 +232,19 @@ def main():
         cnt = dict(line.split() for line in r_stop.stdout.splitlines())
         check('3 stop: REQ_IN = 받은 수, RES_OUT = 결과 수', r_stop.returncode == 0 and int(cnt['REQ_IN']) == n - 1
               and int(cnt['RES_OUT']) == n - 1 and int(cnt['REQ_DROP']) == 1)
+
+        # ---- 4. resample ----
+        from scipy.signal import resample_poly
+        t48 = np.arange(48000 * 2) / 48000
+        rg = np.random.default_rng(0)
+        x48 = np.clip(np.round(8000 * np.sin(2 * np.pi * 1000 * t48) + 6000 * np.sin(2 * np.pi * 9000 * t48)
+                               + rg.normal(0, 3000, t48.size)), -32768, 32767).astype('<i2')
+        r_rs = subprocess.run(['qemu-aarch64', BIN, 'resample'], input=x48.tobytes(), capture_output=True)
+        y_c = np.frombuffer(r_rs.stdout, '<i2').astype(int)
+        y_s = np.clip(np.round(resample_poly(x48.astype(float), 1, 3)), -32768, 32767).astype(int)
+        d_rs = np.abs(y_c[10:] - y_s[:y_c.size - 10])
+        check('4 resample = resample_poly(x, 1, 3) 10샘플 늦춤 (1 차이까지)', r_rs.returncode == 0 and y_c.size == x48.size // 3
+              and d_rs.max() <= 1, f'{y_c.size}샘플, 최대 차 {d_rs.max()}')
     finally:
         if mock:
             mock.terminate()

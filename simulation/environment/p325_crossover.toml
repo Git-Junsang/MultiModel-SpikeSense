@@ -31,6 +31,7 @@ host_gather_ms = 0.0
 host_gather_to_max = false
 host_packet_gap_us = 0.0
 host_fixed_delay_us = 0.0
+host_link = "pcie"
 fpga_drop_busy = false
 cache_policy = "pnu_count"
 cache_entries = 4

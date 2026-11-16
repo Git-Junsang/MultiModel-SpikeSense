@@ -37,7 +37,7 @@ static long pnu_tables(const char *trace, double J, uint32_t *tau, uint32_t *lut
         char line[4096];
         int col = -1;
         if (!f || !fgets(line, sizeof line, f)) {
-            fprintf(stderr, "묶음 지연 표 %s를 읽을 수 없다\n", trace);
+            fprintf(stderr, "모델 그룹 지연 표 %s를 읽을 수 없다\n", trace);
             if (f)
                 fclose(f);
             return -1;
@@ -119,7 +119,7 @@ int cmd_setup(int argc, char **argv)
 {
     const char *ip = "192.168.10.2", *map = NULL, *models = NULL, *trace = NULL;
     int n_tracks = MAX_TRACKS;
-    double J = 0, margin = 0;
+    double J = 0, margin = MARGIN_US;
     static struct option o[] = {{"fpga", 1, 0, 'f'}, {"tracks", 1, 0, 'n'}, {"map", 1, 0, 'p'}, {"models", 1, 0, 'm'},
                                 {"model-group-delay-trace", 1, 0, 'g'}, {"jitter-us", 1, 0, 'j'}, {"margin-us", 1, 0, 'r'}, {0}};
     for (int ch; (ch = getopt_long(argc, argv, "", o, NULL)) != -1;)

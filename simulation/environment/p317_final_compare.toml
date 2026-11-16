@@ -1,0 +1,63 @@
+# P3.17 E2: 최종 방법 비교를 라즈베리파이 5 Host 측정 조건(P3.16)으로 다시 돌린다(P3.26 E5는 Xeon Host·PCIe 표본)
+# Host 처리 지연 = 라즈베리파이 5에서 잰 모델 그룹 지연, 추론 요청별 지연 없음(none, p317_entry.toml 머리 참고), 링크 지연 = Ethernet 표본.
+# 모든 방법에 같은 (모델, 주기) 지연을 넣는다. 표는 모델당 25.6트랙·Offset Assignment Host에서 쟀으므로 편중(K·SK)과
+# global alignment·unaligned의 실제 Host 처리 지연 모양은 다를 수 있다(P3.26과 같은 한계).
+# 나머지 조건: L·64-lane @100 MHz, 1,024트랙, 모델 40개, rtl67, DDR3 3,015 MB/s, entry 4, 12 bit membrane potential,
+# 즉시 송신, drop 규칙. Deadline = t_host + 32 ms. 시나리오 6개 × seed 30. Dysta Method η = 0.0001, DeepRT Method window 14.9 ms·flush off
+# 키 설명은 template.toml
+
+sim_mode = "run"
+sim_scenarios = ["uniform", "skewed", "synchronized", "intermittent", "skewed_synchronized", "fluctuating"]
+sim_seeds = 30
+sim_seed0 = 0
+sim_warmup_periods = 16
+sim_meas_periods = 64
+model_size = "L"
+model_count = 40
+compute_lanes = 64
+compute_input = "golden"
+compute_spikes_per_cycle = 2
+compute_ctrl_scale = 1.0
+membrane_place = "split"
+membrane_bits = 12
+bram_reserve_tiles = 25.5
+ddr3_bandwidth_mbps = 3015.0
+track_count = 1024
+host_offset = "offset_assignment"
+host_jitter_ms = 0.0
+host_jitter_dist = "none"
+host_jitter_trace = ""
+host_model_group_delay_trace = "hardware/board_test/p316_meas/result/pi_group_pin3_performance_load0.csv.gz"
+host_gather_ms = 0.0
+host_gather_to_max = false
+host_packet_gap_us = 0.0
+host_fixed_delay_us = 0.0
+host_link = "ethernet"
+fpga_drop_busy = true
+cache_policy = "pnu_count"
+cache_entries = 4
+cache_attrs = {}
+scheduler = "grouping"
+scheduler_attrs = {}
+search_key = "track_count"
+search_values = []
+search_step = 16
+tune_attr = ""
+tune_values = []
+tune_conds = []
+
+[sweep]
+method = [
+  {label = "Dysta Method (unaligned, LRU)", host_offset = "unaligned", cache_policy = "lru", scheduler = "dysta_method", scheduler_attrs = {eta = 0.0001}},
+  {label = "DeepRT Method (unaligned, LRU)", host_offset = "unaligned", cache_policy = "lru", scheduler = "deeprt_method", scheduler_attrs = {window = [14900.0, false]}},
+  {label = "global alignment + Grouping (LRU)", host_offset = "global_alignment", cache_policy = "lru", scheduler = "grouping"},
+  {label = "global alignment + Dysta Method (LRU)", host_offset = "global_alignment", cache_policy = "lru", scheduler = "dysta_method", scheduler_attrs = {eta = 0.0001}},
+  {label = "global alignment + DeepRT Method (LRU)", host_offset = "global_alignment", cache_policy = "lru", scheduler = "deeprt_method", scheduler_attrs = {window = [14900.0, false]}},
+  {label = "Model-Grouped Offset Assignment + Grouping + PNU-Count (제안)", host_offset = "offset_assignment", cache_policy = "pnu_count", scheduler = "grouping"},
+  {label = "Model-Grouped Offset Assignment + Dysta Method + PNU-Count", host_offset = "offset_assignment", cache_policy = "pnu_count", scheduler = "dysta_method", scheduler_attrs = {eta = 0.0001}},
+  {label = "Model-Grouped Offset Assignment + DeepRT Method + PNU-Count", host_offset = "offset_assignment", cache_policy = "pnu_count", scheduler = "deeprt_method", scheduler_attrs = {window = [14900.0, false]}},
+]
+host = [
+  {label = "Pi CPU 고정·performance·부하 없음", host_model_group_delay_trace = "hardware/board_test/p316_meas/result/pi_group_pin3_performance_load0.csv.gz"},
+  {label = "Pi CPU 고정·performance·부하 3", host_model_group_delay_trace = "hardware/board_test/p316_meas/result/pi_group_pin3_performance_load3.csv.gz"},
+]

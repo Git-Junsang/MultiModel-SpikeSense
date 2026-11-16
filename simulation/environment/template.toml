@@ -1,6 +1,6 @@
 # 실험 1개 = 환경 파일 1개. 이 파일을 복사해 값을 바꾼다. 키는 빼거나 더할 수 없다(engine이 멈춤).
 #   python3 simulation/engine/engine.py simulation/environment/<파일>.toml --jobs 11
-#   결과: simulation/result/<파일 이름>.csv(점별 요약), <파일 이름>_runs.csv.gz(실행별 원자료). 형식은 design_references/simulation_engine.md §7
+#   결과: simulation/result/<파일 이름>.csv(점별 요약), <파일 이름>_runs.csv.gz(실행별 원자료). 형식은 manual/simulation_engine.md §7
 # 기본값 = 제안 구성(design_references 01 §2): L·64-lane @100 MHz·1,024트랙, Model-Grouped Offset Assignment, Grouping,
 #   PNU-Count entry 4, 남는 BRAM에 12 bit membrane potential, 즉시 송신, drop 규칙,
 #   Host 처리 지연 = Xeon CPU 고정·부하 없음의 모델 그룹 지연 재생 + 추론 요청별 지연 U(0, 0.8 ms), 시나리오 6개 × seed 30
@@ -47,6 +47,7 @@ host_gather_to_max = false # true = 모아 보내기 대기 D를 Host 처리 지
 host_packet_gap_us = 0.0   # 모아 보내기 packet 분할: 같은 모델·주기 모델 그룹을 64 B 추론 요청 23개(MTU 1,500 B)씩 packet으로 나누고
                            # j번째 packet을 j × 간격 µs 늦게 도착시킨다. 0 = 분할 없음
 host_fixed_delay_us = 0.0  # t_host 뒤 송신 전에 모든 추론 요청에 더하는 지연 µs. Response time에 들어간다(mic–Host 지연 참고)
+host_link = "pcie"         # 링크 지연 표본: pcie(P3.3 PCIe 64 B) | ethernet(P3.16 라즈베리파이 5–보드 직결 1 Gb/s UDP, 1,024트랙 즉시 송신)
 fpga_drop_busy = true      # true = 같은 트랙의 이전 추론 요청이 FPGA 연산을 마치기 전에 온 추론 요청을 버린다(06 §4.3 ERR_CODE 5). 버린 추론 요청은 miss이자 drop
 
 # ---- 부품 ----

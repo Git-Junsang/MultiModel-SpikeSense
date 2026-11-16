@@ -13,6 +13,7 @@
 #define N_MODELS    40
 #define MAX_TRACKS  1024
 #define PERIOD_US   32000         /* 주기 = deadline */
+#define MARGIN_US   250           /* LATE 여유 = 결과 링크 지연 최대 126 µs(P3.16) + 시각 오차 예산 100 µs(06 §5), 올림 */
 #define REQ_B       64
 #define RES_B       32
 #define REQ_PER_DG  23            /* datagram 하나에 추론 요청 최대 23개 (MTU 1,500 B) */
@@ -67,6 +68,21 @@ int  clock_diff(ctl_t *c, int tries, uint32_t *diff, uint32_t *rtt_us);  /* FPGA
 /* 트랙 → 모델 대응. map 파일 한 줄 = 트랙 하나(줄 번호 = track_id): model_id [dB 하한]. 없으면 track % 40.
  * 둘째 칸이 있으면 floor_db[트랙]에 쓴다(floor_db가 NULL이면 무시) */
 int  load_map(const char *path, int n_tracks, uint8_t *model, double *floor_db);
+
+/* mic.c: USB mic 입력(ALSA 커널 interface). 48 kHz mono, period 192 frame = 16 kHz 64샘플 block(4 ms) */
+#define MIC_RATE    48000
+#define MIC_PERIOD  192
+#define MIC_PERIODS 4             /* buffer 16 ms. P3.16 §3.7: buffer 8 ms 이상이면 부하에서도 xrun 0 */
+#define MIC_TAPS    61            /* resampler FIR = scipy resample_poly(x, 1, 3) 기본값(Kaiser β 5) */
+#define MIC_BLOCK   (MIC_PERIOD / 3)
+#define MAX_MIC     8
+typedef struct { int fd; uint64_t xrun; float hist[MIC_TAPS - 1]; } mic_t;
+void mic_fir_init(void);
+void mic_resample(float *hist, const int16_t *x48, int16_t *y16);   /* 48 kHz 192샘플 → 16 kHz 64샘플 */
+int  mic_open(mic_t *m, const char *id);                            /* id = ALSA card 이름 또는 번호 */
+int  mic_start(mic_t *m);                                           /* PREPARE, START */
+int  mic_read(mic_t *m, int16_t *y16, uint64_t *t_arr_ns);          /* 0 성공, −1 xrun(다시 시작), −2 오류 */
+int  cmd_resample(int argc, char **argv);
 
 int  cmd_setup(int argc, char **argv);
 int  cmd_run(int argc, char **argv);

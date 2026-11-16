@@ -7,8 +7,13 @@ import numpy as np
 from part_hardware import PERIOD_US, ROOT
 
 PCIE_SAMPLE_DIR = os.path.join(ROOT, 'hardware', 'board_test', 'p3_meas', 'result', 'raw', 'pcie')
-LINK_IN_FILE = 'p3_h2c_64_p62.5.txt'   # 링크 지연 표본: 64 B H2C, 62.5 µs 간격(16 kHz 추론 요청률)
-LINK_OUT_FILE = 'p3_c2h_64.txt'        # 64 B C2H, 연속
+ETH_SAMPLE_DIR = os.path.join(ROOT, 'hardware', 'board_test', 'p316_meas', 'result')
+LINK_FILES = {                         # 링크 지연 표본 ns (입력 Host → FPGA, 결과 FPGA → Host). 환경 키 host_link
+    'pcie': (os.path.join(PCIE_SAMPLE_DIR, 'p3_h2c_64_p62.5.txt'),     # P3.3 64 B H2C, 62.5 µs 간격(16 kHz 추론 요청률)
+             os.path.join(PCIE_SAMPLE_DIR, 'p3_c2h_64.txt')),          # 64 B C2H, 연속
+    'ethernet': (os.path.join(ETH_SAMPLE_DIR, 'eth_up_ns.txt'),        # P3.16 라즈베리파이 5–보드 직결 1 Gb/s, 1,024트랙 즉시 송신.
+                 os.path.join(ETH_SAMPLE_DIR, 'eth_down_ns.txt')),     # 추론 요청마다 잰 값이라 datagram 안 위치가 들어 있다
+}
 PACKET_REQUESTS = 23                   # MTU 1,500 B packet 하나에 들어가는 64 B 추론 요청 수
 
 SCENARIOS = {                           # 추론 요청 시나리오. Workload.make 인자로 넘긴다
@@ -21,9 +26,9 @@ SCENARIOS = {                           # 추론 요청 시나리오. Workload.m
 }
 
 
-def link_samples(name):
-    """PCIe 64 B 링크 지연 실측 표본 µs (P3.3)"""
-    return np.loadtxt(os.path.join(PCIE_SAMPLE_DIR, name)) / 1000.0
+def link_samples(link, i):
+    """링크 지연 실측 표본 µs. link = LINK_FILES 키, i = 0 입력·1 결과"""
+    return np.loadtxt(LINK_FILES[link][i]) / 1000.0
 
 
 def zipf_share(M):
@@ -84,8 +89,8 @@ class Workload:
         model = np.repeat(tm, K)
         trk = np.repeat(np.arange(n_tracks), K)
         n = t_host.size
-        di = rng.choice(link_samples(LINK_IN_FILE), n) if d_in is None else np.full(n, float(d_in))
-        do = rng.choice(link_samples(LINK_OUT_FILE), n) if d_out is None else np.full(n, float(d_out))
+        di = rng.choice(link_samples(hw.link, 0), n) if d_in is None else np.full(n, float(d_in))
+        do = rng.choice(link_samples(hw.link, 1), n) if d_out is None else np.full(n, float(d_out))
         if jit is None and (jitter is not None or model_group_delay is not None):
             jit = jitter.draw(seed, n_tracks, K) if jitter is not None else np.zeros((n_tracks, K))
             if model_group_delay is not None:                          # 모델 그룹 지연을 더한다. Host는 트랙의 frame을 차례로 처리한다

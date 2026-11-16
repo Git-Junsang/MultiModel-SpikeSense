@@ -131,7 +131,7 @@ class OffsetOnly(Cache):
 class PNU(OffsetOnly):
     """PNU-Count: 모델 그룹마다 지금 주기에 남은 추론 요청 수와 nominal offset(또는 첫 도착) 뒤 경과 시간으로 다음 사용을 예측한다.
     예상 추론 요청 수는 Host가 packet에 싣는 값이고 받은 수는 FPGA가 센다. 미래 도착·난수는 읽지 않는다"""
-    name = 'PNU-count'
+    name = 'PNU-Count'
     count = True                     # False면 PNU-Timeout(예상 추론 요청 수를 모른다)
     pred = 'exact'                   # δ 계산: exact(조건부 기대값) | lut(bin_us 칸 × 남은 수 6칸 표)
     bin_us = 200.0
@@ -234,13 +234,13 @@ class PNU(OffsetOnly):
 
 class PNUTimeout(PNU):
     """PNU-Timeout: 예상 추론 요청 수 없이 nominal offset 뒤 τ 동안은 추론 요청이 더 온다고 본다(r = 1)"""
-    name, count = 'PNU-timeout', False
+    name, count = 'PNU-Timeout', False
 
 
 class PNURTL(PNU):
     """next_use_predictor.v(P4.3)와 같은 PNU-Count. 시각은 µs 정수로 내리고 δ를 LUT_BIN_US 칸 표로 읽는다. 모델 그룹마다
     가장 최근 주기 하나의 (예상 수, 도착 수, 첫 도착)만 둔다. 추론 요청의 주기는 RTL처럼 도착 시각과 t_host로 정한다"""
-    name, pred = 'PNU-count RTL', 'rtl'
+    name, pred = 'PNU-Count RTL', 'rtl'
     LUT_BIN_US, LUT_BINS = 256, 128
     log = None                       # list면 도착을 (도착 µs, 모델 그룹, t_host µs, 예상 수)로 남긴다
 

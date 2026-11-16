@@ -30,7 +30,7 @@ from part_jitter import Jitter, TraceJitter  # noqa: E402
 from part_result import read_csv, write_csv  # noqa: E402
 from part_scheduler import DeepRTMethod, DystaMethod, Grouping  # noqa: E402
 from part_simulator import Queue, belady, simulate  # noqa: E402
-from part_workload import Workload  # noqa: E402
+from part_workload import Workload, link_samples  # noqa: E402
 
 P, T0, W = PERIOD_US, DMA_SETUP_US, Workload.make
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -454,6 +454,14 @@ def selftest_p326():
     r9 = engine.Adversarial.one((0, 'small', e9, 0))
     check('9 adversarial evaluations · worst = max of tested', abs(r9['evals'] - 62)
           + abs(r9['adv_send_max_ms'] - max(t['send_max_ms'] for t in r9['tested'])), 0.0, 0)
+    # 10. Ethernet 링크 표본(host_link = "ethernet", P3.16): 입력·결과 지연을 그 표본에서 뽑고, Dysta Method 여유 = 결과 최대 + 20 µs
+    up, down = link_samples('ethernet', 0), link_samples('ethernet', 1)
+    s10 = engine.Setup(template(host_link='ethernet', scheduler='dysta_method'))
+    w10 = W(s10.hw, 30, warmup=0, meas=4, offset=0.0, track_model=[0] * 30)
+    d10 = w10.t_arr - w10.t_ready
+    check('10a Ethernet link delays within samples', float(up.min() <= d10.min() and d10.max() <= up.max()
+                                                           and down.min() <= w10.d_out.min() and w10.d_out.max() <= down.max()), 1.0, 0)
+    check('10b Dysta Method margin = Ethernet result max + 20 µs', s10.scheduler.margin, down.max() + 20.0, 1e-9)
     return check.ok
 
 

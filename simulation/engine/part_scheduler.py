@@ -2,7 +2,7 @@
 import math
 
 from part_hardware import PERIOD_US, Part
-from part_workload import LINK_OUT_FILE, link_samples
+from part_workload import link_samples
 
 
 class Scheduler(Part):
@@ -38,7 +38,7 @@ class DystaMethod(Scheduler):
     def __init__(self, hw, **attrs):
         super().__init__(hw, **attrs)
         if self.margin is None:
-            self.margin = link_samples(LINK_OUT_FILE).max() + 20.0
+            self.margin = link_samples(hw.link, 1).max() + 20.0
 
     def pick(self, queue, T, cache, busy_until):
         t_host = queue.wl.t_host

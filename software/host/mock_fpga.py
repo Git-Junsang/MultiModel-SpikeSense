@@ -4,7 +4,8 @@
 UDP <ip>:5000(추론 요청)과 5001(제어 packet)을 받는다. 주소 공간은 정보·상태·제어·시각·설정·counter·오류·PNU 표·DDR3 창만 흉내 낸다.
 결과는 snn_int8과 같은 정수 연산으로 바로 계산한다(membrane potential 12 bit 저장, RESET_STATE면 0부터).
 weight는 Host가 DDR3 창에 적재한 slot을 02 §6 배치로 읽는다. 그래서 모델 image 적재가 틀리면 결과도 틀린다.
-시각은 실제 FPGA가 아니다. NOW_US는 시작 5초 뒤 2^32에서 되감기게 둔다(Host의 32 bit 시각 처리 확인).
+시각은 실제 FPGA가 아니다. NOW_US는 시작 5초 뒤 2^32에서 되감기게 두고, Host clock보다 200 ppm 빠르게 센다
+(Host의 32 bit 시각 처리와 --pace의 clock 속도 보정 확인).
   --drop TRACK:SEQ        그 추론 요청을 결과 없이 버린다(state도 바꾸지 않는다)
   --delay TRACK:SEQ:MS    그 결과를 MS ms 늦게 보낸다
 RUN이 1 → 0이 되면 받은 추론 요청·결과(requests.npz), 설정·PNU 표·counter(regs.json), DDR3 내용(ddr3.bin)을 --out에 쓴다.
@@ -74,7 +75,7 @@ class Mock:
         self.cs.bind((a.ip, 5001))
 
     def raw_us(self):
-        return time.monotonic_ns() // 1000
+        return time.monotonic_ns() * 10002 // 10_000_000   # Host보다 200 ppm 빠른 clock
 
     def now(self):
         return (self.raw_us() + self.base) & 0xFFFF_FFFF
